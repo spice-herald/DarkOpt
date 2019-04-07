@@ -1,4 +1,4 @@
-PD2 Simulation 
+## PD2 Simulation 
 
 A simulation for PD2 to obtain energy and position resolution. 
 
