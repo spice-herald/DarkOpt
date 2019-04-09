@@ -1,8 +1,10 @@
 from tes import TES
 from QET import QET
+from electronics import Electronics
 import numpy as np
 import sys
 
+k_b = 1.38e-3 # J/K
 class Detector:
 
     def __init__(self, name, fridge, absorber, n_channel, n_TES=1185,
@@ -34,6 +36,8 @@ class Detector:
         self._N_TES = n_TES
         self._w_rail_main = w_rail_main
         self._w_rail_qet = w_rail_qet
+        self._electronics = Electronics(fridge, 5e-3, 2e-3, 75e-9, 25e-9, 6e-12)
+        self._sigma_energy = 0
 
         resistivity = 4.0 * 35e-9  # Resistivity of balzers tungsten [Ohm m]
 
@@ -42,7 +46,7 @@ class Detector:
         else:
             n_fin = 4
 
-        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity)
+        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, 0.32e-12, 1.7e-14, 5, -69) # TODO Last parameter is eq temperature
         self._QET = QET(n_fin, l_fin, h_fin, l_overlap, self._TES)
 
         self._QET.set_qpabsb_eff(l_fin, h_fin, l_overlap, l_TES)
@@ -126,14 +130,29 @@ class Detector:
         self._nkpb = 4
 
         # ----------- Electronics ----------
-        # TODO Get total inductance by interacting with electronics class
+        self._total_L = self._electronics.get_l_squid() + self._electronics.get_l_p() + self._TES.get_L()
 
+    def get_energy_resolution(self, t_bath, w_eff, n=4):
+        """
+            
+        :param g: Thermal Conductance
+        :param t_bath: Bath Temperature
+        :param w_eff: Sensor bandwidth, 1/t_eff
+        :param n: Thermal bath coupling exponent, 4 from thesis. 
+        :return: Energy resolution, sigma_e. 
+        """
+        g = self._TES.get_G()
+        t_o = self._TES.get_To()
+        t_c = self._TES.get_TC()
 
+        f_tfn = ((t_bath / t_o) ** (n + 1) + 1)/2 # TODO GET RIGHT FORM!
+        front_factor = 4 * k_b * g * (t_c/self._eEabsb) ** 2
+        p = np.sqrt((n * f_tfn) / (1 - (t_bath/t_o) ** n))
+        res = np.sqrt(front_factor * f_tfn * (w_eff * p + self._w_collect) / (w_eff * p * self._w_collect))
+        self._sigma_energy = res
+        return res
 
-        def get_energy_resolution(self):
-            pass
-
-        def get_position_resolution(self):
-            pass
+    def get_position_resolution(self):
+        pass
 
 

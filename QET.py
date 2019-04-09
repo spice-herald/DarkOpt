@@ -22,8 +22,6 @@ class QET:
         self._afin_empty = n_fin * l_fin * wempty + 2 * TES.get_L() * wempty_tes + self._nhole * ahole
         self._a_fin = np.pi * (self._l_fin ** 2) + 2 * self._l_fin * TES.get_L() - self._afin_empty
 
-        # TODO ASK ABOUT LINES 193-197 QUASIPARTICLE DIFFUSIVE STUFF!
-
     def set_qpabsb_eff(self, l_fin, h_fin, loverlap, l_TES, eff_absb=1.22e-4):
         ci = 2 * l_TES
         ri = ci / (2 * np.pi)
@@ -91,9 +89,6 @@ class QET:
 
     def get_afin_empty(self):
         return self._afin_empty
-
-    def get_a_fin(self):
-        return self._a_fin
 
     def get_a_fin(self):
         return self._a_fin

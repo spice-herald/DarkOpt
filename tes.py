@@ -1,6 +1,6 @@
 class TES:
 
-    def __init__(self, t, l, w, foverlap, n_fin, resistivity, fOp=0.45, L=0):
+    def __init__(self, t, l, w, foverlap, n_fin, resistivity, sigma, V, n, T_eq, T_c=40e-3, fOp=0.45, L=0):
         """
         TES Class
         
@@ -21,6 +21,11 @@ class TES:
         self._fOp = fOp
         self._volume_TES = self._t * self._l * self._w
         self._L = L
+        self._K = sigma * V # P_bath vs T, eq 3.1 in thesis.
+        self._n = n # used to define G, refer to eqs 3.1 and 3.3
+        self._T_eq = T_eq # equilibrium temperature
+        self._G = n * self._K * (T_eq ** (n-1))
+        self._T_c = T_c # Critical temperature, default 40mK from MaterialProperties.m line 427
 
         # Volume of the W/Al overlap
         self._vol_WAl_overlap = 10e-6 * 2 * self._l * self._foverlap_width * self._t
@@ -66,3 +71,12 @@ class TES:
 
     def get_R(self):
         return self._res
+
+    def get_G(self):
+        return self._G
+
+    def get_TC(self):
+        return self._T_c
+
+    def get_To(self):
+        return self._T_eq

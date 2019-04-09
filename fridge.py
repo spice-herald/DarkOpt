@@ -34,4 +34,3 @@ class Fridge:
 
     def get_parasitic(self):
         return self._parasitic
-    
