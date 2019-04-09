@@ -1,6 +1,7 @@
 from tes import TES
 from QET import QET
 import numpy as np
+import sys
 
 class Detector:
 
@@ -34,11 +35,17 @@ class Detector:
         self._w_rail_main = w_rail_main
         self._w_rail_qet = w_rail_qet
 
-        resistivity = 10
-        n_fin = 6
+        resistivity = 4.0 * 35e-9  # Resistivity of balzers tungsten [Ohm m]
+
+        if l_fin > 100e-6:
+            n_fin = 6
+        else:
+            n_fin = 4
 
         self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity)
         self._QET = QET(n_fin, l_fin, h_fin, l_overlap, self._TES)
+
+        self._QET.set_qpabsb_eff(l_fin, h_fin, l_overlap, l_TES)
 
         # -------------- TES -------------
         # Resistance of N_TES sensors in parallel.
@@ -87,8 +94,13 @@ class Detector:
         self._ePcollect = self._SA_active / (self._SA_active + self._SA_passive)
 
         # ------------ Ballistic Phonon Absorption Time --------------
-        # TODO Get phonon absorption time tau for PD2 by running matlab script. No need to simulate from iZIP again
-        self._t_pabsb = 100;
+        if self._absorber.get_name() == 'Ge':
+            self._t_pabsb = 750e-6
+        elif self._absorber.get_name() == 'Si':
+            self._t_pabsb = 175e-6
+        else:
+            print("Incorrect Material. must be Ge or Si")
+            sys.exit(1)
 
         self._w_collect = 1/self._t_pabsb
 
@@ -106,8 +118,7 @@ class Detector:
         self._e156 = 100 # TODO Get iZIP combined efficiency.
 
         # Total collection efficiency:
-        self._eEabsb = self._e156 * self._ePcollect # TODO QET.ePQP implement and get QP transport efficiency in QET
-                                                    # TODO by getting explanation of lines 193-197.
+        self._eEabsb = self._e156 * self._ePcollect  * self._QET.get_eqpabsb() * self._QET.get_epqp()
 
         # ------------ Thermal Conductance to Bath ---------------
         self._kpb = 1.55e-4
@@ -119,13 +130,10 @@ class Detector:
 
 
 
-    def get_energy_resolution(self):
-        pass
+        def get_energy_resolution(self):
+            pass
 
-    def get_position_resolution(self):
-        pass
-
-
-
+        def get_position_resolution(self):
+            pass
 
 

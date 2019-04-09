@@ -3,7 +3,7 @@ import numpy as np
 
 class Absorber:
 
-    def __init__(self, h, r, w_safety, tc, W, rho):
+    def __init__(self, name, h, r, w_safety, tc, W, rho):
         """
         Absorber Medium of Detector. Assumed in shape of cylinder. 
         
@@ -14,6 +14,7 @@ class Absorber:
         :param W: Phonon Coupling Constant [Some intense SI unit combo which I forgot] 
         :param rho: Density [kg m^-3]
         """
+        self._name = name
         self._h = h
         self._r = r
         self._w_safety = w_safety
@@ -26,6 +27,9 @@ class Absorber:
         self._SA = 2 * (self._SA_face + np.pi * self._r * self._h)
         self._m = self._rho * self._volume
         pass
+
+    def get_name(self):
+        return self._name
 
     def get_H(self):
         return self._h
