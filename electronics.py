@@ -1,7 +1,7 @@
 class Electronics:
 
-    def __init__(self, fridge, R_S, R_P, l_squid, l_p, si_squid):
-
+    def __init__(self, fridge, R_S=5e-3, R_P=2e-3, l_squid=75e-9, l_p=25e-9, si_squid=6e-12):
+        """Default values from eSNOLAB.m"""
         self._fridge = fridge
 
         # -- Shunt Resistor
@@ -12,6 +12,9 @@ class Electronics:
         self._R_P = R_P
         self._T_P = fridge.get_TMC()
         # self._T_PT = self._R_P * fridge.
+
+        # -- Total Load Resistance
+        self._R_L = self._R_P + self._R_S
 
         # -- Inductances
         self._l_squid = l_squid
@@ -26,3 +29,6 @@ class Electronics:
 
     def get_l_p(self):
         return self._l_p
+
+    def get_RL(self):
+        return self._R_L

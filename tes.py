@@ -1,6 +1,7 @@
+import numpy as np
 class TES:
 
-    def __init__(self, t, l, w, foverlap, n_fin, resistivity, sigma, V, n, T_eq, T_c=40e-3, fOp=0.45, L=0):
+    def __init__(self, t, l, w, foverlap, n_fin, resistivity, sigma, V, n, T_eq, T_c=40e-3, fOp=0.45, L=0, Qp=0):
         """
         TES Class
         
@@ -21,11 +22,20 @@ class TES:
         self._fOp = fOp
         self._volume_TES = self._t * self._l * self._w
         self._L = L
-        self._K = sigma * V # P_bath vs T, eq 3.1 in thesis.
-        self._n = n # used to define G, refer to eqs 3.1 and 3.3
-        self._T_eq = T_eq # equilibrium temperature
+        self._K = sigma * V  # P_bath vs T, eq 3.1 in thesis.
+        self._n = n  # used to define G, refer to eqs 3.1 and 3.3
+        self._T_eq = T_eq  # equilibrium temperature
+
+        # Phonon electron thermal coupling
         self._G = n * self._K * (T_eq ** (n-1))
-        self._T_c = T_c # Critical temperature, default 40mK from MaterialProperties.m line 427
+
+        # Critical temperature, default 40mK from MaterialProperties.m line 427
+        self._T_c = T_c
+        self._Qp = Qp  # Parasitic heating
+
+        wTc_1090 = 1.4e-3 * self._T_c / 68e-3  # [K], line 65-66 Tc_ResPt.m
+        self._wTc = wTc_1090 / 2 / np.log(3)  # Same as above, putting this in due to SimpleEquilibrium line 51
+
 
         # Volume of the W/Al overlap
         self._vol_WAl_overlap = 10e-6 * 2 * self._l * self._foverlap_width * self._t
@@ -54,6 +64,30 @@ class TES:
         # Operating Resistance
         self._res_o = self._res * self._fOp
 
+        # ------ Parameters to be set later when simulating equilibrium -----
+
+        # Alpha
+        self._alpha = 0
+        # Beta
+        self._beta = 0
+        # Heat Capacity
+        self._C = 0
+        # Power (relies on fridge information so not set in here)
+        self._Po = 0
+        # Loop Gain
+        self._LG = 0
+        # Equilibrium Current
+        self._Io = 0
+        # Bias Voltage
+        self._Vbias = 0
+        # Inverse naive bandwidth T_0
+        self._tau0 = 0
+        # Inverse effective bandwidth T_etf
+        self._tau_etf = 0
+        # Effective Bandwidth
+        self._w_etf = 0
+
+
     def get_T(self):
         return self._t
 
@@ -72,11 +106,63 @@ class TES:
     def get_R(self):
         return self._res
 
+    def get_Ro(self):
+        return self._res_o
+
     def get_G(self):
         return self._G
 
-    def get_TC(self):
+    def get_Tc(self):
         return self._T_c
 
     def get_To(self):
         return self._T_eq
+
+    def get_fOp(self):
+        return self._fOp
+
+    def set_To(self, T):
+        self._T_eq = T
+
+    def set_Qp(self, q):
+        self._Qp = q
+
+    def get_wTc(self):
+        return self._wTc
+
+    def get_n(self):
+        return self._n
+
+    def get_K(self):
+        """K = Sigma * Volume defined from thesis eq 3.1 page 18"""
+        return self._K
+
+    def set_alpha(self, a):
+        self._alpha = a
+
+    def set_beta(self, b):
+        self._beta = b
+
+    def set_Po(self, p):
+        self._Po = p
+
+    def set_LG(self, lg):
+        self._LG = lg
+
+    def set_Io(self, I):
+        self._Io = I
+
+    def set_Vbias(self, V):
+        self._Vbias = V
+
+    def set_C(self, c):
+        self._C = c
+
+    def set_tau0(self, t):
+        self._tau0 = t
+
+    def set_tau_etf(self, t):
+        self._tau_etf = t
+
+    def set_w_etf(self, w):
+        self._w_etf = w

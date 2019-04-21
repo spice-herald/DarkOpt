@@ -119,7 +119,7 @@ class Detector:
         # 6) ?
 
         # Let's combine 1), 5), and 6) together and assume that it is the same as the measured/derived value from iZIP4
-        self._e156 = 100 # TODO Get iZIP combined efficiency.
+        self._e156 = 0.2 # TODO Confirm PD2 efficiency is 0.2
 
         # Total collection efficiency:
         self._eEabsb = self._e156 * self._ePcollect  * self._QET.get_eqpabsb() * self._QET.get_epqp()
@@ -156,3 +156,14 @@ class Detector:
         pass
 
 
+    def get_TES(self):
+        return self._TES
+
+    def get_QET(self):
+        return self._QET
+
+    def get_fridge(self):
+        return self._fridge
+
+    def get_electronics(self):
+        return self._electronics
