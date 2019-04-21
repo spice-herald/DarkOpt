@@ -1,11 +1,8 @@
 from simple_equilibrium import simple_equilibrium
 import numpy as np
+# """Final Result: sigPt_of = sqrt(Det.nP)*sigPt_of_1chan; %[eV]"""
 
-def simulate_noise(detector):
-    """Final Result: sigPt_of = sqrt(Det.nP)*sigPt_of_1chan; %[eV]"""
-
-    # Put all relevant TES parameters at equilibrium value.
-    simple_equilibrium(detector)
+def dynamical_response(detector):
 
     n_omega = 1e5
     omega = np.logspace(-1, 5.5, n_omega) * 2 * np.pi
@@ -76,8 +73,12 @@ def simulate_noise(detector):
     TES.set_tau_etf_simp(tau_etf_simp)
     TES.set_w_etf_simp(1/tau_etf_simp)
 
-    # --------------------------------------------------------------- 
+    # ---------------------------------------------------------------
 
+def simulate_noise(detector):
+    # Put all relevant TES parameters at equilibrium value.
+    simple_equilibrium(detector)
+    dynamical_response(detector)
 
 
 
