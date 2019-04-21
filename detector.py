@@ -66,7 +66,7 @@ class Detector:
         a_cell = self._absorber.get_pattern_SA() / (n_channel * n_TES) # 1/2 channels on each side
         self._l_cell = np.sqrt(a_cell)
 
-        y_cell = 2 * QET.get_l_fin() + TES.get_L()
+        y_cell = 2 * self._QET.get_l_fin() + self._TES.get_L()
 
         if self._l_cell > y_cell:
             # Design is not close packed. Get passive Al/QET
@@ -119,10 +119,10 @@ class Detector:
         # 6) ?
 
         # Let's combine 1), 5), and 6) together and assume that it is the same as the measured/derived value from iZIP4
-        self._e156 = 0.2 # TODO Confirm PD2 efficiency is 0.2
+        self._e156 = 0.2  # TODO Confirm PD2 efficiency is 0.2
 
         # Total collection efficiency:
-        self._eEabsb = self._e156 * self._ePcollect  * self._QET.get_eqpabsb() * self._QET.get_epqp()
+        self._eEabsb = self._e156 * self._ePcollect * self._QET.get_eqpabsb() * self._QET.get_epqp()
 
         # ------------ Thermal Conductance to Bath ---------------
         self._kpb = 1.55e-4
@@ -139,6 +139,9 @@ class Detector:
         self._response_z_tes = 0
         self._response_z_tot = 0
         self._response_dIdV = 0
+        self._response_dIdV0 = 0
+        self._response_dIdV_step = 0
+        self._response_t = 0
 
 
     def get_energy_resolution(self, t_bath, w_eff, n=4):
@@ -200,3 +203,12 @@ class Detector:
 
     def set_dIdV(self, val):
         self._response_dIdV = val
+
+    def set_dIdV0(self, val):
+        self._response_dIdV0 = val
+
+    def set_dIdV_step(self, val):
+        self._response_dIdV_step = val
+
+    def set_t(self, val):
+        self._response_t = val

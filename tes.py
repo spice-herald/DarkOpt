@@ -99,6 +99,12 @@ class TES:
         # ETF time constant under assumption of no pole mixing
         self._tau_etf_simp = 0
         self._w_etf_simp = 0
+        # Pole frequencies taking into account pole mixing
+        self._wp_p = 0
+        self._wp_m = 0
+        # Pole frequency time constants
+        self._taup_p = 0
+        self._taup_m = 0
 
 
     def get_T(self):
@@ -245,3 +251,27 @@ class TES:
 
     def get_w_etf_simp(self):
         return self._w_etf_simp
+
+    def set_wpp(self, val):
+        self._wp_p = val
+
+    def get_wpp(self):
+        return self._wp_p
+
+    def set_wpm(self, val):
+        self._wp_m = val
+
+    def get_wpm(self):
+        return self._wp_m
+
+    def set_taupp(self, val):
+        self._taup_p = val
+
+    def get_taupp(self):
+        return self._taup_p
+
+    def set_taupm(self, val):
+        self._taup_m = val
+
+    def get_taupm(self):
+        return self._taup_m

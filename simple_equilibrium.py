@@ -18,9 +18,9 @@ def simple_equilibrium(detector, beta=0, Qp=0):
 
     wTc = _TES.get_wTc()
     Tc = _TES.get_Tc()
-    To = _TES.get_To()
 
     _TES.set_To(zeta_o * wTc + Tc) # K
+    To = _TES.get_To()
 
     # ----- Alpha/Beta at Transition Point -----
 
@@ -52,6 +52,7 @@ def simple_equilibrium(detector, beta=0, Qp=0):
 
     ro = _TES.get_Ro()
     Io = np.sqrt(po/ro)
+
     _TES.set_Io(Io)
 
     # Bias Voltage
