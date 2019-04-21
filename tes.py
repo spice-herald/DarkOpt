@@ -87,6 +87,19 @@ class TES:
         # Effective Bandwidth
         self._w_etf = 0
 
+        # ------ Parameters set when simulating noise -----
+
+        # Exponential rise time for current biased circuit
+        self._tau_I = 0
+        # Bandwidth associated with current rise time.
+        self._w_I = 0
+        # L/R time constant under assumption of no pole mixing
+        self._tau_el = 0
+        self._w_el = 0
+        # ETF time constant under assumption of no pole mixing
+        self._tau_etf_simp = 0
+        self._w_etf_simp = 0
+
 
     def get_T(self):
         return self._t
@@ -140,29 +153,95 @@ class TES:
     def set_alpha(self, a):
         self._alpha = a
 
+    def get_alpha(self):
+        return self._alpha
+
     def set_beta(self, b):
         self._beta = b
+
+    def get_beta(self):
+        return self._beta
 
     def set_Po(self, p):
         self._Po = p
 
+    def get_Po(self):
+        return self._Po
+
     def set_LG(self, lg):
         self._LG = lg
+
+    def get_LG(self):
+        return self._LG
 
     def set_Io(self, I):
         self._Io = I
 
+    def get_Io(self):
+        return self._Io
+
     def set_Vbias(self, V):
         self._Vbias = V
+
+    def get_Vbias(self):
+        return self._Vbias
 
     def set_C(self, c):
         self._C = c
 
+    def get_C(self):
+        return self._C
+
     def set_tau0(self, t):
         self._tau0 = t
+
+    def get_tau0(self):
+        return self._tau0
 
     def set_tau_etf(self, t):
         self._tau_etf = t
 
+    def get_tau_etf(self):
+        return self._tau_etf
+
     def set_w_etf(self, w):
         self._w_etf = w
+
+    def get_w_etf(self):
+        return self._w_etf
+
+    def set_tau_I(self, val):
+        self._tau_I = val
+
+    def get_tau_I(self):
+        return self._tau_I
+
+    def set_w_I(self, val):
+        self._w_I = val
+
+    def get_w_I(self):
+        return self._w_I
+
+    def set_tau_el(self, val):
+        self._tau_el = val
+
+    def get_tau_el(self):
+        return self._tau_el
+
+    def set_w_el(self, val):
+        self._w_el = val
+
+    def get_w_el(self):
+        return self._w_el
+
+    def set_tau_etf_simp(self, val):
+        self._tau_etf_simp = val
+
+    def get_tau_etf_simp(self):
+        return self._tau_etf_simp
+
+    def set_w_etf_simp(self, val):
+        self._w_etf_simp = val
+
+    def get_w_etf_simp(self):
+        return self._w_etf_simp

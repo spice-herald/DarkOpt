@@ -19,6 +19,7 @@ class Electronics:
         # -- Inductances
         self._l_squid = l_squid
         self._l_p = l_p
+        self._lt = l_squid + l_p
 
         # -- Current noise from squid A/√Hz
         self._si_squid = si_squid
@@ -29,6 +30,9 @@ class Electronics:
 
     def get_l_p(self):
         return self._l_p
+
+    def get_lt(self):
+        return self._lt
 
     def get_RL(self):
         return self._R_L

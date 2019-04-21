@@ -132,6 +132,15 @@ class Detector:
         # ----------- Electronics ----------
         self._total_L = self._electronics.get_l_squid() + self._electronics.get_l_p() + self._TES.get_L()
 
+        # ---------- Response Variables to Be Set in Simulation of Noise ---------------
+        self._response_omega = 0
+        self._response_dPtdE = 0
+        self._response_dIdP = 0
+        self._response_z_tes = 0
+        self._response_z_tot = 0
+        self._response_dIdV = 0
+
+
     def get_energy_resolution(self, t_bath, w_eff, n=4):
         """
             
@@ -165,5 +174,29 @@ class Detector:
     def get_fridge(self):
         return self._fridge
 
+    def get_eEabsb(self):
+        return self._eEabsb
+
+    def get_collection_bandwidth(self):
+        return self._w_collect
+
     def get_electronics(self):
         return self._electronics
+
+    def set_response_omega(self, omega):
+        self._response_omega = omega
+
+    def set_dPtdE(self, val):
+        self._response_dPtdE = val
+
+    def set_dIdP(self, val):
+        self._response_dIdP = val
+
+    def set_ztes(self, val):
+        self._response_z_tes = val
+
+    def set_ztot(self, val):
+        self._response_z_tot = val
+
+    def set_dIdV(self, val):
+        self._response_dIdV = val
