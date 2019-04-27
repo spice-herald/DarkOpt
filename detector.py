@@ -46,7 +46,8 @@ class Detector:
         else:
             n_fin = 4
 
-        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, 0.32e-12, 1.7e-14, 5, -69) # TODO Last parameter is eq temperature
+        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, 0.32e9, 1.7e-14, 5, -69) # TODO Last parameter is eq temperature,
+        # TODO sigma really 0.32?
         self._QET = QET(n_fin, l_fin, h_fin, l_overlap, self._TES)
 
         self._QET.set_qpabsb_eff(l_fin, h_fin, l_overlap, l_TES)
@@ -189,11 +190,20 @@ class Detector:
     def set_response_omega(self, omega):
         self._response_omega = omega
 
+    def get_response_omega(self):
+        return self._response_omega
+
     def set_dPtdE(self, val):
         self._response_dPtdE = val
 
+    def get_dPtdE(self):
+        return self._response_dPtdE
+
     def set_dIdP(self, val):
         self._response_dIdP = val
+
+    def get_dIdP(self):
+        return self._response_dIdP
 
     def set_ztes(self, val):
         self._response_z_tes = val
@@ -204,6 +214,9 @@ class Detector:
     def set_dIdV(self, val):
         self._response_dIdV = val
 
+    def get_dIdV(self):
+        return self._response_dIdV
+
     def set_dIdV0(self, val):
         self._response_dIdV0 = val
 
@@ -212,3 +225,6 @@ class Detector:
 
     def set_t(self, val):
         self._response_t = val
+
+    def get_n_channel(self):
+        return self._n_channel

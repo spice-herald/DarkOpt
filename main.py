@@ -12,5 +12,3 @@ eSnolab = Electronics(fSnolab)
 det = Detector("PD2", fSnolab, absorber, 1)
 simulate_noise(det)
 
-print("Jason")
-

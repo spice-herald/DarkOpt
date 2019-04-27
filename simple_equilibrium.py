@@ -22,6 +22,12 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     _TES.set_To(zeta_o * wTc + Tc) # K
     To = _TES.get_To()
 
+    n = _TES.get_n()
+    K = _TES.get_K()
+
+    Gep = n * K * To ** (n-1)
+    _TES.set_G(Gep)
+
     # ----- Alpha/Beta at Transition Point -----
 
     alpha = 2 * To / wTc / (np.exp(zeta_o)/(np.exp(zeta_o) + np.exp(-zeta_o)))

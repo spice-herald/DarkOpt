@@ -15,6 +15,7 @@ class Electronics:
 
         # -- Total Load Resistance
         self._R_L = self._R_P + self._R_S
+        self._T_L = 0
 
         # -- Inductances
         self._l_squid = l_squid
@@ -36,3 +37,9 @@ class Electronics:
 
     def get_RL(self):
         return self._R_L
+
+    def get_si_squid(self):
+        return self._si_squid
+
+    def get_TL(self):
+        return self._T_L

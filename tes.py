@@ -87,7 +87,7 @@ class TES:
         # Effective Bandwidth
         self._w_etf = 0
 
-        # ------ Parameters set when simulating noise -----
+        # ------ Parameters set when getting dynamic response  -----
 
         # Exponential rise time for current biased circuit
         self._tau_I = 0
@@ -106,6 +106,8 @@ class TES:
         self._taup_p = 0
         self._taup_m = 0
 
+        # ------ Parameters set when simulating noise -----
+        self._fSp_xtra = 0
 
     def get_T(self):
         return self._t
@@ -130,6 +132,9 @@ class TES:
 
     def get_G(self):
         return self._G
+
+    def set_G(self, val):
+        self._G = val
 
     def get_Tc(self):
         return self._T_c
@@ -275,3 +280,9 @@ class TES:
 
     def get_taupm(self):
         return self._taup_m
+
+    def set_fSp_xtra(self, val):
+        self._fSp_xtra = val
+
+    def get_fSp_xtra(self):
+        return self._fSp_xtra
