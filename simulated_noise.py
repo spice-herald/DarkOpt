@@ -14,7 +14,7 @@ def dynamical_response(detector):
     detector.set_response_omega(omega)
 
     # Plotting variables
-    lgc_plt = False
+    lgc_plt = True
     lgc_pltsimp = False
 
     w_Pabsb = detector.get_collection_bandwidth()
@@ -170,6 +170,13 @@ def dynamical_response(detector):
         plt.semilogx()
         plt.grid()
         plt.legend()
+        plt.show()
+
+        plt.plot(np.real(z_tot), np.imag(z_tot))
+        plt.xlabel("Re(Z_tot)")
+        plt.ylabel("Im(Z_tot)")
+        plt.title("Im(Z_tot) vs Re(Z_tot)")
+        plt.grid()
         plt.show()
 
 

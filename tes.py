@@ -59,10 +59,11 @@ class TES:
         self._volume = self._volume_TES + self._veff_WFinCon * self._vol_WFinCon + \
                        self._veff_WAloverlap * self._vol_WAl_overlap
 
-        self._res = self._resistivity * self._l / (self._w * self._t)
+        # Normal Resistance
+        self._res_n = self._resistivity * self._l / (self._w * self._t * 1185)
 
         # Operating Resistance
-        self._res_o = self._res * self._fOp
+        self._res_o = self._res_n * self._fOp
 
         # ------ Parameters to be set later when simulating equilibrium -----
 
@@ -125,7 +126,7 @@ class TES:
         return self._volume
 
     def get_R(self):
-        return self._res
+        return self._res_n
 
     def get_Ro(self):
         return self._res_o

@@ -39,14 +39,15 @@ class Detector:
         self._electronics = Electronics(fridge, 5e-3, 2e-3, 75e-9, 25e-9, 6e-12)
         self._sigma_energy = 0
 
-        resistivity = 4.0 * 35e-9  # Resistivity of balzers tungsten [Ohm m]
+        resistivity = 9.6e-8 # Ohm m
+
 
         if l_fin > 100e-6:
             n_fin = 6
         else:
             n_fin = 4
 
-        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, 0.32e9, 1.7e-14, 5, -69) # TODO Last parameter is eq temperature,
+        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, 0.32e9, 1.7e-14, 5, -100) # TODO Last parameter is eq temperature,
         # TODO sigma really 0.32?
         self._QET = QET(n_fin, l_fin, h_fin, l_overlap, self._TES)
 
