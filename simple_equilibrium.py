@@ -30,14 +30,12 @@ def simple_equilibrium(detector, beta=0, Qp=0):
 
     # ----- Alpha/Beta at Transition Point -----
 
-    alpha = 2 * To / wTc / (np.exp(zeta_o)/(np.exp(zeta_o) + np.exp(-zeta_o)))
+    alpha = 2*To/wTc/np.exp(zeta_o)/(np.exp(zeta_o)+np.exp(-zeta_o))
 
     _TES.set_alpha(alpha)
     _TES.set_beta(beta)
 
     # ---- TES properties at equilibrium ----
-
-    # Heat Capacity
 
     # Bias Power (Phonon/Electron coupling G already set in TES.py)
 
@@ -63,7 +61,7 @@ def simple_equilibrium(detector, beta=0, Qp=0):
 
     # Bias Voltage
 
-    rl = detector.get_electronics().get_RL()
+    rl = _det.get_electronics().get_RL()
     Vbias = Io * (rl + ro)  # V
     _TES.set_Vbias(Vbias)
 
@@ -73,7 +71,7 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     # TODO Check if these values are the ones meant to be taken.
     fCsn = 2.43
     gC_v = 108
-    vol = _TES.get_volume()
+    vol = _TES.get_total_volume()
     C = fCsn * gC_v * To * vol
     _TES.set_C(C)
 
@@ -86,6 +84,37 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     tau_etf = tau0 / (1 + lg * (1 - r_ratio)/(1 + beta + r_ratio))
     _TES.set_tau_etf(tau_etf)
     _TES.set_w_etf(1/tau_etf)
+
+    Gep = _TES.get_G()
+    LG = _TES.get_LG()
+    C = _TES.get_C()
+    Io = _TES.get_Io()
+    Lt = detector.get_electronics().get_lt()
+    Rl = detector.get_electronics().get_RL()
+    Ro = _TES.get_Ro()
+    beta = _TES.get_beta()
+    Po = _TES.get_Po()
+    Vbias = _TES.get_Vbias()
+    t0 = _TES.get_tau0()
+    tau_etf = _TES.get_tau_etf()
+    w_etf = _TES.get_w_etf()
+    To = _TES.get_To()
+
+
+    print("---------------- EQUILIBRIUM PARAMETERS ----------------")
+    print("To %s" % To)
+    print("alpha %s" % _TES.get_alpha())
+    print("beta %s" % beta)
+    print("C %s" % C)
+    print("Gep %s" % Gep)
+    print("Po %s" % Po)
+    print("LG %s" % LG)
+    print("Io %s" % Io)
+    print("VBias %s" % Vbias)
+    print("tau0 %s" % t0)
+    print("tau_etf %s" % tau_etf)
+    print("w_etf %s" % w_etf)
+    print("------------------------------------------------\n")
 
 
 

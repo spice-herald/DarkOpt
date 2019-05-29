@@ -7,8 +7,8 @@ import sys
 k_b = 1.38e-3 # J/K
 class Detector:
 
-    def __init__(self, name, fridge, absorber, n_channel, n_TES=1185,
-                 l_TES=140e-6, l_fin=200e-6, h_fin=600e-6, l_overlap=10e-6,
+    def __init__(self, name, fridge, electronics, absorber, n_channel, n_TES=1185,
+                 l_TES=140e-6, l_fin=200e-6, h_fin=600e-9, l_overlap=10e-6,
                  w_rail_main=8e-6, w_rail_qet=4e-6):
         """
         
@@ -36,7 +36,7 @@ class Detector:
         self._N_TES = n_TES
         self._w_rail_main = w_rail_main
         self._w_rail_qet = w_rail_qet
-        self._electronics = Electronics(fridge, 5e-3, 2e-3, 75e-9, 25e-9, 6e-12)
+        self._electronics = electronics #Electronics(fridge, 5e-3, 6e-3, 75e-9, 25e-9, 6e-12) # SNOLAB values by default
         self._sigma_energy = 0
 
         resistivity = 9.6e-8 # Ohm m
@@ -47,7 +47,7 @@ class Detector:
         else:
             n_fin = 4
 
-        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, 0.32e9, 1.7e-14, 5, -100) # TODO Last parameter is eq temperature,
+        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, 0.22e9, 1.7e-14, 5, -100) # TODO Last parameter is eq temperature,
         # TODO sigma really 0.32?
         self._QET = QET(n_fin, l_fin, h_fin, l_overlap, self._TES)
 
@@ -103,7 +103,7 @@ class Detector:
         if self._absorber.get_name() == 'Ge':
             self._t_pabsb = 750e-6
         elif self._absorber.get_name() == 'Si':
-            self._t_pabsb = 175e-6
+            self._t_pabsb = 1.7927e-05
         else:
             print("Incorrect Material. must be Ge or Si")
             sys.exit(1)
@@ -121,7 +121,7 @@ class Detector:
         # 6) ?
 
         # Let's combine 1), 5), and 6) together and assume that it is the same as the measured/derived value from iZIP4
-        self._e156 = 0.2  # TODO Confirm PD2 efficiency is 0.2
+        self._e156 = 0.8690  # TODO Confirm PD2 efficiency is 0.2
 
         # Total collection efficiency:
         self._eEabsb = self._e156 * self._ePcollect * self._QET.get_eqpabsb() * self._QET.get_epqp()
@@ -145,6 +145,20 @@ class Detector:
         self._response_dIdV_step = 0
         self._response_t = 0
 
+        print("---------------- DETECTOR PARAMETERS ----------------")
+        print("nP %s" % self._n_channel)
+        print("SAactive %s" % self._SA_active)
+        print("lcell %s" % self._l_cell)
+        print("SApassive %s" % self._SA_passive)
+        print("fSA_QPabsb %s" % self._fSA_qpabsorb)
+        print("ePcollect %s" % self._ePcollect)
+        print("tau_pabsb %s" % self._t_pabsb)
+        print("w_pabsb %s" % (1/self._t_pabsb))
+        print("eE156 %s" % self._e156)
+        print("eEabsb %s" % self._eEabsb)
+        print("Kpb %s" % self._kpb)
+        print("nKpb %s" % self._nkpb)
+        print("------------------------------------------------\n")
 
     def get_energy_resolution(self, t_bath, w_eff, n=4):
         """

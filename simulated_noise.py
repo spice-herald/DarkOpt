@@ -14,7 +14,7 @@ def dynamical_response(detector):
     detector.set_response_omega(omega)
 
     # Plotting variables
-    lgc_plt = True
+    lgc_plt = False
     lgc_pltsimp = False
 
     w_Pabsb = detector.get_collection_bandwidth()
@@ -37,21 +37,18 @@ def dynamical_response(detector):
     Ro = TES.get_Ro()
     beta = TES.get_beta()
 
-    print("TES Constants: \n Gep %s \n LG %s \n C %s \n Io %s \n Lt %s \n Rl %s \n Ro %s \n beta %s \n"
-          % (Gep, LG, C, Io, Lt, Rl, Ro, beta))
-
+    print(">>> Rl %s" % Rl)
     dIdPt = -(Gep * LG / (C * Io * Lt)) * (1 / (1j*omega + Gep * (1 - LG) / C) *
                                            (1j*omega + (Rl + Ro*(1 + beta))/Lt) +
                                            (LG * (Ro/Lt) * (Gep/C) * (2 + beta)))
 
+    dIdPt =  -Gep * LG / (C * Io * Lt) / ((1j * omega + Gep * (1 - LG) / C) * (1j * omega + (Rl + Ro * (1 + beta)) / Lt) + LG * Ro / Lt * Gep / C * (2 + beta))
+
     detector.set_dIdP(dIdPt)
 
     # Calculate dIdV
-    z_tes = Ro * (1 + beta) + \
-            (Ro * LG /(1 - LG)) *\
-            (2 + beta)/(1 + 1j*omega * C/(Gep * (1 - LG)))
-
-    z_tot = Rl + 1j*omega * Lt + z_tes
+    z_tes = Ro * (1 + beta) + Ro * LG / (1 - LG) * (2 + beta) / (1 + 1j * omega * C / Gep / (1 - LG))
+    z_tot = Rl + 1j * omega * Lt + z_tes
 
     detector.set_ztes(z_tes)
     detector.set_ztot(z_tot)
@@ -82,12 +79,12 @@ def dynamical_response(detector):
     TES.set_tau_etf_simp(tau_etf_simp)
     TES.set_w_etf_simp(1/tau_etf_simp)
 
+
     # ---------------------------------------------------------------
 
     # Frequencies of poles taking into account pole mixing
-    wp_avg = (1/tau_el)/2 + (1/tau_I)/2
-    dw = 0.5 * np.sqrt((1/tau_el - 1/tau_I) ** 2 - 4 * (Ro / Lt) * LG * (2 + beta)/tau0)
-
+    wp_avg = (1/tau_el)/2+(1/tau_I)/2
+    dw = np.sqrt(((1 / tau_el) - (1. / tau_I)) ** 2 - 4 * (Ro / Lt) * LG * (2 + beta) / tau0) / 2
 
     wp_p = wp_avg + dw
     wp_m = wp_avg - dw
@@ -95,7 +92,7 @@ def dynamical_response(detector):
     taup_p = 1/wp_p
     taup_m = 1/wp_m
 
-    print("taup_p %s" % taup_p)
+    print("taup_m %s" % taup_m)
 
     TES.set_wpp(wp_p)  # High Frequency pole ~ L/R
     TES.set_wpm(wp_m)  # Low Frequency Pole ~ tau_eff
@@ -103,7 +100,8 @@ def dynamical_response(detector):
     TES.set_taupp(taup_p)
     TES.set_taupm(taup_m)
 
-    dIdV0 = (1 - LG) / (Rl + Ro * (1 + beta) + LG * (Ro - Rl))
+    dIdV0 = (1-LG)/(Rl+Ro*(1+beta)+ LG*(Ro-Rl))
+    print(">>> dIdV0 %s" % dIdV0)
     detector.set_dIdV0(dIdV0)
 
     # --------- check inversion equations which take wp_p, wp_m, w_z, dIdV(0)  to give
@@ -121,15 +119,14 @@ def dynamical_response(detector):
     # -------- dIdV step function
 
     n_t = int(1e4)
-    t = np.linspace(-5, 10, n_t) * taup_m
+    t = np.linspace(0, 10, n_t) * taup_m
 
     # Calculate amplitude of dIdV between peaks
     dIdVmid = 1/(Rl + Ro * (1 + beta))
 
     dIdV_chk = dIdV0 * (1 + 1j * omega / w_I) / (1 + 1j * omega / wp_p) /(1 + 1j * omega / wp_m)
 
-    dIdV_step = dIdV0 * (1  - (taup_p - tau_I) / (taup_p - taup_m) * np.exp(-t/taup_p)) - \
-                (taup_m - tau_I) /(taup_m - taup_p) * np.exp(-t/taup_m)
+    dIdV_step = dIdV0 * (1 - (taup_p - tau_I) / (taup_p - taup_m) * np.exp(-t / taup_p) - (taup_m - tau_I) / (taup_m - taup_p) * np.exp(-t / taup_m))
 
     detector.set_dIdV_step(dIdV_step)
     detector.set_t(t)
@@ -172,12 +169,24 @@ def dynamical_response(detector):
         plt.legend()
         plt.show()
 
-        plt.plot(np.real(z_tot), np.imag(z_tot))
-        plt.xlabel("Re(Z_tot)")
-        plt.ylabel("Im(Z_tot)")
-        plt.title("Im(Z_tot) vs Re(Z_tot)")
+        plt.plot(np.real(z_tot), np.imag(z_tot), label='Z_tot', c='black')
+        plt.plot(np.real(z_tes), np.imag(z_tes), label='Z_tes', c='blue')
+        plt.xlabel("Re(Z)")
+        plt.ylabel("Im(Z)")
+        plt.title("Im(Z) vs Re(Z)")
+        plt.grid()
+        plt.legend(loc='best')
+        plt.show()
+
+        plt.plot(t, dIdV_step)
+        plt.plot(t, dIdV0 * np.ones(n_t), c='green')
+        plt.plot(t, dIdVmid * np.ones(n_t), 'blue')
+        plt.xlabel('time [s]')
+        plt.ylabel('dIdV Step Function [1/Ohm]')
+        plt.title('Step function voltage response')
         plt.grid()
         plt.show()
+
 
 
 def Ftfn(Tl, Th, n, isBallistic):
@@ -201,6 +210,7 @@ def simulate_noise(detector):
     lgc_xtraNoise = False
 
     # Squid Noise -------------------------
+    print(">>>>>>>SI_Squid %s" % detector.get_electronics().get_si_squid())
     SI_squid = detector.get_electronics().get_si_squid() ** 2 * np.ones(n_omega) # A^2 / Hz
 
     dIdPt = detector.get_dIdP()
@@ -209,6 +219,7 @@ def simulate_noise(detector):
     # Johnson Load Noise ------------------
 
     Tl = detector.get_electronics().get_TL()
+    print(">>>>> Tl %s" % Tl)
     Rl = detector.get_electronics().get_RL()
     Sv_l = 4 * kb * Tl * Rl  # V^2 / Hz
     Si_RlSC = Sv_l / (Rl ** 2)  # A^2 / Hz FIXME location of square
@@ -232,7 +243,8 @@ def simulate_noise(detector):
     Gep = TES.get_G()
     T_MC = detector.get_fridge().get_TMC()
     nPep = TES.get_n()
-    Spt_Gtb = 4 * kb * To * Gep * Ftfn(T_MC, To, nPep, False)
+    Spt_Gtb = 4 * kb * To ** 2 * Gep * Ftfn(T_MC, To, nPep, False) * np.ones(n_omega)
+
     Si_Gtb = abs(dIdPt ** 2) * Spt_Gtb
 
     # Unexplained Noise scaling as Pt
@@ -246,15 +258,45 @@ def simulate_noise(detector):
 
     # -------- Optimal Filtering ------------
     domega = np.zeros(n_omega)
-    domega[1:n_omega-1] = (omega[2:n_omega] - omega[1:n_omega-1])/2 # FIXME index manipulations incorrect?
+    domega[1: n_omega - 2]= (omega[2:n_omega-1]-omega[0:n_omega - 3])/2
     domega[0] = (omega[1] - omega[0]) / 2
-    domega[n_omega-1] = (omega[n_omega-1] - omega[n_omega-2]) / 2
+    domega[n_omega-1] = (omega[n_omega-1] - omega[n_omega - 2]) / 2
+    print(">>>>>>>> omega:")
+    print(omega)
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
+    print(">>>>>>>> domega:")
+    print(domega)
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     dPtdE = detector.get_dPtdE()
-    sigPt_of_1chan = np.sqrt(1/((domega / (2 * np.pi) * 4 * abs(dPtdE) ** 2 / Spt_tot).sum())) / e
-
+    sigPt_of_1chan = np.sqrt(1/(domega/(2*np.pi)*4*np.abs(dPtdE)**2/Spt_tot).sum())/e
     n_channel = detector.get_n_channel()
+    print(">>> n_channel %s" % n_channel)
     sigPt_of = np.sqrt(n_channel) * sigPt_of_1chan
 
     print(">>>>>>>>>>>>>>>>>>>>>> RESOLUTION IS %s" % sigPt_of)
+
+
+    plt.plot(omega/(2*np.pi),np.sqrt(SI_squid)*1e12,'yellow', label='Squid')
+    plt.plot(omega/(2*np.pi),np.sqrt(Si_Rl)*1e12,'red', label='R_load')
+    plt.plot(omega/(2*np.pi),np.sqrt(Si_Rt)*1e12,'green', label='R_tes')
+    plt.plot(omega/(2*np.pi),np.sqrt(Si_Gtb)*1e12,'cyan', label='G TES-Bath')
+    plt.plot(omega / (2 * np.pi), np.sqrt(Si_tot) * 1e12, 'black', label='Total')
+    plt.grid()
+    plt.legend(loc='best')
+    plt.semilogx()
+    plt.semilogy()
+    plt.show()
+
+    plt.plot(omega/(2*np.pi),np.sqrt(SPt_squid),'yellow', label='Squid')
+    plt.plot(omega/(2*np.pi),np.sqrt(Spt_Rl),'red', label='R_load')
+    plt.plot(omega/(2*np.pi),np.sqrt(Spt_Rt),'green', label='R_tes')
+    plt.plot(omega/(2*np.pi),np.sqrt(Spt_Gtb),'cyan', label='G TES-Bath')
+    plt.plot(omega/(2*np.pi),np.sqrt(Spt_tot),'black', label='Total')
+    plt.title("Power Noise")
+    plt.grid()
+    plt.legend(loc='best')
+    plt.semilogy()
+    plt.semilogx()
+    plt.show()
 

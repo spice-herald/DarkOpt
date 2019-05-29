@@ -22,26 +22,25 @@ class TES:
         self._fOp = fOp
         self._volume_TES = self._t * self._l * self._w
         self._L = L
-        self._K = sigma * V  # P_bath vs T, eq 3.1 in thesis.
+        #self._K = sigma * V  # P_bath vs T, eq 3.1 in thesis.
         self._n = n  # used to define G, refer to eqs 3.1 and 3.3
         self._T_eq = T_eq  # equilibrium temperature
 
-        # Phonon electron thermal coupling
-        self._G = n * self._K * (T_eq ** (n-1))
 
         # Critical temperature, default 40mK from MaterialProperties.m line 427
         self._T_c = T_c
         self._Qp = Qp  # Parasitic heating
 
         wTc_1090 = 1.4e-3 * self._T_c / 68e-3  # [K], line 65-66 Tc_ResPt.m
-        self._wTc = wTc_1090 / 2 / np.log(3)  # Same as above, putting this in due to SimpleEquilibrium line 51
+        self._wTc = 0.000177496649192233 #wTc_1090 #/ 2 / np.log(3)  # Same as above, putting this in due to SimpleEquilibrium line 51
 
 
         # Volume of the W/Al overlap
         self._vol_WAl_overlap = 10e-6 * 2 * self._l * self._foverlap_width * self._t
 
         #  Volume of the W only Fin connector
-        self._vol_WFinCon =  2.5e-6 * (n_fin * 4e-6 * self._t + (2 * self._l + self._foverlap_width))
+        #self._vol_WFinCon =  2.5e-6 * (n_fin * 4e-6 * self._t + (2 * self._l + self._foverlap_width))
+        self._vol_WFinCon = 2.5e-6 * n_fin * 4e-6 * self._t + 2.5e-6 * (2 * self._l * self._foverlap_width) * self._t
 
         # Volume of the W only portion of the fin connector
         # Since the temperature in the fin connector is lower than the temperature
@@ -58,6 +57,11 @@ class TES:
 
         self._volume = self._volume_TES + self._veff_WFinCon * self._vol_WFinCon + \
                        self._veff_WAloverlap * self._vol_WAl_overlap
+
+        self._tot_volume = self._volume * 1185
+        self._K = self._tot_volume * sigma
+        # Phonon electron thermal coupling
+        self._G = n * self._K * (T_eq ** (n-1))
 
         # Normal Resistance
         self._res_n = self._resistivity * self._l / (self._w * self._t * 1185)
@@ -110,6 +114,28 @@ class TES:
         # ------ Parameters set when simulating noise -----
         self._fSp_xtra = 0
 
+
+        # Debugging Printing Info
+        print("---------------- TES PARAMETERS ----------------")
+        print("wTc %s" % self._wTc)
+        print("Tc %s" % self._T_c)
+        print("rho %s" % self._resistivity)
+        print("t %s" % self._t)
+        print("l %s" % self._l)
+        print("w %s" % self._w)
+        print("vol1TES %s" % self._volume_TES)
+        print("vol1 %s" % self._volume)
+        print("volFinCon %s" % self._vol_WFinCon)
+        print("WAlOverlap %s" % self._vol_WAl_overlap)
+        print("veff_WFinCon %s" % self._veff_WFinCon)
+        print("veff_WAloverlap %s" % self._veff_WAloverlap)
+        print("Rn %s" % self._res_n)
+        print("Ro %s" % self._res_o)
+        print("fOp %s" % self._fOp)
+        print("Ro %s" % self._res_o)
+        print("L %s" % self._L)
+        print("------------------------------------------------\n")
+
     def get_T(self):
         return self._t
 
@@ -124,6 +150,9 @@ class TES:
 
     def get_volume(self):
         return self._volume
+
+    def get_total_volume(self):
+        return self._tot_volume
 
     def get_R(self):
         return self._res_n
@@ -287,3 +316,4 @@ class TES:
 
     def get_fSp_xtra(self):
         return self._fSp_xtra
+
