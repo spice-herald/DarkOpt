@@ -68,9 +68,8 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     # Heat Capacity
 
     # Tungsten values taken from MaterialProperties.m line 385 / 376
-    # TODO Check if these values are the ones meant to be taken.
-    fCsn = 2.43
-    gC_v = 108
+    fCsn = _TES.get_material().get_fCsn()
+    gC_v = _TES.get_material().get_gC_v() 
     vol = _TES.get_total_volume()
     C = fCsn * gC_v * To * vol
     _TES.set_C(C)

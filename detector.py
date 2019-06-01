@@ -1,5 +1,6 @@
 from tes import TES
 from QET import QET
+from MaterialProperties import TESMaterial
 from electronics import Electronics
 import numpy as np
 import sys
@@ -47,8 +48,9 @@ class Detector:
         else:
             n_fin = 4
 
-        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, 0.22e9, 1.7e-14, 5, -100) # TODO Last parameter is eq temperature,
-        # TODO sigma really 0.32?
+        tungsten = TESMaterial()
+        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, tungsten.get_gPep_v(), 1.7e-14, 5, -100, tungsten)
+
         self._QET = QET(n_fin, l_fin, h_fin, l_overlap, self._TES)
 
         self._QET.set_qpabsb_eff(l_fin, h_fin, l_overlap, l_TES)
@@ -121,7 +123,7 @@ class Detector:
         # 6) ?
 
         # Let's combine 1), 5), and 6) together and assume that it is the same as the measured/derived value from iZIP4
-        self._e156 = 0.8690  # TODO Confirm PD2 efficiency is 0.2
+        self._e156 = 0.8690
 
         # Total collection efficiency:
         self._eEabsb = self._e156 * self._ePcollect * self._QET.get_eqpabsb() * self._QET.get_epqp()
@@ -159,26 +161,6 @@ class Detector:
         print("Kpb %s" % self._kpb)
         print("nKpb %s" % self._nkpb)
         print("------------------------------------------------\n")
-
-    def get_energy_resolution(self, t_bath, w_eff, n=4):
-        """
-            
-        :param g: Thermal Conductance
-        :param t_bath: Bath Temperature
-        :param w_eff: Sensor bandwidth, 1/t_eff
-        :param n: Thermal bath coupling exponent, 4 from thesis. 
-        :return: Energy resolution, sigma_e. 
-        """
-        g = self._TES.get_G()
-        t_o = self._TES.get_To()
-        t_c = self._TES.get_TC()
-
-        f_tfn = ((t_bath / t_o) ** (n + 1) + 1)/2 # TODO GET RIGHT FORM!
-        front_factor = 4 * k_b * g * (t_c/self._eEabsb) ** 2
-        p = np.sqrt((n * f_tfn) / (1 - (t_bath/t_o) ** n))
-        res = np.sqrt(front_factor * f_tfn * (w_eff * p + self._w_collect) / (w_eff * p * self._w_collect))
-        self._sigma_energy = res
-        return res
 
     def get_position_resolution(self):
         pass

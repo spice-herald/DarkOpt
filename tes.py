@@ -1,7 +1,9 @@
 import numpy as np
+from MaterialProperties import TESMaterial
 class TES:
 
-    def __init__(self, t, l, w, foverlap, n_fin, resistivity, sigma, V, n, T_eq, T_c=40e-3, fOp=0.45, L=0, Qp=0):
+    def __init__(self, t, l, w, foverlap, n_fin, resistivity, sigma, V, n, T_eq,
+                 material=TESMaterial(), T_c=40e-3, fOp=0.45, L=0, Qp=0):
         """
         TES Class
         
@@ -25,15 +27,15 @@ class TES:
         #self._K = sigma * V  # P_bath vs T, eq 3.1 in thesis.
         self._n = n  # used to define G, refer to eqs 3.1 and 3.3
         self._T_eq = T_eq  # equilibrium temperature
-
+        self._material = material
 
         # Critical temperature, default 40mK from MaterialProperties.m line 427
-        self._T_c = T_c
+        self._T_c = material.get_Tc() #T_c
         self._Qp = Qp  # Parasitic heating
 
         wTc_1090 = 1.4e-3 * self._T_c / 68e-3  # [K], line 65-66 Tc_ResPt.m
-        self._wTc = 0.000177496649192233 #wTc_1090 #/ 2 / np.log(3)  # Same as above, putting this in due to SimpleEquilibrium line 51
-
+        self._wTc = material.get_wTc() #0.000177496649192233 #wTc_1090 #/ 2 / np.log(3)  # Same as above, putting this in due to SimpleEquilibrium line 51
+        self._material.get_gPep_v()
 
         # Volume of the W/Al overlap
         self._vol_WAl_overlap = 10e-6 * 2 * self._l * self._foverlap_width * self._t
@@ -190,6 +192,9 @@ class TES:
     def get_K(self):
         """K = Sigma * Volume defined from thesis eq 3.1 page 18"""
         return self._K
+
+    def get_material(self):
+        return self._material
 
     def set_alpha(self, a):
         self._alpha = a
