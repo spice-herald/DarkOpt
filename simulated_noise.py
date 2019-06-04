@@ -37,7 +37,7 @@ def dynamical_response(detector):
     Ro = TES.get_Ro()
     beta = TES.get_beta()
 
-    print(">>> Rl %s" % Rl)
+    #print(">>> Rl %s" % Rl)
     dIdPt = -(Gep * LG / (C * Io * Lt)) * (1 / (1j*omega + Gep * (1 - LG) / C) *
                                            (1j*omega + (Rl + Ro*(1 + beta))/Lt) +
                                            (LG * (Ro/Lt) * (Gep/C) * (2 + beta)))
@@ -57,7 +57,7 @@ def dynamical_response(detector):
     # Calculate dIdV step functions
     tau0 = C/Gep
     TES.set_tau0(tau0)
-    print("Tau0: C %s Gep %s" % (C, Gep))
+    #print("Tau0: C %s Gep %s" % (C, Gep))
 
     # Exponential rise time for the current biased circuit
     tau_I = tau0 / (1 - LG)
@@ -92,7 +92,7 @@ def dynamical_response(detector):
     taup_p = 1/wp_p
     taup_m = 1/wp_m
 
-    print("taup_m %s" % taup_m)
+    #print("taup_m %s" % taup_m)
 
     TES.set_wpp(wp_p)  # High Frequency pole ~ L/R
     TES.set_wpm(wp_m)  # Low Frequency Pole ~ tau_eff
@@ -101,7 +101,7 @@ def dynamical_response(detector):
     TES.set_taupm(taup_m)
 
     dIdV0 = (1-LG)/(Rl+Ro*(1+beta)+ LG*(Ro-Rl))
-    print(">>> dIdV0 %s" % dIdV0)
+    #print(">>> dIdV0 %s" % dIdV0)
     detector.set_dIdV0(dIdV0)
 
     # --------- check inversion equations which take wp_p, wp_m, w_z, dIdV(0)  to give
@@ -210,7 +210,7 @@ def simulate_noise(detector):
     lgc_xtraNoise = False
 
     # Squid Noise -------------------------
-    print(">>>>>>>SI_Squid %s" % detector.get_electronics().get_si_squid())
+    #print(">>>>>>>SI_Squid %s" % detector.get_electronics().get_si_squid())
     SI_squid = detector.get_electronics().get_si_squid() ** 2 * np.ones(n_omega) # A^2 / Hz
 
     dIdPt = detector.get_dIdP()
@@ -219,7 +219,7 @@ def simulate_noise(detector):
     # Johnson Load Noise ------------------
 
     Tl = detector.get_electronics().get_TL()
-    print(">>>>> Tl %s" % Tl)
+    #print(">>>>> Tl %s" % Tl)
     Rl = detector.get_electronics().get_RL()
     Sv_l = 4 * kb * Tl * Rl  # V^2 / Hz
     Si_RlSC = Sv_l / (Rl ** 2)  # A^2 / Hz FIXME location of square
@@ -261,22 +261,22 @@ def simulate_noise(detector):
     domega[1: n_omega - 2]= (omega[2:n_omega-1]-omega[0:n_omega - 3])/2
     domega[0] = (omega[1] - omega[0]) / 2
     domega[n_omega-1] = (omega[n_omega-1] - omega[n_omega - 2]) / 2
-    print(">>>>>>>> omega:")
-    print(omega)
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    #print(">>>>>>>> omega:")
+    #print(omega)
+    #print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
-    print(">>>>>>>> domega:")
-    print(domega)
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    #print(">>>>>>>> domega:")
+    #print(domega)
+    #print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     dPtdE = detector.get_dPtdE()
     sigPt_of_1chan = np.sqrt(1/(domega/(2*np.pi)*4*np.abs(dPtdE)**2/Spt_tot).sum())/e
     n_channel = detector.get_n_channel()
-    print(">>> n_channel %s" % n_channel)
+    #print(">>> n_channel %s" % n_channel)
     sigPt_of = np.sqrt(n_channel) * sigPt_of_1chan
 
-    print(">>>>>>>>>>>>>>>>>>>>>> RESOLUTION IS %s" % sigPt_of)
-
-
+    #print(">>>>>>>>>>>>>>>>>>>>>> RESOLUTION IS %s" % sigPt_of)
+    return sigPt_of
+    """
     plt.plot(omega/(2*np.pi),np.sqrt(SI_squid)*1e12,'yellow', label='Squid')
     plt.plot(omega/(2*np.pi),np.sqrt(Si_Rl)*1e12,'red', label='R_load')
     plt.plot(omega/(2*np.pi),np.sqrt(Si_Rt)*1e12,'green', label='R_tes')
@@ -289,7 +289,7 @@ def simulate_noise(detector):
     plt.title("TES Current Noise", fontsize=20)
     plt.xlabel("F [Hz]", fontsize=20)
     plt.ylabel("S_I [pA/√Hz]", fontsize=20)
-    plt.show()
+    #plt.show()
 
     plt.plot(omega/(2*np.pi),np.sqrt(SPt_squid),'yellow', label='Squid')
     plt.plot(omega/(2*np.pi),np.sqrt(Spt_Rl),'red', label='R_load')
@@ -303,5 +303,5 @@ def simulate_noise(detector):
     plt.legend(loc='best')
     plt.semilogy()
     plt.semilogx()
-    plt.show()
+    #plt.show()"""
 

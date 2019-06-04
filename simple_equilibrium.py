@@ -69,7 +69,7 @@ def simple_equilibrium(detector, beta=0, Qp=0):
 
     # Tungsten values taken from MaterialProperties.m line 385 / 376
     fCsn = _TES.get_material().get_fCsn()
-    gC_v = _TES.get_material().get_gC_v() 
+    gC_v = _TES.get_material().get_gC_v()
     vol = _TES.get_total_volume()
     C = fCsn * gC_v * To * vol
     _TES.set_C(C)
@@ -99,7 +99,7 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     w_etf = _TES.get_w_etf()
     To = _TES.get_To()
 
-
+    """
     print("---------------- EQUILIBRIUM PARAMETERS ----------------")
     print("To %s" % To)
     print("alpha %s" % _TES.get_alpha())
@@ -114,6 +114,7 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     print("tau_etf %s" % tau_etf)
     print("w_etf %s" % w_etf)
     print("------------------------------------------------\n")
+    """
 
 
 

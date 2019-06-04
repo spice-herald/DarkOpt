@@ -21,7 +21,7 @@ class QET:
         self._ahole = ahole
         self._afin_empty = n_fin * l_fin * wempty + 2 * TES.get_L() * wempty_tes + self._nhole * ahole
         self._a_fin = np.pi * (self._l_fin ** 2) + 2 * self._l_fin * TES.get_L() - self._afin_empty
-
+        """
         print("---------------- QET PARAMETERS ----------------")
         print("ePQP %s" % self._ePQP)
         print("lfin %s" % self._l_fin)
@@ -34,7 +34,7 @@ class QET:
         print("Afin %s" % self._a_fin)
         print("nfin %s" % self._n_fin)
         print("------------------------------------------------\n")
-
+        """
 
     def set_qpabsb_eff(self, l_fin, h_fin, loverlap, l_TES, eff_absb=1.22e-4):
         ci = 2 * l_TES
@@ -74,8 +74,6 @@ class QET:
         / (besseli(1, rhoo) * (besselk(0, rhoi) + lambdaA * besselk(1, rhoi)) +
         (besseli(0, rhoi) - lambdaA * besseli(1, rhoi)) * besselk(1, rhoo))
         self._eQPabsb = fQP
-        # TODO SOMETHING IS WRONG IN THIS QET EFFICIENCY!
-        print("###################### QET QP absb efficiency = %s" % self._eQPabsb)
 
     def get_epqp(self):
         return self._ePQP

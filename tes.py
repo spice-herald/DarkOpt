@@ -2,7 +2,7 @@ import numpy as np
 from MaterialProperties import TESMaterial
 class TES:
 
-    def __init__(self, t, l, w, foverlap, n_fin, resistivity, sigma, V, n, T_eq,
+    def __init__(self, t, l, w, foverlap, n_fin, resistivity, sigma, V, n, T_eq, n_TES,
                  material=TESMaterial(), T_c=40e-3, fOp=0.45, L=0, Qp=0):
         """
         TES Class
@@ -28,6 +28,7 @@ class TES:
         self._n = n  # used to define G, refer to eqs 3.1 and 3.3
         self._T_eq = T_eq  # equilibrium temperature
         self._material = material
+        self._nTES = n_TES
 
         # Critical temperature, default 40mK from MaterialProperties.m line 427
         self._T_c = material.get_Tc() #T_c
@@ -60,13 +61,13 @@ class TES:
         self._volume = self._volume_TES + self._veff_WFinCon * self._vol_WFinCon + \
                        self._veff_WAloverlap * self._vol_WAl_overlap
 
-        self._tot_volume = self._volume * 1185
+        self._tot_volume = self._volume * self._nTES #1185
         self._K = self._tot_volume * sigma
         # Phonon electron thermal coupling
         self._G = n * self._K * (T_eq ** (n-1))
 
         # Normal Resistance
-        self._res_n = self._resistivity * self._l / (self._w * self._t * 1185)
+        self._res_n = self._resistivity * self._l / (self._w * self._t * self._nTES)
 
         # Operating Resistance
         self._res_o = self._res_n * self._fOp
@@ -118,6 +119,7 @@ class TES:
 
 
         # Debugging Printing Info
+        """
         print("---------------- TES PARAMETERS ----------------")
         print("wTc %s" % self._wTc)
         print("Tc %s" % self._T_c)
@@ -137,6 +139,7 @@ class TES:
         print("Ro %s" % self._res_o)
         print("L %s" % self._L)
         print("------------------------------------------------\n")
+        """
 
     def get_T(self):
         return self._t

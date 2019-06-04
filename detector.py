@@ -49,7 +49,7 @@ class Detector:
             n_fin = 4
 
         tungsten = TESMaterial()
-        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, tungsten.get_gPep_v(), 1.7e-14, 5, -100, tungsten)
+        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, tungsten.get_gPep_v(), 1.7e-14, 5, -100, 1185)
 
         self._QET = QET(n_fin, l_fin, h_fin, l_overlap, self._TES)
 
@@ -122,11 +122,14 @@ class Detector:
         # 5) Energy conversion efficiency at W/Al interface
         # 6) ?
 
+        # Phonon Downconversion Factor
+        self._e_downconvert = 1/4000
+
         # Let's combine 1), 5), and 6) together and assume that it is the same as the measured/derived value from iZIP4
         self._e156 = 0.8690
 
         # Total collection efficiency:
-        self._eEabsb = self._e156 * self._ePcollect * self._QET.get_eqpabsb() * self._QET.get_epqp()
+        self._eEabsb = self._e156 * self._ePcollect * self._QET.get_eqpabsb() * self._QET.get_epqp() # * self._e_downconvert * self._fSA_qpabsorb 
 
         # ------------ Thermal Conductance to Bath ---------------
         self._kpb = 1.55e-4
@@ -147,6 +150,7 @@ class Detector:
         self._response_dIdV_step = 0
         self._response_t = 0
 
+        """
         print("---------------- DETECTOR PARAMETERS ----------------")
         print("nP %s" % self._n_channel)
         print("SAactive %s" % self._SA_active)
@@ -161,6 +165,7 @@ class Detector:
         print("Kpb %s" % self._kpb)
         print("nKpb %s" % self._nkpb)
         print("------------------------------------------------\n")
+        """
 
     def get_position_resolution(self):
         pass
