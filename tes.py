@@ -2,8 +2,8 @@ import numpy as np
 from MaterialProperties import TESMaterial
 class TES:
 
-    def __init__(self, t, l, w, foverlap, n_fin, resistivity, sigma, V, n, T_eq, n_TES,
-                 material=TESMaterial(), T_c=40e-3, fOp=0.45, L=0, Qp=0):
+    def __init__(self, t, l, w, foverlap, n_fin, resistivity, sigma, n, T_eq, n_TES, specifyResistance,
+                 material=TESMaterial(), fOp=0.45, L=0, Qp=0):
         """
         TES Class
         
@@ -56,7 +56,8 @@ class TES:
         # Volume of the W/Al overlap portion of the fin connector
         # The W/Al portion is completely proximitized ... it should have a very low
         # effective volume
-        self._veff_WAloverlap = 0.13
+        # TODO this value is uncertain! Needs to be properly measured.
+        self._veff_WAloverlap = 0.35
 
         self._volume = self._volume_TES + self._veff_WFinCon * self._vol_WFinCon + \
                        self._veff_WAloverlap * self._vol_WAl_overlap
@@ -67,7 +68,13 @@ class TES:
         self._G = n * self._K * (T_eq ** (n-1))
 
         # Normal Resistance
-        self._res_n = self._resistivity * self._l / (self._w * self._t * self._nTES)
+        if not specifyResistance:
+            self._res_n = self._resistivity * self._l / (self._w * self._t * self._nTES)
+            print("NTES FLAG WORKING INCORRECTLY")
+        else:
+            # Have a desired output resistance and optimise length to fix n_TES.
+            self._res_n = 300e-3
+            self._nTES = self._resistivity * self._l  / (self._w * self._t * self._res_n)
 
         # Operating Resistance
         self._res_o = self._res_n * self._fOp
@@ -324,4 +331,7 @@ class TES:
 
     def get_fSp_xtra(self):
         return self._fSp_xtra
+
+    def get_ntes(self):
+        return self._nTES
 

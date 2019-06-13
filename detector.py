@@ -10,7 +10,7 @@ class Detector:
 
     def __init__(self, name, fridge, electronics, absorber, n_channel, n_TES=1185,
                  l_TES=140e-6, l_fin=200e-6, h_fin=600e-9, l_overlap=10e-6,
-                 w_rail_main=8e-6, w_rail_qet=4e-6):
+                 w_rail_main=6e-6, w_rail_qet=3e-6):
         """
         
         PD2 Detector Object
@@ -42,14 +42,17 @@ class Detector:
 
         resistivity = 9.6e-8 # Ohm m
 
-
         if l_fin > 100e-6:
             n_fin = 6
         else:
             n_fin = 4
 
         tungsten = TESMaterial()
-        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity, tungsten.get_gPep_v(), 1.7e-14, 5, -100, 1185)
+        # True flag here because specifying resistance to be 300e-3 so that l_tes and n_tes are constrained.
+        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity,
+                        tungsten.get_gPep_v(), 5, -100, 1185, True)
+
+        self._N_TES = self._TES.get_ntes()
 
         self._QET = QET(n_fin, l_fin, h_fin, l_overlap, self._TES)
 
@@ -64,10 +67,10 @@ class Detector:
 
         # ------------- QET Fins -----------------
         # Percentage of surface area covered by QET Fins
-        self._SA_active = self._n_channel * n_TES * self._QET.get_a_fin()
+        self._SA_active = self._n_channel * self._N_TES * self._QET.get_a_fin()
 
         # Average area per cell, and corresponding length
-        a_cell = self._absorber.get_pattern_SA() / (n_channel * n_TES) # 1/2 channels on each side
+        a_cell = self._absorber.get_pattern_SA() / (n_channel * self._N_TES) # 1/2 channels on each side
         self._l_cell = np.sqrt(a_cell)
 
         y_cell = 2 * self._QET.get_l_fin() + self._TES.get_L()
@@ -81,7 +84,7 @@ class Detector:
             x_cell = a_cell / y_cell
             a_passive_qet = x_cell * w_rail_main
 
-        tes_passive = a_passive_qet * n_channel * n_TES
+        tes_passive = a_passive_qet * n_channel * self._N_TES
         outer_ring = 2 * np.pi * (self._absorber.get_R() - self._absorber.get_w_safety()) * w_rail_main
         inner_ring = outer_ring / (np.sqrt(2))
         inner_vertical_rail = 3 * (self._absorber.get_R() - self._absorber.get_w_safety()) * w_rail_main * (1 - np.sqrt(2)/2.0)
@@ -103,12 +106,20 @@ class Detector:
 
         # ------------ Ballistic Phonon Absorption Time --------------
         if self._absorber.get_name() == 'Ge':
-            self._t_pabsb = 750e-6
+            self._t_pabsb = 750e-6 # TODO SET THIS PROPERLY
         elif self._absorber.get_name() == 'Si':
             self._t_pabsb = 1.7927e-05
         else:
             print("Incorrect Material. must be Ge or Si")
             sys.exit(1)
+
+        PD2_absb_time = 20e-6
+        absb_lscat = absorber.scattering_length()
+        PD2_fSA_qpabsb = 0.0071453736535236241
+        PD2_lscat = 0.001948849104859335
+
+
+        self._t_pabsb = PD2_absb_time * (absb_lscat / PD2_lscat) * (PD2_fSA_qpabsb / self._fSA_qpabsorb)
 
         self._w_collect = 1/self._t_pabsb
 

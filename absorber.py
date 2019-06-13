@@ -53,5 +53,5 @@ class Absorber:
     def get_mass(self):
         return self._m
 
-    def scattering_length(self, volume, SA):
-        pass
+    def scattering_length(self):
+        return 4 * self._volume / self._SA
