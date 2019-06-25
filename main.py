@@ -33,7 +33,7 @@ bnds = ((0, None), (0, None), (0, None))
 """result = minimize(main_func, initial_guess, bounds=bnds)
 
 det = Detector("PD2", fSnolab, eSLAC, absorber, 1, *result.x)
-lit = simulate_noise(det)
+noise = simulate_noise(det)
 
 print("Params are %s, gives value %s" % (result.x, lit))
 #print(result.success)
