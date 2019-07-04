@@ -175,52 +175,6 @@ class TESMaterial:
         self._wTc_1090 = 3.9e-4* Tc/40e-3
         self._wTc = self._wTc_1090/2/log(3)
 
-    def get_A(self):
-        return self._A
-
-    def get_Z(self):
-        return self._Z
-
-    def get_rho_mass(self):
-        return self._rho_m
-
-    def get_rho_number(self):
-        return self._rho_n
-
-    def get_gC_v(self):
-        return self._gC_v
-
-    def get_gC2_mol(self):
-        return self._gC2_mol
-
-    def get_gC2_v(self):
-        return self._gC2_v
-
-    def get_nC(self):
-        return self._nC
-
-    def get_fCsn(self):
-        return self._fCsn
-
-    def get_gPep_v(self):
-        return self._gPep_v
-
-    def get_nPep(self):
-        return self._nPep
-
-    def get_nPee(self):
-        return self._nPee
-
-    def get_rho_electric(self):
-        return self._rho_electrical
-
-    def get_Tc(self):
-        return self._Tc
-
-    def get_wTc(self):
-        return self._wTc
-
-
 class QETMaterial(QET):
     def __init__(self, name):
         self._name = name

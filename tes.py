@@ -21,8 +21,9 @@ class TES:
         self._t = 40e-9 # thickness is limited by fabrication constraints
         self._l = l
         self._w = w
-        self._foverlap_width = foverlap # fraction overlap 
-        self._resistivity = material.get_rho_electric()
+        self._foverlap_width = foverlap # fraction overlap
+        self._n_fin = n_fin 
+        self._resistivity = material._rho_electrical
         self._fOp = fOp
         self._volume_TES = self._t * self._l * self._w
         self._L = L
@@ -32,12 +33,12 @@ class TES:
         self._material = material
 
         # Critical temperature, default 40mK
-        self._T_c = material.get_Tc() #T_c
+        self._T_c = material._Tc # Critical temperature of W 
         self._Qp = Qp  # Parasitic heating
 
         wTc_1090 = 1.4e-3 * self._T_c / 68e-3  # [K], line 65-66 Tc_ResPt.m
-        self._wTc = material.get_wTc() #0.000177496649192233 #wTc_1090 #/ 2 / np.log(3)  # Same as above, putting this in due to SimpleEquilibrium line 51
-        self._material.get_gPep_v()
+        self._wTc = material._wTc #0.000177496649192233 #wTc_1090 #/ 2 / np.log(3)  # Same as above, putting this in due to SimpleEquilibrium line 51
+        self._material._gPep_v
 
         # Volume of the W/Al overlap
         self._vol_WAl_overlap = 10e-6 * 2 * self._l * self._foverlap_width * self._t
