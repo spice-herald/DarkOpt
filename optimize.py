@@ -10,9 +10,7 @@ from scipy.optimize import minimize
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Code to Optimize Design of New cm3 Devices
-# This code makes plots  
-# Summer Zuber July 2019 
+# testing out some plotting
 
 #                 name     T_MC   T_CP    T_Still  T_4K  parasitic  %%% CHECK ALL OF THESE  
 fSnolab = Fridge("SNOLAB", 20e-3, 145e-3, 900e-3,  4.8,  0)
@@ -58,9 +56,11 @@ def plot_efftes_l():
     plt.show()
 
 def plot_signoise_tesl():
-    tes_l = np.arange(0, 500e-6, 5e-6)
+    # something very strange is going on here 
+    tes_l = np.arange(0, 300e-6, 20e-6)
     sig_noise = []
 
+    fig, ax = plt.subplots()
     for l in np.nditer(tes_l):
        tes = TES(l, tes_w, foverlap, n_fin, sigma, T_eq, res_n, tungsten)
        qet = QET(n_fin, l_fin, h_fin, l_overlap, tes)

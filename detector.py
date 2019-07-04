@@ -200,5 +200,5 @@ class Detector:
     def set_t(self, val):
         self._response_t = val
 
-    def get_n_channel(self):
-        return self._n_channel
+   # def get_n_channel(self):
+   #     return self._n_channel

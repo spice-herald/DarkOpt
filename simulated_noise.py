@@ -270,7 +270,7 @@ def simulate_noise(detector):
     #print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     dPtdE = detector._response_dPtdE
     sigPt_of_1chan = np.sqrt(1/(domega/(2*np.pi)*4*np.abs(dPtdE)**2/Spt_tot).sum())/e
-    n_channel = detector.get_n_channel()
+    n_channel = detector._n_channel
     #print(">>> n_channel %s" % n_channel)
     sigPt_of = np.sqrt(n_channel) * sigPt_of_1chan
 
