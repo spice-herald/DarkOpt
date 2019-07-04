@@ -51,7 +51,7 @@ def plot_efftes_l():
        tes = TES(l, tes_w, foverlap, n_fin, sigma, T_eq, res_n, tungsten)
        qet = QET(n_fin, l_fin, h_fin, l_overlap, tes)
        det = Detector("cubes", fSnolab, eSLAC, absorber, qet, tes, 1)
-       e = det.get_eEabsb()
+       e = det._eEabsb
        eff.append(e)
     plt.plot(tes_l, eff) 
     fig.savefig("test.png")
@@ -65,7 +65,7 @@ def plot_signoise_tesl():
        tes = TES(l, tes_w, foverlap, n_fin, sigma, T_eq, res_n, tungsten)
        qet = QET(n_fin, l_fin, h_fin, l_overlap, tes)
        det = Detector("cubes", fSnolab, eSLAC, absorber, qet, tes, 1)
-       e = det.get_eEabsb()
+       e = det._eEabsb
        noise = simulate_noise(det)
        sig_noise.append(e/noise)
     plt.plot(tes_l, sig_noise) 

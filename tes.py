@@ -157,9 +157,6 @@ class TES:
     def get_overlap_width(self):
         return self._foverlap_width
 
-    def get_volume(self):
-        return self._volume
-
     def get_total_volume(self):
         return self._tot_volume
     

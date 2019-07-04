@@ -17,14 +17,14 @@ def dynamical_response(detector):
     lgc_plt = True
     lgc_pltsimp = False
 
-    w_Pabsb = detector.get_collection_bandwidth()
-    dPtdE = detector.get_eEabsb() / (1 + 1j * omega/w_Pabsb)
+    w_Pabsb = detector._w_collect
+    dPtdE = detector._eEabsb / (1 + 1j * omega/w_Pabsb)
     detector.set_dPtdE(dPtdE)
 
 
     lgc_1oF = False
 
-    TES = detector.get_TES()
+    TES = detector._tes # tes object
 
     # Calculate dIdP
 
@@ -32,8 +32,8 @@ def dynamical_response(detector):
     LG = TES.get_LG()
     C = TES.get_C()
     Io = TES.get_Io()
-    Lt = detector.get_electronics().get_lt()
-    Rl = detector.get_electronics().get_RL()
+    Lt = detector._electronics.get_lt()
+    Rl = detector._electronics.get_RL()
     Ro = TES.get_Ro()
     beta = TES.get_beta()
 
@@ -201,17 +201,16 @@ def simulate_noise(detector):
     simple_equilibrium(detector, beta=0, Qp=0)
     dynamical_response(detector)
 
-    omega = detector.get_response_omega()
+    omega = detector._response_omega
     n_omega = omega.size
 
-    TES = detector.get_TES()
+    TES = detector._tes
 
     TES.set_fSp_xtra(0)
     lgc_xtraNoise = False
 
     # Squid Noise -------------------------
-    #print(">>>>>>>SI_Squid %s" % detector.get_electronics().get_si_squid())
-    SI_squid = detector.get_electronics().get_si_squid() ** 2 * np.ones(n_omega) # A^2 / Hz
+    SI_squid = detector._electronics.get_si_squid() ** 2 * np.ones(n_omega) # A^2 / Hz
 
     dIdPt = detector.get_dIdP()
     # converting to units of power
@@ -219,9 +218,9 @@ def simulate_noise(detector):
 
     # Johnson Load Noise ------------------
 
-    Tl = detector.get_electronics().get_TL()
+    Tl = detector._electronics.get_TL()
     #print(">>>>> Tl %s" % Tl)
-    Rl = detector.get_electronics().get_RL()
+    Rl = detector._electronics.get_RL()
     Sv_l = 4 * kb * Tl * Rl  # V^2 / Hz
     Si_RlSC = Sv_l / (Rl ** 2)  # A^2 / Hz FIXME location of square
 
@@ -242,7 +241,7 @@ def simulate_noise(detector):
 
     # Phonon Cooling Noise across TES-Bath conductance ----------------
     Gep = TES.get_G()
-    T_MC = detector.get_fridge().get_TMC()
+    T_MC = detector._fridge.get_TMC()
     nPep = TES.get_n()
     Spt_Gtb = 4 * kb * To ** 2 * Gep * Ftfn(T_MC, To, nPep, False) * np.ones(n_omega)
 
@@ -269,7 +268,7 @@ def simulate_noise(detector):
     #print(">>>>>>>> domega:")
     #print(domega)
     #print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    dPtdE = detector.get_dPtdE()
+    dPtdE = detector._response_dPtdE
     sigPt_of_1chan = np.sqrt(1/(domega/(2*np.pi)*4*np.abs(dPtdE)**2/Spt_tot).sum())/e
     n_channel = detector.get_n_channel()
     #print(">>> n_channel %s" % n_channel)

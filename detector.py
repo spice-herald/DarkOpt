@@ -7,10 +7,12 @@ import sys
 
 # Some hard-coded numbers:
 k_b = 1.38e-3 # J/K
-t_tes = 40e-9 # m [set by fac constraints] 
+t_tes = 40e-9 # m [set by fab constraints] 
 n = 5 # used to define G (related to phonon/electron DOF)
+
 class Detector:
 
+    # want to be able to easily create PD2 object with values directly from ledit design 
     def __init__(self, name, fridge, electronics, absorber, qet, tes, n_channel):
         
         print("Initializing Detector Object...")
@@ -53,13 +55,15 @@ class Detector:
         self._qet.set_qpabsb_eff(self._l_fin, self._h_fin, self._l_overlap, self._l_TES) 
 
         # Total volume of Tungsten
-        self._total_TES_vol = self._tes.get_volume()
+        self._total_TES_vol = self._tes._volume
+        # ++++ for PD2 would get from ledit and compare 
 
         # ------------- QET Fins -----------------
         # Percentage of surface area covered by QET Fins 
         # SZ: this is not a percentage 
         # SZ: should be multiplied by n_fin??? 
         self._SA_active = self._n_channel * self._N_TES * self._qet.get_a_fin()
+        # ++++ for PD2 would get from ledit and compare   
 
         # Average area per cell, and corresponding length
         a_cell = self._absorber.get_pattern_SA() / (n_channel * self._N_TES) # 1/2 channels on each side
@@ -162,39 +166,12 @@ class Detector:
         print("------------------------------------------------\n")
         
 
-    def get_position_resolution(self):
-        pass
-
-
-    def get_TES(self):
-        return self._tes
-
-    def get_QET(self):
-        return self._QET
-
-    def get_fridge(self):
-        return self._fridge
-
-    def get_eEabsb(self):
-        return self._eEabsb
-
-    def get_collection_bandwidth(self):
-        return self._w_collect
-
-    def get_electronics(self):
-        return self._electronics
 
     def set_response_omega(self, omega):
         self._response_omega = omega
 
-    def get_response_omega(self):
-        return self._response_omega
-
     def set_dPtdE(self, val):
         self._response_dPtdE = val
-
-    def get_dPtdE(self):
-        return self._response_dPtdE
 
     def set_dIdP(self, val):
         self._response_dIdP = val

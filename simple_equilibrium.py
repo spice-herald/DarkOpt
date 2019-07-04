@@ -5,7 +5,7 @@ import numpy as np
 def simple_equilibrium(detector, beta=0, Qp=0):
     _det = detector
     _beta = beta
-    _TES = _det.get_TES()
+    _TES = _det._tes # the tes object
     _TES.set_Qp(Qp)
 
     #  ---- Bias Point Temperature ----
@@ -42,7 +42,7 @@ def simple_equilibrium(detector, beta=0, Qp=0):
 
     K = _TES.get_K()
     n = _TES.get_n()
-    T_MC = detector.get_fridge().get_TMC()
+    T_MC = detector._fridge.get_TMC()
 
     po = K * ((To ** n) - (T_MC ** n)) - Qp # W
     _TES.set_Po(po)  # W
@@ -62,7 +62,7 @@ def simple_equilibrium(detector, beta=0, Qp=0):
 
     # Bias Voltage
 
-    rl = _det.get_electronics().get_RL()
+    rl = _det._electronics.get_RL()
     Vbias = Io * (rl + ro)  # V
     _TES.set_Vbias(Vbias)
 
@@ -89,8 +89,8 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     LG = _TES.get_LG()
     C = _TES.get_C()
     Io = _TES.get_Io()
-    Lt = detector.get_electronics().get_lt()
-    Rl = detector.get_electronics().get_RL()
+    Lt = detector._electronics.get_lt()
+    Rl = detector._electronics.get_RL()
     Ro = _TES.get_Ro()
     beta = _TES.get_beta()
     Po = _TES.get_Po()
