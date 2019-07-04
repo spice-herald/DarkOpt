@@ -4,14 +4,14 @@ from scipy.special import kv as besselk
 
 class QET:
 
-    def __init__(self, n_fin, l_fin, h_fin, l_overlap, TES, eQPabsb=0.0, ePQP=0.52,
+    def __init__(self, l_fin, h_fin, l_overlap, TES, eQPabsb=0.0, ePQP=0.52,
                  wempty=6e-6, wempty_tes=7.5e-6, ahole=1e-10):
 
-        self._n_fin = n_fin
         self._l_fin = l_fin
         self._h_fin = h_fin
         self.l_overlap = l_overlap
         self._tes = TES
+        self._n_fin = TES._n_fin
         self._eQPabsb = eQPabsb
         self._ePQP = ePQP
         # ---- QET Active Area ----
@@ -20,7 +20,7 @@ class QET:
         self._nhole = 3 * self._n_fin
         self._ahole = ahole
         # SZ: shape of fins... recalculate area 
-        self._afin_empty = n_fin * l_fin * wempty + 2 * TES.get_L() * wempty_tes + self._nhole * ahole 
+        self._afin_empty = self._n_fin * l_fin * wempty + 2 * TES.get_L() * wempty_tes + self._nhole * ahole 
         self._a_fin = np.pi * (self._l_fin ** 2) + 2 * self._l_fin * TES.get_L() - self._afin_empty
         """
         print("---------------- QET PARAMETERS ----------------")

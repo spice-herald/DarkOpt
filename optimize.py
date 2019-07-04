@@ -1,5 +1,6 @@
 from fridge import Fridge
 from detector import Detector
+from PD2 import PD2
 from electronics import Electronics
 from absorber import Absorber
 from tes import TES 
@@ -47,7 +48,7 @@ def plot_efftes_l():
     fig, ax = plt.subplots()
     for l in np.nditer(tes_l):
        tes = TES(l, tes_w, foverlap, n_fin, sigma, T_eq, res_n, tungsten)
-       qet = QET(n_fin, l_fin, h_fin, l_overlap, tes)
+       qet = QET( l_fin, h_fin, l_overlap, tes)
        det = Detector("cubes", fSnolab, eSLAC, absorber, qet, tes, 1)
        e = det._eEabsb
        eff.append(e)
@@ -57,10 +58,6 @@ def plot_efftes_l():
 
 
 plot_efftes_l()
-
-
-
-
 
 
 def plot_signoise_tesl():
@@ -79,3 +76,4 @@ def plot_signoise_tesl():
     plt.plot(tes_l, sig_noise) 
     fig.savefig("test.png")
     plt.show()
+
