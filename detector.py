@@ -1,16 +1,19 @@
 from tes import TES
 from QET import QET
-from MaterialProperties import TESMaterial
+from MaterialProperties import TESMaterial, DetectorMaterial
 from electronics import Electronics
 import numpy as np
 import sys
 
+# Some hard-coded numbers:
 k_b = 1.38e-3 # J/K
+t_tes = 40e-9 # m [set by fac constraints] 
+n = 5 # used to define G (related to phonon/electron DOF)
 class Detector:
 
-    def __init__(self, name, fridge, electronics, absorber, n_channel, n_TES=1185,
-                 l_TES=140e-6, l_fin=200e-6, h_fin=600e-9, l_overlap=10e-6,
-                 w_rail_main=6e-6, w_rail_qet=3e-6):
+    def __init__(self, name, fridge, electronics, absorber, qet, tes, n_channel):
+        
+        print("Initializing Detector Object...")
         """
         
         PD2 Detector Object
@@ -23,57 +26,46 @@ class Detector:
         :param l_TES: Length of TES
         :param l_fin: Length of QET Fin
         :param h_fin: Height of QET Fin
-        :param l_overlap: Length of ??
+        :param l_overlap: Length of Overlap of W and Al???
+
         """
+        # Figure out where these come from!!! 
+        w_rail_main = 6e-6
+        w_rail_qet = 3e-3 
 
         self._name = name
         self._fridge = fridge
         self._absorber = absorber
         self._n_channel = n_channel
-        self._l_TES = l_TES
-        self._l_fin = l_fin
-        self._h_fin = h_fin
-        self._l_overlap = l_overlap
-        self._N_TES = n_TES
+        self._l_TES = tes.get_L()
+        self._l_fin = qet.get_l_fin()
+        self._h_fin = qet.get_h_fin()
+        self._l_overlap = qet.get_l_overlap()
         self._w_rail_main = w_rail_main
         self._w_rail_qet = w_rail_qet
-        self._electronics = electronics #Electronics(fridge, 5e-3, 6e-3, 75e-9, 25e-9, 6e-12) # SNOLAB values by default
+        self._electronics = electronics
         self._sigma_energy = 0
+        self._qet = qet 
+        self._tes = tes 
+        self._N_TES = self._tes.get_ntes() # number of tes as derived in the tes class   
 
-        resistivity = 9.6e-8 # Ohm m
-
-        if l_fin > 100e-6:
-            n_fin = 6
-        else:
-            n_fin = 4
-
-        tungsten = TESMaterial()
-        # True flag here because specifying resistance to be 300e-3 so that l_tes and n_tes are constrained.
-        self._TES = TES(40e-9, l_TES, 3.5e-6, 1, n_fin, resistivity,
-                        tungsten.get_gPep_v(), 5, -100, 1185, True)
-
-        self._N_TES = self._TES.get_ntes()
-
-        self._QET = QET(n_fin, l_fin, h_fin, l_overlap, self._TES)
-
-        self._QET.set_qpabsb_eff(l_fin, h_fin, l_overlap, l_TES)
-
-        # -------------- TES -------------
-        # Resistance of N_TES sensors in parallel.
-        self._total_TES_R = self._TES.get_R() / self._N_TES
+        # Set the QP Absorbtion Efficiency 
+        self._qet.set_qpabsb_eff(self._l_fin, self._h_fin, self._l_overlap, self._l_TES) 
 
         # Total volume of Tungsten
-        self._total_TES_vol = self._TES.get_volume()
+        self._total_TES_vol = self._tes.get_volume()
 
         # ------------- QET Fins -----------------
-        # Percentage of surface area covered by QET Fins
-        self._SA_active = self._n_channel * self._N_TES * self._QET.get_a_fin()
+        # Percentage of surface area covered by QET Fins 
+        # SZ: this is not a percentage 
+        # SZ: should be multiplied by n_fin??? 
+        self._SA_active = self._n_channel * self._N_TES * self._qet.get_a_fin()
 
         # Average area per cell, and corresponding length
         a_cell = self._absorber.get_pattern_SA() / (n_channel * self._N_TES) # 1/2 channels on each side
         self._l_cell = np.sqrt(a_cell)
 
-        y_cell = 2 * self._QET.get_l_fin() + self._TES.get_L()
+        y_cell = 2 * self._qet.get_l_fin() + self._tes.get_L()
 
         if self._l_cell > y_cell:
             # Design is not close packed. Get passive Al/QET
@@ -82,13 +74,13 @@ class Detector:
         else:
             # Design is close packed. No vertical rail to QET
             x_cell = a_cell / y_cell
-            a_passive_qet = x_cell * w_rail_main
+            a_passive_qet = x_cell * self._w_rail_main
 
         tes_passive = a_passive_qet * n_channel * self._N_TES
-        outer_ring = 2 * np.pi * (self._absorber.get_R() - self._absorber.get_w_safety()) * w_rail_main
+        outer_ring = 2 * np.pi * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main
         inner_ring = outer_ring / (np.sqrt(2))
-        inner_vertical_rail = 3 * (self._absorber.get_R() - self._absorber.get_w_safety()) * w_rail_main * (1 - np.sqrt(2)/2.0)
-        outer_vertical_rail = (self._absorber.get_R() - self._absorber.get_w_safety()) * w_rail_main * (1 + np.sqrt(2)/2.0)
+        inner_vertical_rail = 3 * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main * (1 - np.sqrt(2)/2.0)
+        outer_vertical_rail = (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main * (1 + np.sqrt(2)/2.0)
 
         # Total Passive Surface Area
         # 1. TES Passive Area
@@ -104,20 +96,12 @@ class Detector:
         # Fraction of Al which is QET fin which can produce signal
         self._ePcollect = self._SA_active / (self._SA_active + self._SA_passive)
 
-        # ------------ Ballistic Phonon Absorption Time --------------
-        if self._absorber.get_name() == 'Ge':
-            self._t_pabsb = 750e-6 # TODO SET THIS PROPERLY
-        elif self._absorber.get_name() == 'Si':
-            self._t_pabsb = 1.7927e-05
-        else:
-            print("Incorrect Material. must be Ge or Si")
-            sys.exit(1)
+        self._t_pabsb = DetectorMaterial(absorber.get_name()).get_t_pabsb() # TODO SET THIS PROPERLY
 
         PD2_absb_time = 20e-6
         absb_lscat = absorber.scattering_length()
         PD2_fSA_qpabsb = 0.0071453736535236241
         PD2_lscat = 0.001948849104859335
-
 
         self._t_pabsb = PD2_absb_time * (absb_lscat / PD2_lscat) * (PD2_fSA_qpabsb / self._fSA_qpabsorb)
 
@@ -140,7 +124,7 @@ class Detector:
         self._e156 = 0.8690
 
         # Total collection efficiency:
-        self._eEabsb = self._e156 * self._ePcollect * self._QET.get_eqpabsb() * self._QET.get_epqp() # * self._e_downconvert * self._fSA_qpabsorb 
+        self._eEabsb = self._e156 * self._ePcollect * self._qet.get_eqpabsb() * self._qet.get_epqp() # * self._e_downconvert * self._fSA_qpabsorb 
 
         # ------------ Thermal Conductance to Bath ---------------
         self._kpb = 1.55e-4
@@ -148,7 +132,7 @@ class Detector:
         self._nkpb = 4
 
         # ----------- Electronics ----------
-        self._total_L = self._electronics.get_l_squid() + self._electronics.get_l_p() + self._TES.get_L()
+        self._total_L = self._electronics.get_l_squid() + self._electronics.get_l_p() + self._tes.get_L()
 
         # ---------- Response Variables to Be Set in Simulation of Noise ---------------
         self._response_omega = 0
@@ -161,7 +145,7 @@ class Detector:
         self._response_dIdV_step = 0
         self._response_t = 0
 
-        """
+        
         print("---------------- DETECTOR PARAMETERS ----------------")
         print("nP %s" % self._n_channel)
         print("SAactive %s" % self._SA_active)
@@ -176,14 +160,14 @@ class Detector:
         print("Kpb %s" % self._kpb)
         print("nKpb %s" % self._nkpb)
         print("------------------------------------------------\n")
-        """
+        
 
     def get_position_resolution(self):
         pass
 
 
     def get_TES(self):
-        return self._TES
+        return self._tes
 
     def get_QET(self):
         return self._QET

@@ -1,6 +1,7 @@
 import numpy as np
 
-
+# simple because beta=0 
+# 
 def simple_equilibrium(detector, beta=0, Qp=0):
     _det = detector
     _beta = beta

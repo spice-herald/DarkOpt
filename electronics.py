@@ -1,5 +1,8 @@
 class Electronics:
-
+    
+    # future: 
+    # electronics should always use the fridge 
+    # electronic used in any fridge 
     def __init__(self, fridge, TS, TP, R_S=5e-3, R_P=6e-3, l_squid=75e-9, l_p=25e-9, si_squid=6e-12):
         """Default values from eSNOLAB.m"""
         self._fridge = fridge

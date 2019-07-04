@@ -1,8 +1,9 @@
 import numpy as np
 from MaterialProperties import TESMaterial
-class TES:
 
-    def __init__(self, t, l, w, foverlap, n_fin, resistivity, sigma, n, T_eq, n_TES, specifyResistance,
+class TES:
+    # n_TES always a derived quantity, shouldn't be an input  
+    def __init__(self, l, w, foverlap, n_fin, sigma, T_eq, total_res_n, 
                  material=TESMaterial(), fOp=0.45, L=0, Qp=0):
         """
         TES Class
@@ -10,27 +11,27 @@ class TES:
         :param t: Thickness of TES [m]
         :param l: Length of TES [m]
         :param w: Width of TES [m] 
-        :param foverlap: Fraction of the Al fin edge that is adjacent to the TES which is covered with Al 
+        :param foverlap: Fraction of the Al fin edge that is adjacent to the TES which is covered with Al
+         w_fincon = (Perimeter/n_fin)*foverlap                 
         :param n_fin: Number of Fins to form QET
         :param resistivity: Resistivity
         :param fOp: TES Operating point resistance ratio 
         :param L: Inductance [H] 
         """
-        self._t = t
+        self._t = 40e-9 # thickness is limited by fabrication constraints
         self._l = l
         self._w = w
-        self._foverlap_width = foverlap
-        self._resistivity = resistivity
+        self._foverlap_width = foverlap # fraction overlap 
+        self._resistivity = material.get_rho_electric()
         self._fOp = fOp
         self._volume_TES = self._t * self._l * self._w
         self._L = L
         #self._K = sigma * V  # P_bath vs T, eq 3.1 in thesis.
-        self._n = n  # used to define G, refer to eqs 3.1 and 3.3
+        self._n = 5  # used to define G, refer to eqs 3.1 and 3.3
         self._T_eq = T_eq  # equilibrium temperature
         self._material = material
-        self._nTES = n_TES
 
-        # Critical temperature, default 40mK from MaterialProperties.m line 427
+        # Critical temperature, default 40mK
         self._T_c = material.get_Tc() #T_c
         self._Qp = Qp  # Parasitic heating
 
@@ -62,22 +63,17 @@ class TES:
         self._volume = self._volume_TES + self._veff_WFinCon * self._vol_WFinCon + \
                        self._veff_WAloverlap * self._vol_WAl_overlap
 
-        self._tot_volume = self._volume * self._nTES #1185
+        # Have a desired output resistance and optimise length to fix n_TES.
+        self._total_res_n = total_res_n
+        self._nTES = self._resistivity * self._l  / (self._w * self._t * self._total_res_n)
+
+        self._tot_volume = self._volume * self._nTES #1185 but number of TES changed later??? 
         self._K = self._tot_volume * sigma
         # Phonon electron thermal coupling
-        self._G = n * self._K * (T_eq ** (n-1))
-
-        # Normal Resistance
-        if not specifyResistance:
-            self._res_n = self._resistivity * self._l / (self._w * self._t * self._nTES)
-            print("NTES FLAG WORKING INCORRECTLY")
-        else:
-            # Have a desired output resistance and optimise length to fix n_TES.
-            self._res_n = 300e-3
-            self._nTES = self._resistivity * self._l  / (self._w * self._t * self._res_n)
-
+        self._G = self._n * self._K * (T_eq ** (self._n-1))
+        
         # Operating Resistance
-        self._res_o = self._res_n * self._fOp
+        self._res_o = self._total_res_n * self._fOp
 
         # ------ Parameters to be set later when simulating equilibrium -----
 
@@ -126,7 +122,7 @@ class TES:
 
 
         # Debugging Printing Info
-        """
+       
         print("---------------- TES PARAMETERS ----------------")
         print("wTc %s" % self._wTc)
         print("Tc %s" % self._T_c)
@@ -136,17 +132,18 @@ class TES:
         print("w %s" % self._w)
         print("vol1TES %s" % self._volume_TES)
         print("vol1 %s" % self._volume)
+        print("nTES %s" % self._nTES)
         print("volFinCon %s" % self._vol_WFinCon)
         print("WAlOverlap %s" % self._vol_WAl_overlap)
         print("veff_WFinCon %s" % self._veff_WFinCon)
         print("veff_WAloverlap %s" % self._veff_WAloverlap)
-        print("Rn %s" % self._res_n)
+        print("Rn %s" % self._total_res_n)
         print("Ro %s" % self._res_o)
         print("fOp %s" % self._fOp)
         print("Ro %s" % self._res_o)
         print("L %s" % self._L)
         print("------------------------------------------------\n")
-        """
+      
 
     def get_T(self):
         return self._t
@@ -165,9 +162,10 @@ class TES:
 
     def get_total_volume(self):
         return self._tot_volume
-
+    
+    # Normal Resistance of N TES in Parallel  
     def get_R(self):
-        return self._res_n
+        return self._total_res_n
 
     def get_Ro(self):
         return self._res_o

@@ -25,7 +25,7 @@ def main_func(TES_L, fin_L, overlap_L):
     #l_overlap = 15e-6
     # TES number is garbage because will be set later.
     det = Detector("PD2", fSnolab, eSLAC, absorber, 1, 69, TES_L, fin_L, h_fin, overlap_L)
-    return simulate_noise(det)
+    return simulate_noise(det) # [eV]
 
 initial_guess = np.array([140e-6, 200e-6, 10e-6])
 #bnds = ((0, None), (0, None), (0, None), (0, None), (0, None), (8e-6, None), (4e-6, None))
@@ -74,6 +74,7 @@ print(">>>>> Min Location: (%s, %s) Value: %s" % (x_coord, y_coord, minimum))
 plt.imshow(z, interpolation='bilinear',
            origin='lower', extent=[lower_limit_tes*1e6,upper_limit_tes*1e6,lower_limit_fin*1e6, upper_limit_fin*1e6],cmap='Reds')
 plt.colorbar()
+#set(get(cb, 'title'), 'string', 'Simulated Noise / eV')
 plt.xlabel("TES Length / µm")
 plt.ylabel("Fin Length / µm")
 
@@ -90,7 +91,4 @@ print(np.amin(z))
 
 plt.title("Overlap Length %.1f µm. \n Min = %.3f at TES Length = %.1f Fin Length = %.1f" % (overlap*1e6, minimum, TES_L*1e6, fin_L*1e6))
 
-plt.show()
-
-
-
+plt.savefig('overlap.png')

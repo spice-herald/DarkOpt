@@ -1,9 +1,10 @@
+from math import *
 import numpy as np
-
+from MaterialProperties import DetectorMaterial
 
 class Absorber:
 
-    def __init__(self, name, h, r, w_safety, rho):
+    def __init__(self, name, shape, h, r, w_safety):
         """
         Absorber Medium of Detector. Assumed in shape of cylinder. 
         
@@ -14,15 +15,25 @@ class Absorber:
         :param W: Phonon Coupling Constant [Some intense SI unit combo which I forgot] 
         :param rho: Density [kg m^-3]
         """
+        material = DetectorMaterial(name)
+
         self._name = name
-        self._h = h
-        self._r = r
-        self._w_safety = w_safety
-        self._rho = rho
-        self._volume = np.pi * (self._r ** 2) * self._h
-        self._SA_face = np.pi * (self._r ** 2)
-        self._SA_pattern = np.pi * (self._r - self._w_safety) ** 2
-        self._SA = 2 * (self._SA_face + np.pi * self._r * self._h)
+        self._h = h # if cube - length of one side
+        self._r = r # if cube r = h 
+        self._w_safety = w_safety  
+        self._rho = material.get_rho_mass()
+        if shape == "cylinder":
+            self._volume = np.pi * (self._r ** 2) * self._h
+            self._SA_face = np.pi * (self._r ** 2)
+            self._SA_pattern = np.pi * (self._r - self._w_safety) ** 2
+            self._SA = 2 * (self._SA_face + np.pi * self._r * self._h)
+        elif shape == "cube": 
+            self._volume = self._h**3
+            self._SA_face = self._h**2
+            self._SA_pattern = (self._h -2*self._w_safety)**2
+            self._SA = 6*self._SA_face
+        else:
+            print("Wrong Shape.")
         self._m = self._rho * self._volume
         pass
 
@@ -54,4 +65,11 @@ class Absorber:
         return self._m
 
     def scattering_length(self):
+    # In ballistic limited transport, the average scattering length will depend upon the absorber geometry 
+    # From the super simple sabine equation 
+    # (http://courses.physics.illinois.edu/phys406/Lecture_Notes/P406POM_Lecture_Notes/Derivation_of_the_Sabine_Equation.pdf)
+    # Inputs:
+    #   1) Absorber Volume
+    #    2) Absorber Surface Area
+    # 12/6/13: MCP
         return 4 * self._volume / self._SA

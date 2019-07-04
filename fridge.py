@@ -1,6 +1,9 @@
-class Fridge:
+ Frid.classe:
 
-    def __init__(self, name, T_MC, T_CP, T_Still, T_4K, parasitic):
+    nit__.py  notes                  overlap.png  QET.py       simulated_noise.py
+electronics.py  main.py      notes_2                plotting.py  README.md    tes.py
+summer@Bruce ~/anaconda3/Pyle/detdesign $ vim 
+def __init__(self, name, T_MC, T_CP, T_Still, T_4K, parasitic):
         """
         Fridge Class 
         :param name: Name of Fridge
