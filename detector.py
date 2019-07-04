@@ -40,9 +40,9 @@ class Detector:
         self._absorber = absorber
         self._n_channel = n_channel
         self._l_TES = tes.get_L()
-        self._l_fin = qet.get_l_fin()
-        self._h_fin = qet.get_h_fin()
-        self._l_overlap = qet.get_l_overlap()
+        self._l_fin = qet._l_fin
+        self._h_fin = qet._h_fin
+        self._l_overlap = qet.l_overlap
         self._w_rail_main = w_rail_main
         self._w_rail_qet = w_rail_qet
         self._electronics = electronics
@@ -62,14 +62,14 @@ class Detector:
         # Percentage of surface area covered by QET Fins 
         # SZ: this is not a percentage 
         # SZ: should be multiplied by n_fin??? 
-        self._SA_active = self._n_channel * self._N_TES * self._qet.get_a_fin()
+        self._SA_active = self._n_channel * self._N_TES * self._qet._a_fin
         # ++++ for PD2 would get from ledit and compare   
 
         # Average area per cell, and corresponding length
         a_cell = self._absorber.get_pattern_SA() / (n_channel * self._N_TES) # 1/2 channels on each side
         self._l_cell = np.sqrt(a_cell)
 
-        y_cell = 2 * self._qet.get_l_fin() + self._tes.get_L()
+        y_cell = 2 * self._qet._l_fin + self._tes.get_L()
 
         if self._l_cell > y_cell:
             # Design is not close packed. Get passive Al/QET
@@ -102,6 +102,7 @@ class Detector:
 
         self._t_pabsb = DetectorMaterial(absorber.get_name()).get_t_pabsb() # TODO SET THIS PROPERLY
 
+        # Find out where these come from !!! 
         PD2_absb_time = 20e-6
         absb_lscat = absorber.scattering_length()
         PD2_fSA_qpabsb = 0.0071453736535236241
@@ -128,7 +129,7 @@ class Detector:
         self._e156 = 0.8690
 
         # Total collection efficiency:
-        self._eEabsb = self._e156 * self._ePcollect * self._qet.get_eqpabsb() * self._qet.get_epqp() # * self._e_downconvert * self._fSA_qpabsorb 
+        self._eEabsb = self._e156 * self._ePcollect * self._qet._eQPabsb * self._qet._ePQP # * self._e_downconvert * self._fSA_qpabsorb 
 
         # ------------ Thermal Conductance to Bath ---------------
         self._kpb = 1.55e-4
@@ -200,5 +201,3 @@ class Detector:
     def set_t(self, val):
         self._response_t = val
 
-   # def get_n_channel(self):
-   #     return self._n_channel

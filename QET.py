@@ -94,41 +94,4 @@ class QET:
         (besseli(0, rhoi) - lambdaA * besseli(1, rhoi)) * besselk(1, rhoo))
         self._eQPabsb = fQP
 
-    def get_epqp(self):
-        return self._ePQP
 
-    def get_eqpabsb(self):
-        return self._eQPabsb
-
-    def get_n_fin(self):
-        return self._n_fin
-
-    def get_l_fin(self):
-        return self._l_fin
-
-    def get_h_fin(self):
-        return self._h_fin
-
-    def get_l_overlap(self):
-        return self.l_overlap
-
-    def get_TES(self):
-        return self._tes
-
-    def get_wempty(self):
-        return self._wempty
-
-    def get_wempty_tes(self):
-        return self._wempty_tes
-
-    def get_nhole(self):
-        return self._nhole
-
-    def get_ahole(self):
-        return self._ahole
-
-    def get_afin_empty(self):
-        return self._afin_empty
-
-    def get_a_fin(self):
-        return self._a_fin

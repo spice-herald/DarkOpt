@@ -55,6 +55,14 @@ def plot_efftes_l():
     fig.savefig("test.png")
     plt.show()
 
+
+plot_efftes_l()
+
+
+
+
+
+
 def plot_signoise_tesl():
     # something very strange is going on here 
     tes_l = np.arange(0, 300e-6, 20e-6)
