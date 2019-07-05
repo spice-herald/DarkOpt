@@ -145,189 +145,76 @@ class TES:
         print("L %s" % self._L)
         print("------------------------------------------------\n")
       
-
-    def get_T(self):
-        return self._t
-
-    def get_L(self):
-        return self._l
-
-    def get_W(self):
-        return self._w
-
-    def get_overlap_width(self):
-        return self._foverlap_width
-
-    def get_total_volume(self):
-        return self._tot_volume
     
-    # Normal Resistance of N TES in Parallel  
-    def get_R(self):
-        return self._total_res_n
-
-    def get_Ro(self):
-        return self._res_o
-
-    def get_G(self):
-        return self._G
-
     def set_G(self, val):
         self._G = val
-
-    def get_Tc(self):
-        return self._T_c
-
-    def get_To(self):
-        return self._T_eq
-
-    def get_fOp(self):
-        return self._fOp
-
+   
     def set_To(self, T):
         self._T_eq = T
 
     def set_Qp(self, q):
         self._Qp = q
-
-    def get_wTc(self):
-        return self._wTc
-
-    def get_n(self):
-        return self._n
-
-    def get_K(self):
-        """K = Sigma * Volume defined from thesis eq 3.1 page 18"""
-        return self._K
-
-    def get_material(self):
-        return self._material
-
+    
     def set_alpha(self, a):
         self._alpha = a
-
-    def get_alpha(self):
-        return self._alpha
 
     def set_beta(self, b):
         self._beta = b
 
-    def get_beta(self):
-        return self._beta
-
     def set_Po(self, p):
         self._Po = p
-
-    def get_Po(self):
-        return self._Po
 
     def set_LG(self, lg):
         self._LG = lg
 
-    def get_LG(self):
-        return self._LG
-
     def set_Io(self, I):
         self._Io = I
-
-    def get_Io(self):
-        return self._Io
 
     def set_Vbias(self, V):
         self._Vbias = V
 
-    def get_Vbias(self):
-        return self._Vbias
-
     def set_C(self, c):
         self._C = c
-
-    def get_C(self):
-        return self._C
 
     def set_tau0(self, t):
         self._tau0 = t
 
-    def get_tau0(self):
-        return self._tau0
-
     def set_tau_etf(self, t):
         self._tau_etf = t
-
-    def get_tau_etf(self):
-        return self._tau_etf
 
     def set_w_etf(self, w):
         self._w_etf = w
 
-    def get_w_etf(self):
-        return self._w_etf
-
     def set_tau_I(self, val):
         self._tau_I = val
-
-    def get_tau_I(self):
-        return self._tau_I
 
     def set_w_I(self, val):
         self._w_I = val
 
-    def get_w_I(self):
-        return self._w_I
-
     def set_tau_el(self, val):
         self._tau_el = val
-
-    def get_tau_el(self):
-        return self._tau_el
 
     def set_w_el(self, val):
         self._w_el = val
 
-    def get_w_el(self):
-        return self._w_el
-
     def set_tau_etf_simp(self, val):
         self._tau_etf_simp = val
-
-    def get_tau_etf_simp(self):
-        return self._tau_etf_simp
 
     def set_w_etf_simp(self, val):
         self._w_etf_simp = val
 
-    def get_w_etf_simp(self):
-        return self._w_etf_simp
-
     def set_wpp(self, val):
         self._wp_p = val
-
-    def get_wpp(self):
-        return self._wp_p
 
     def set_wpm(self, val):
         self._wp_m = val
 
-    def get_wpm(self):
-        return self._wp_m
-
     def set_taupp(self, val):
         self._taup_p = val
-
-    def get_taupp(self):
-        return self._taup_p
 
     def set_taupm(self, val):
         self._taup_m = val
 
-    def get_taupm(self):
-        return self._taup_m
-
     def set_fSp_xtra(self, val):
         self._fSp_xtra = val
-
-    def get_fSp_xtra(self):
-        return self._fSp_xtra
-
-    def get_ntes(self):
-        return self._nTES
 

@@ -11,17 +11,17 @@ class QET:
         self._h_fin = h_fin
         self.l_overlap = l_overlap
         self._tes = TES
-        self._n_fin = TES._n_fin
+        #self._n_fin = TES._n_fin
         self._eQPabsb = eQPabsb
         self._ePQP = ePQP
         # ---- QET Active Area ----
         self._wempty = wempty
         self._wempty_tes = wempty_tes
-        self._nhole = 3 * self._n_fin
+        self._nhole = 3 * TES._n_fin
         self._ahole = ahole
         # SZ: shape of fins... recalculate area 
-        self._afin_empty = self._n_fin * l_fin * wempty + 2 * TES.get_L() * wempty_tes + self._nhole * ahole 
-        self._a_fin = np.pi * (self._l_fin ** 2) + 2 * self._l_fin * TES.get_L() - self._afin_empty
+        self._afin_empty = TES._n_fin * l_fin * wempty + 2 * TES._l * wempty_tes + self._nhole * ahole 
+        self._a_fin = np.pi * (self._l_fin ** 2) + 2 * self._l_fin * TES._l - self._afin_empty
         """
         print("---------------- QET PARAMETERS ----------------")
         print("ePQP %s" % self._ePQP)

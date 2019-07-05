@@ -7,7 +7,6 @@ from scipy.constants import e
 # """Final Result: sigPt_of = sqrt(Det.nP)*sigPt_of_1chan [eV]"""
 
 def dynamical_response(detector):
-
     n_omega = int(1e5)
     omega = np.logspace(-1, 5.5, n_omega) * 2 * np.pi
 
@@ -28,14 +27,14 @@ def dynamical_response(detector):
 
     # Calculate dIdP
 
-    Gep = TES.get_G()
-    LG = TES.get_LG()
-    C = TES.get_C()
-    Io = TES.get_Io()
+    Gep = TES._G
+    LG = TES._LG
+    C = TES._C
+    Io = TES._Io
     Lt = detector._electronics.get_lt()
     Rl = detector._electronics.get_RL()
-    Ro = TES.get_Ro()
-    beta = TES.get_beta()
+    Ro = TES._res_o
+    beta = TES._beta
 
     #print(">>> Rl %s" % Rl)
     dIdPt = -(Gep * LG / (C * Io * Lt)) * (1 / (1j*omega + Gep * (1 - LG) / C) *
@@ -130,7 +129,6 @@ def dynamical_response(detector):
 
     detector.set_dIdV_step(dIdV_step)
     detector.set_t(t)
-
     if lgc_plt:
         # Plot dIdPt magnitude just as a test, can put the other plots later
         plt.plot(omega/(2 * np.pi), np.abs(dIdPt))
@@ -188,7 +186,6 @@ def dynamical_response(detector):
         #plt.show()
 
 
-
 def Ftfn(Tl, Th, n, isBallistic):
 
     if isBallistic:
@@ -229,27 +226,27 @@ def simulate_noise(detector):
     Spt_Rl = Si_Rl / abs(dIdPt ** 2)
 
     # Johnson TES noise ------------------
-    To = TES.get_To()
-    Ro = TES.get_Ro()
-    beta = TES.get_beta()
+    To = TES._T_eq
+    Ro = TES._res_o
+    beta = TES._beta
     Sv_t = 4 * kb * To * Ro * (1 + beta) ** 2  # FIXME Is the square in the right place? Dimensionally this makes sense.
 
-    Io = TES.get_Io()
+    Io = TES._Io
 
     Si_Rt = abs(dIdV - Io * dIdPt) ** 2 * Sv_t # A^2 / Hz
     Spt_Rt = Si_Rt / abs(dIdPt ** 2) # W^2 / Hz
 
     # Phonon Cooling Noise across TES-Bath conductance ----------------
-    Gep = TES.get_G()
+    Gep = TES._G
     T_MC = detector._fridge.get_TMC()
-    nPep = TES.get_n()
+    nPep = TES._n
     Spt_Gtb = 4 * kb * To ** 2 * Gep * Ftfn(T_MC, To, nPep, False) * np.ones(n_omega)
 
     Si_Gtb = abs(dIdPt ** 2) * Spt_Gtb
 
     # Unexplained Noise scaling as Pt
-    Spt_xtra_Sp = Spt_Gtb * TES.get_fSp_xtra() ** 2
-    Si_extra_Sp = Si_Gtb * TES.get_fSp_xtra() ** 2
+    Spt_xtra_Sp = Spt_Gtb * TES._fSp_xtra ** 2
+    Si_extra_Sp = Si_Gtb * TES._fSp_xtra ** 2
 
     # --------- TOTAL NOISE TERMS (EXCEPT 1/F) -----------
 
@@ -274,9 +271,6 @@ def simulate_noise(detector):
     #print(">>> n_channel %s" % n_channel)
     sigPt_of = np.sqrt(n_channel) * sigPt_of_1chan
 
-    #print(">>>>>>>>>>>>>>>>>>>>>> RESOLUTION IS %s" % sigPt_of)
-    return sigPt_of
-    """
     plt.plot(omega/(2*np.pi),np.sqrt(SI_squid)*1e12,'yellow', label='Squid')
     plt.plot(omega/(2*np.pi),np.sqrt(Si_Rl)*1e12,'red', label='R_load')
     plt.plot(omega/(2*np.pi),np.sqrt(Si_Rt)*1e12,'green', label='R_tes')
@@ -287,8 +281,8 @@ def simulate_noise(detector):
     plt.semilogx()
     plt.semilogy()
     plt.title("TES Current Noise", fontsize=20)
-    plt.xlabel("F [Hz]", fontsize=20)
-    plt.ylabel("S_I [pA/√Hz]", fontsize=20)
+    plt.xlabel("F [Hz]", fontsize=15)
+    plt.ylabel("S_I [pA/√Hz]", fontsize=15)
     #plt.show()
 
     plt.plot(omega/(2*np.pi),np.sqrt(SPt_squid),'yellow', label='Squid')
@@ -297,11 +291,14 @@ def simulate_noise(detector):
     plt.plot(omega/(2*np.pi),np.sqrt(Spt_Gtb),'cyan', label='G TES-Bath')
     plt.plot(omega/(2*np.pi),np.sqrt(Spt_tot),'black', label='Total')
     plt.title("TES Power Noise", fontsize=20)
-    plt.xlabel("F [Hz]", fontsize=20)
-    plt.ylabel("S_P [W/√Hz]", fontsize=20)
+    plt.xlabel("F [Hz]", fontsize=15)
+    plt.ylabel("S_P [W/√Hz]", fontsize=15)
     plt.grid()
     plt.legend(loc='best')
     plt.semilogy()
     plt.semilogx()
-    #plt.show()"""
+    #plt.show()
 
+    print(">>>>>>>>>>>>>>>>>>>>>> RESOLUTION IS %s" % sigPt_of)
+    return sigPt_of
+    

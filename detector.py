@@ -12,10 +12,8 @@ n = 5 # used to define G (related to phonon/electron DOF)
 
 class Detector:
 
-    # want to be able to easily create PD2 object with values directly from ledit design 
     def __init__(self, name, fridge, electronics, absorber, qet, tes, n_channel):
         
-        print("Initializing Detector Object...")
         """
         
         PD2 Detector Object
@@ -39,7 +37,7 @@ class Detector:
         self._fridge = fridge
         self._absorber = absorber
         self._n_channel = n_channel
-        self._l_TES = tes.get_L()
+        self._l_TES = tes._l
         self._l_fin = qet._l_fin
         self._h_fin = qet._h_fin
         self._l_overlap = qet.l_overlap
@@ -49,7 +47,7 @@ class Detector:
         self._sigma_energy = 0
         self._qet = qet 
         self._tes = tes 
-        self._N_TES = self._tes.get_ntes() # number of tes as derived in the tes class   
+        self._N_TES = self._tes._nTES # number of tes as derived in the tes class   
 
         # Set the QP Absorbtion Efficiency 
         self._qet.set_qpabsb_eff(self._l_fin, self._h_fin, self._l_overlap, self._l_TES) 
@@ -69,7 +67,7 @@ class Detector:
         a_cell = self._absorber.get_pattern_SA() / (n_channel * self._N_TES) # 1/2 channels on each side
         self._l_cell = np.sqrt(a_cell)
 
-        y_cell = 2 * self._qet._l_fin + self._tes.get_L()
+        y_cell = 2 * self._qet._l_fin + self._tes._l
 
         if self._l_cell > y_cell:
             # Design is not close packed. Get passive Al/QET
@@ -137,7 +135,7 @@ class Detector:
         self._nkpb = 4
 
         # ----------- Electronics ----------
-        self._total_L = self._electronics.get_l_squid() + self._electronics.get_l_p() + self._tes.get_L()
+        self._total_L = self._electronics.get_l_squid() + self._electronics.get_l_p() + self._tes._l
 
         # ---------- Response Variables to Be Set in Simulation of Noise ---------------
         self._response_omega = 0

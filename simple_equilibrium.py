@@ -7,24 +7,23 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     _beta = beta
     _TES = _det._tes # the tes object
     _TES.set_Qp(Qp)
-
     #  ---- Bias Point Temperature ----
     # let's calculate the temperature of the operating point resistance.
     # [Notice that if the resistance of the TES changes with current, then this doesn't work]
 
-    zeta_o = np.log(_TES.get_fOp()/(1 - _TES.get_fOp()))/2
+    zeta_o = np.log(_TES._fOp/(1 - _TES._fOp))/2
 
     # Attempting to replicate SimpleEquilibrium_1TES line 51 with Tc_ResPt.m line 65-66. wTc doesn't show up
     # anywhere else! wTc calculated using this way in TES.py 32-33
 
-    wTc = _TES.get_wTc()
-    Tc = _TES.get_Tc()
+    wTc = _TES._wTc
+    Tc = _TES._T_c
 
     _TES.set_To(zeta_o * wTc + Tc) # K
-    To = _TES.get_To()
+    To = _TES._T_eq
 
-    n = _TES.get_n()
-    K = _TES.get_K()
+    n = _TES._n
+    K = _TES._K
 
     Gep = n * K * To ** (n-1)
     _TES.set_G(Gep)
@@ -40,8 +39,8 @@ def simple_equilibrium(detector, beta=0, Qp=0):
 
     # Bias Power (Phonon/Electron coupling G already set in TES.py)
 
-    K = _TES.get_K()
-    n = _TES.get_n()
+    K = _TES._K
+    n = _TES._n
     T_MC = detector._fridge.get_TMC()
 
     po = K * ((To ** n) - (T_MC ** n)) - Qp # W
@@ -49,13 +48,13 @@ def simple_equilibrium(detector, beta=0, Qp=0):
 
     # Loop Gain
 
-    Gep = _TES.get_G()
+    Gep = _TES._G
     lg = alpha * po / (To * Gep)
     _TES.set_LG(lg)
 
     # Current At Equilibrium
 
-    ro = _TES.get_Ro()
+    ro = _TES._res_o
     Io = np.sqrt(po/ro)
 
     _TES.set_Io(Io)
@@ -69,9 +68,9 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     # Heat Capacity
 
     # Tungsten values taken from MaterialProperties.m line 385 / 376
-    fCsn = _TES.get_material().get_fCsn()
-    gC_v = _TES.get_material().get_gC_v()
-    vol = _TES.get_total_volume()
+    fCsn = _TES._material._fCsn
+    gC_v = _TES._material._gC_v
+    vol = _TES._tot_volume
     C = fCsn * gC_v * To * vol
     _TES.set_C(C)
 
@@ -85,25 +84,25 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     _TES.set_tau_etf(tau_etf)
     _TES.set_w_etf(1/tau_etf)
 
-    Gep = _TES.get_G()
-    LG = _TES.get_LG()
-    C = _TES.get_C()
-    Io = _TES.get_Io()
+    Gep = _TES._G
+    LG = _TES._LG
+    C = _TES._C
+    Io = _TES._Io
     Lt = detector._electronics.get_lt()
     Rl = detector._electronics.get_RL()
-    Ro = _TES.get_Ro()
-    beta = _TES.get_beta()
-    Po = _TES.get_Po()
-    Vbias = _TES.get_Vbias()
-    t0 = _TES.get_tau0()
-    tau_etf = _TES.get_tau_etf()
-    w_etf = _TES.get_w_etf()
-    To = _TES.get_To()
+    Ro = _TES._res_o
+    beta = _TES._beta
+    Po = _TES._Po
+    Vbias = _TES._Vbias
+    t0 = _TES._tau0
+    tau_etf = _TES._tau_etf
+    w_etf = _TES._w_etf
+    To = _TES._T_eq
 
-    """
+    
     print("---------------- EQUILIBRIUM PARAMETERS ----------------")
     print("To %s" % To)
-    print("alpha %s" % _TES.get_alpha())
+    print("alpha %s" % _TES._alpha)
     print("beta %s" % beta)
     print("C %s" % C)
     print("Gep %s" % Gep)
@@ -114,8 +113,8 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     print("tau0 %s" % t0)
     print("tau_etf %s" % tau_etf)
     print("w_etf %s" % w_etf)
-    print("------------------------------------------------\n")
-    """
+    print("----------------------------------------------------\n")
+   
 
 
 
