@@ -11,7 +11,6 @@ class QET:
         self._h_fin = h_fin
         self.l_overlap = l_overlap
         self._tes = TES
-        #self._n_fin = TES._n_fin
         self._eQPabsb = eQPabsb
         self._ePQP = ePQP
         # ---- QET Active Area ----
@@ -22,7 +21,7 @@ class QET:
         # SZ: shape of fins... recalculate area 
         self._afin_empty = TES._n_fin * l_fin * wempty + 2 * TES._l * wempty_tes + self._nhole * ahole 
         self._a_fin = np.pi * (self._l_fin ** 2) + 2 * self._l_fin * TES._l - self._afin_empty
-        """
+        
         print("---------------- QET PARAMETERS ----------------")
         print("ePQP %s" % self._ePQP)
         print("lfin %s" % self._l_fin)
@@ -33,9 +32,8 @@ class QET:
         print("la %s " % (1 /eff_absb*h_fin**2/l_overlap))
         print("Afin_empty %s" % self._afin_empty)
         print("Afin %s" % self._a_fin)
-        print("nfin %s" % self._n_fin)
         print("------------------------------------------------\n")
-        """
+        
 
     def set_qpabsb_eff(self, l_fin, h_fin, loverlap, l_TES, eff_absb=1.22e-4):
         # From Effqp_2D_moffatt.m in Matt's dropbox 
