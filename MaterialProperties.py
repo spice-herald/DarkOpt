@@ -46,6 +46,7 @@ class DetectorMaterial():
             # Monte Carlo calculations', https://doi.org/10.1103/PhysRevB.48.13502
             # We're using the simplified Maris rate calculation
             a_ah_dc = 4.1e4*1e-60 /(2*pi)**5  # [s^4] from Ge_prop_lattice
+            
             # Ballistic Phonon Absorption Time 
             t_pabsb = 1.7927e-05
      
@@ -142,8 +143,8 @@ class DetectorMaterial():
 
     def get_gC_v(self):
         return self._gC_v
-    def get_t_pabsb(self):
-        return self._t_pabsb 
+    #def get_t_pabsb(self):
+    #    return self._t_pabsb 
 
     def get_fUThK(self):
         return self._fUThK
@@ -172,7 +173,8 @@ class TESMaterial:
         # B) Our W has a lot of crystal defects, limiting the scattering length
         self._rho_electrical = rho_electrical # 9.6e-8 Ohm*m at 100mK [Normal Resistivity] 
         self._Tc = Tc
-        self._wTc_1090 = 3.9e-4* Tc/40e-3
+        #self._wTc_1090 = 3.9e-4* Tc/40e-3 # matlab has 3.65e-4 -SZ 
+        self._wTc_1090 = 3.65e-4* Tc/40e-3 # matlab has 3.65e-4 -SZ 
         self._wTc = self._wTc_1090/2/log(3)
 
 class QETMaterial(QET):
