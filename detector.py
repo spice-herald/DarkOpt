@@ -47,7 +47,6 @@ class Detector:
         self._sigma_energy = 0
         self._qet = qet 
         self._tes = tes 
-        self._N_TES = self._tes._nTES # number of tes as derived in the tes class   
 
         # Set the QP Absorbtion Efficiency 
         self._qet.set_qpabsb_eff(self._l_fin, self._h_fin, self._l_overlap, self._l_TES) 
@@ -60,11 +59,11 @@ class Detector:
         # Percentage of surface area covered by QET Fins 
         # SZ: this is not a percentage 
         # SZ: should be multiplied by n_fin??? 
-        self._SA_active = self._n_channel * self._N_TES * self._qet._a_fin
+        self._SA_active = self._n_channel * self._tes._nTES * self._qet._a_fin
         # ++++ for PD2 would get from ledit and compare   
 
         # Average area per cell, and corresponding length
-        a_cell = self._absorber.get_pattern_SA() / (n_channel * self._N_TES) # 1/2 channels on each side
+        a_cell = self._absorber.get_pattern_SA() / (n_channel * self._tes._nTES) # 1/2 channels on each side
         self._l_cell = np.sqrt(a_cell)
 
         y_cell = 2 * self._qet._l_fin + self._tes._l
@@ -78,7 +77,7 @@ class Detector:
             x_cell = a_cell / y_cell
             a_passive_qet = x_cell * self._w_rail_main
 
-        tes_passive = a_passive_qet * n_channel * self._N_TES
+        tes_passive = a_passive_qet * n_channel * self._tes._nTES
         outer_ring = 2 * np.pi * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main
         inner_ring = outer_ring / (np.sqrt(2))
         inner_vertical_rail = 3 * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main * (1 - np.sqrt(2)/2.0)
@@ -98,12 +97,18 @@ class Detector:
         # Fraction of Al which is QET fin which can produce signal
         self._ePcollect = self._SA_active / (self._SA_active + self._SA_passive)
 
-        self._t_pabsb = DetectorMaterial(absorber.get_name()).get_t_pabsb() # TODO SET THIS PROPERLY
 
-        # Find out where these come from !!! 
+        # Do the estimation of this?
+        # this value from material properties is never actually used ???  
+        self._t_pabsb = DetectorMaterial(absorber.get_name())._t_pabsb # TODO SET THIS PROPERLY
+ 
+       
+        # Use PD2 values to estimate tau_pabsb: this estimation doensn't seem to be working 
+        # Doesn't match the matlab code  
         PD2_absb_time = 20e-6
         absb_lscat = absorber.scattering_length()
-        PD2_fSA_qpabsb = 0.0071453736535236241
+        #PD2_fSA_qpabsb = 0.0071453736535236241
+        PD2_fSA_qpabsb = 0.0214
         PD2_lscat = 0.001948849104859335
 
         self._t_pabsb = PD2_absb_time * (absb_lscat / PD2_lscat) * (PD2_fSA_qpabsb / self._fSA_qpabsorb)
@@ -135,7 +140,7 @@ class Detector:
         self._nkpb = 4
 
         # ----------- Electronics ----------
-        self._total_L = self._electronics.get_l_squid() + self._electronics.get_l_p() + self._tes._l
+        self._total_L = self._electronics._l_squid + self._electronics._l_p + self._tes._L # OMG WAS ADDING TES LENGTH 
 
         # ---------- Response Variables to Be Set in Simulation of Noise ---------------
         self._response_omega = 0
@@ -162,6 +167,11 @@ class Detector:
         print("eEabsb %s" % self._eEabsb)
         print("Kpb %s" % self._kpb)
         print("nKpb %s" % self._nkpb)
+        print("N_TES %s" % self._tes._nTES)
+        print("l_squid %s" % self._electronics._l_squid)
+        print("l_p %s" % self._electronics._l_p)
+        print("tes_l %s" % self._tes._L)
+        print("total_L %s" % self._total_L)
         print("------------------------------------------------\n")
         
 
