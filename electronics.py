@@ -21,6 +21,19 @@ class Electronics:
         self._T_L = (R_P * self._T_P + R_S * self._T_S)/self._R_L
 
         # -- Inductances
+        
+
+        # ---- Calculate mask Inductance 
+        # ---- Inner Circle: radius 24000um 24 pairs of wires each side, all of different length and different n
+        r = 24000 #um [radius of inner circle]
+        d = 2060 #um [distance between wire pairs]
+        w = 8 #um [width of wire]
+        dl = 1600 #um [Delta l between tes]
+        dy = 2000 #um [y distance between wires]
+        # ---- One half of inner circle 
+        for i in range(12): # one quarter of inner circle
+            l = sqrt(r**2 - (r-dy*i)**2)
+            n = l/dl 
         self._l_squid = l_squid
         self._l_p = l_p
         self._lt = l_squid + l_p
@@ -28,21 +41,3 @@ class Electronics:
         # -- Current noise from squid A/√Hz
         self._si_squid = si_squid
 
-
-    def get_l_squid(self):
-        return self._l_squid
-
-    def get_l_p(self):
-        return self._l_p
-
-    def get_lt(self):
-        return self._lt
-
-    def get_RL(self):
-        return self._R_L
-
-    def get_si_squid(self):
-        return self._si_squid
-
-    def get_TL(self):
-        return self._T_L
