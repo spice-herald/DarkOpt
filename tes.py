@@ -1,4 +1,5 @@
 import numpy as np
+import math as m
 from MaterialProperties import TESMaterial
 
 class TES:
@@ -18,16 +19,18 @@ class TES:
         :param fOp: TES Operating point resistance ratio 
         :param L: Inductance [H] 
         """
-        self._t = 40e-9 # thickness is limited by fabrication constraints
-        self._l = l
-        self._w = w
+        self._t = 40e-9 # thickness is limited by fabrication constraints. same as matlab. 
+        self._l = l # length of tes
+        self._w = w # width of tes 
         self._foverlap_width = foverlap # fraction overlap
         self._n_fin = n_fin 
         self._resistivity = material._rho_electrical
         self._fOp = fOp
+        # volume of a single TES 
         self._volume_TES = self._t * self._l * self._w
         self._L = L
         #self._K = sigma * V  # P_bath vs T, eq 3.1 in thesis.
+        self._sigma = sigma
         self._n = 5  # used to define G, refer to eqs 3.1 and 3.3
         self._T_eq = T_eq  # equilibrium temperature
         self._material = material
@@ -59,15 +62,20 @@ class TES:
         # The W/Al portion is completely proximitized ... it should have a very low
         # effective volume
         # TODO this value is uncertain! Needs to be properly measured.
-        self._veff_WAloverlap = 0.35
+        # self._veff_WAloverlap = 0.35
+        self._veff_WAloverlap = 0.45 # -- changed to .45 to match matlab - SZ 2019  
 
         self._volume = self._volume_TES + self._veff_WFinCon * self._vol_WFinCon + \
                        self._veff_WAloverlap * self._vol_WAl_overlap
 
+        # Resistance of 1 TES 
+        self._res1tes = self._resistivity*self._l/(self._w*self._t)
         # Have a desired output resistance and optimise length to fix n_TES.
         self._total_res_n = total_res_n
-        self._nTES = self._resistivity * self._l  / (self._w * self._t * self._total_res_n)
-
+        self._nTES = m.ceil(self._resistivity * self._l  / (self._w * self._t * self._total_res_n))
+        self._total_res_n = self._res1tes/self._nTES
+        #self._nTES = 1185
+        
         self._tot_volume = self._volume * self._nTES #1185 but number of TES changed later??? 
         self._K = self._tot_volume * sigma
         # Phonon electron thermal coupling
