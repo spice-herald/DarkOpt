@@ -12,7 +12,8 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     # [Notice that if the resistance of the TES changes with current, then this doesn't work]
 
     zeta_o = np.log(_TES._fOp/(1 - _TES._fOp))/2
-
+    print("zeta_o ", zeta_o)
+    
     # Attempting to replicate SimpleEquilibrium_1TES line 51 with Tc_ResPt.m line 65-66. wTc doesn't show up
     # anywhere else! wTc calculated using this way in TES.py 32-33
 
@@ -20,8 +21,9 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     Tc = _TES._T_c
 
     _TES.set_To(zeta_o * wTc + Tc) # K
+    
     To = _TES._T_eq
-
+    
     n = _TES._n
     K = _TES._K
 
@@ -55,24 +57,27 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     # Current At Equilibrium
 
     ro = _TES._res_o
+    print("tes ro ",ro )
     Io = np.sqrt(po/ro)
 
     _TES.set_Io(Io)
 
     # Bias Voltage
 
-    rl = _det._electronics.get_RL()
+    rl = _det._electronics._R_L
     Vbias = Io * (rl + ro)  # V
     _TES.set_Vbias(Vbias)
 
     # Heat Capacity
 
     # Tungsten values taken from MaterialProperties.m line 385 / 376
-    fCsn = _TES._material._fCsn
-    gC_v = _TES._material._gC_v
+    fCsn = _TES._material._fCsn # matches matlab 
+    gC_v = _TES._material._gC_v # matches matlab 
     vol = _TES._tot_volume
+    print("vol ",vol)
     C = fCsn * gC_v * To * vol
     _TES.set_C(C)
+    
 
     # Inverse Bandwidth
     tau0 = C/Gep
@@ -88,8 +93,8 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     LG = _TES._LG
     C = _TES._C
     Io = _TES._Io
-    Lt = detector._electronics.get_lt()
-    Rl = detector._electronics.get_RL()
+    Lt = detector._electronics._lt
+    Rl = detector._electronics._R_L
     Ro = _TES._res_o
     beta = _TES._beta
     Po = _TES._Po
@@ -101,7 +106,23 @@ def simple_equilibrium(detector, beta=0, Qp=0):
 
     
     print("---------------- EQUILIBRIUM PARAMETERS ----------------")
-    print("To %s" % To)
+    print("wTc %s" %wTc)
+    print("zeta_o %s" %zeta_o) 
+    print("Tc %s" %Tc) 
+    print("To %s" %To) 
+    print("K %s" %K) 
+    print("n %s" %n) 
+    print("T_MC %s" %T_MC) 
+    print("Ro %s" %ro) 
+    print("Io %s" %Io) 
+    print("Rl %s" %rl) 
+    print("fCsn %s"%fCsn)
+    print("gC_v %s" %gC_v) 
+    print("vol %s "% vol)
+    print("tau0 %s "% tau0)
+    print("tau_etf %s "% tau_etf)
+    print("r_ratio %s "% r_ratio)
+    print("Lt%s "% Lt)
     print("alpha %s" % _TES._alpha)
     print("beta %s" % beta)
     print("C %s" % C)
@@ -114,7 +135,3 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     print("tau_etf %s" % tau_etf)
     print("w_etf %s" % w_etf)
     print("----------------------------------------------------\n")
-   
-
-
-
