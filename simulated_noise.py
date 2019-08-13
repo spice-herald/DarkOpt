@@ -18,6 +18,7 @@ def dynamical_response(detector):
 
     w_Pabsb = detector._w_collect
     dPtdE = detector._eEabsb / (1 + 1j * omega/w_Pabsb)
+
     detector.set_dPtdE(dPtdE)
 
 
@@ -31,8 +32,8 @@ def dynamical_response(detector):
     LG = TES._LG
     C = TES._C
     Io = TES._Io
-    Lt = detector._electronics.get_lt()
-    Rl = detector._electronics.get_RL()
+    Lt = detector._electronics._lt
+    Rl = detector._electronics._R_L
     Ro = TES._res_o
     beta = TES._beta
 
@@ -186,6 +187,16 @@ def dynamical_response(detector):
         #plt.show()
 
 
+    print("---------- Response Parameters------------")
+    print("Gep %s" %Gep)
+    print("LG  %s" %LG)
+    print("C %s" %C)
+    print("Io %s" %Io)
+    print("Lt %s" %Lt)
+    print("Rl %s" %Rl)
+    print("Ro %s" %Ro)
+    print("beta  %s" %beta)
+    print("-----------------------------------------\n")
 def Ftfn(Tl, Th, n, isBallistic):
 
     if isBallistic:
@@ -207,7 +218,7 @@ def simulate_noise(detector):
     lgc_xtraNoise = False
 
     # Squid Noise -------------------------
-    SI_squid = detector._electronics.get_si_squid() ** 2 * np.ones(n_omega) # A^2 / Hz
+    SI_squid = detector._electronics._si_squid ** 2 * np.ones(n_omega) # A^2 / Hz
 
     dIdPt = detector.get_dIdP()
     # converting to units of power
@@ -215,9 +226,9 @@ def simulate_noise(detector):
 
     # Johnson Load Noise ------------------
 
-    Tl = detector._electronics.get_TL()
+    Tl = detector._electronics._T_L
     #print(">>>>> Tl %s" % Tl)
-    Rl = detector._electronics.get_RL()
+    Rl = detector._electronics._R_L
     Sv_l = 4 * kb * Tl * Rl  # V^2 / Hz
     Si_RlSC = Sv_l / (Rl ** 2)  # A^2 / Hz FIXME location of square
 
@@ -258,17 +269,12 @@ def simulate_noise(detector):
     domega[1: n_omega - 2]= (omega[2:n_omega-1]-omega[0:n_omega - 3])/2
     domega[0] = (omega[1] - omega[0]) / 2
     domega[n_omega-1] = (omega[n_omega-1] - omega[n_omega - 2]) / 2
-    #print(">>>>>>>> omega:")
-    #print(omega)
-    #print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-
-    #print(">>>>>>>> domega:")
-    #print(domega)
-    #print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    
     dPtdE = detector._response_dPtdE
+    
     sigPt_of_1chan = np.sqrt(1/(domega/(2*np.pi)*4*np.abs(dPtdE)**2/Spt_tot).sum())/e
     n_channel = detector._n_channel
-    #print(">>> n_channel %s" % n_channel)
+    print(">>> n_channel %s" % n_channel)
     sigPt_of = np.sqrt(n_channel) * sigPt_of_1chan
 
     plt.plot(omega/(2*np.pi),np.sqrt(SI_squid)*1e12,'yellow', label='Squid')
@@ -283,7 +289,7 @@ def simulate_noise(detector):
     plt.title("TES Current Noise", fontsize=20)
     plt.xlabel("F [Hz]", fontsize=15)
     plt.ylabel("S_I [pA/√Hz]", fontsize=15)
-    #plt.show()
+    plt.show()
 
     plt.plot(omega/(2*np.pi),np.sqrt(SPt_squid),'yellow', label='Squid')
     plt.plot(omega/(2*np.pi),np.sqrt(Spt_Rl),'red', label='R_load')
@@ -297,8 +303,14 @@ def simulate_noise(detector):
     plt.legend(loc='best')
     plt.semilogy()
     plt.semilogx()
-    #plt.show()
-
+    plt.show()
+    
+    print("---------------- NOISE PARAMETERS ----------------")
+    print("dPtdE %s" %dPtdE)
+    print("Si_tot %s" %Si_tot)
+    print("Spt_tot %s" %Spt_tot)
+    print("dIdPt %s" %dIdPt)
+    print("--------------------------------------------------\n")
     print(">>>>>>>>>>>>>>>>>>>>>> RESOLUTION IS %s" % sigPt_of)
     return sigPt_of
     
