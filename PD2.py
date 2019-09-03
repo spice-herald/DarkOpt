@@ -14,7 +14,6 @@ class PD2(Detector):
 
     def calc_maskL(self):
         # ---- Calculate mask Inductance 
-        # ---- Inner Circle: radius 24000um 24 pairs of wires each side, all of different length and different n
         r = 24000e-6 #m [radius of inner circle]
         d = 2060e-6 #m [distance between wire pairs]
         w = 8e-6 #m [width of wire]
@@ -22,29 +21,6 @@ class PD2(Detector):
         # Because current through rails is in same direction, to first order all flux through parallel tes rails 
         # cancels and only inductance comes from the (circular) bias lines. Here is a rough calculation of the 
         # inductance due to these lines. 
-        """# ---- Inner Circle 
-        sumLi = 0 
-        for i in range(12): # one quarter of inner circle
-            l = m.sqrt(r**2 - (r-d*i)**2)
-            n = m.ceil(l/dl)
-            print("n ",n)
-            Li = 0 
-            if n == 0: continue 
-            for j in range(n):
-                print("--- j ",j)
-                dL = (mu*dl/m.pi)*((n-j)/n)*m.log(2*(d-w/2)/w)
-                Li = Li+dL 
-            sumLi = sumLi+(1/Li)
-        sumLi = sumLi*2 # one half of inner circle 
-        sumLi = sumLi*2 # entire inner cirlce
-        # ---- Outer Circle
-        n = 7 # about 7 tes per pair of lines 
-        Li = 0
-        for j in range(n):
-            dL = (mu*dl/m.pi)*((n-j)/n)*m.log(2*(d-(w/2))/w)
-            Li = Li+dL
-        sumLi = sumLi + 60/Li # about 60 pairs of lines
-        l_mask = 1/sumLi"""
         # what about the inductance between bias lines?
         # do we just add it to the other inductance?
         # between central bias line and inner circle bias line:
