@@ -1,7 +1,9 @@
-import numpy as np 
+import numpy as np
+import math as m 
 from detector import Detector
 from absorber import Absorber
 
+mu = 1.257e-6 #H/m  
 class PD2(Detector):
     """
     A class to create a PD2 Detector object that includes the actual geometrical values 
@@ -9,6 +11,60 @@ class PD2(Detector):
     """
     def __init__(self, name, fridge, electronics, absorber, qet, tes, n_channel):
         super().__init__(name, fridge, electronics, absorber, qet, tes, n_channel)
+
+    def calc_maskL(self):
+        # ---- Calculate mask Inductance 
+        # ---- Inner Circle: radius 24000um 24 pairs of wires each side, all of different length and different n
+        r = 24000e-6 #m [radius of inner circle]
+        d = 2060e-6 #m [distance between wire pairs]
+        w = 8e-6 #m [width of wire]
+        dl = 1600e-6 #m [Delta l between tes]
+        # Because current through rails is in same direction, to first order all flux through parallel tes rails 
+        # cancels and only inductance comes from the (circular) bias lines. Here is a rough calculation of the 
+        # inductance due to these lines. 
+        """# ---- Inner Circle 
+        sumLi = 0 
+        for i in range(12): # one quarter of inner circle
+            l = m.sqrt(r**2 - (r-d*i)**2)
+            n = m.ceil(l/dl)
+            print("n ",n)
+            Li = 0 
+            if n == 0: continue 
+            for j in range(n):
+                print("--- j ",j)
+                dL = (mu*dl/m.pi)*((n-j)/n)*m.log(2*(d-w/2)/w)
+                Li = Li+dL 
+            sumLi = sumLi+(1/Li)
+        sumLi = sumLi*2 # one half of inner circle 
+        sumLi = sumLi*2 # entire inner cirlce
+        # ---- Outer Circle
+        n = 7 # about 7 tes per pair of lines 
+        Li = 0
+        for j in range(n):
+            dL = (mu*dl/m.pi)*((n-j)/n)*m.log(2*(d-(w/2))/w)
+            Li = Li+dL
+        sumLi = sumLi + 60/Li # about 60 pairs of lines
+        l_mask = 1/sumLi"""
+        # what about the inductance between bias lines?
+        # do we just add it to the other inductance?
+        # between central bias line and inner circle bias line:
+        l = 2*r
+        dl = 4100e-6 # vertical distance between lines off central bias line 
+        n = 12 # number of lines off central bias line 
+        d_i = 22000e-6 # distance between bias lines
+        d_o = 10400e-6 # distance between outer bias lines 
+        Li_i = 0  
+        Li_o = 0 
+        for j in range(n):
+            dL_i = (mu*dl/m.pi)*((n-j)/(2*n))*m.log((2*(d_i-(w/2)))/w)  
+            dL_o = (mu*dl/m.pi)*((n-j)/(2*n))*m.log((2*(d_o-(w/2)))/w)  
+            Li_i = Li_i +dL_i
+            Li_o = Li_o +dL_o
+        l_bias = 1/(2/Li_i+2/Li_o)
+        l_mask = l_bias
+        print("----- L bias: ", l_bias)
+        return l_mask
+
  
     def set_leditvals(self):
         # _volume_TES is the same
@@ -96,6 +152,8 @@ class PD2(Detector):
 
         # Total collection efficiency:
         self._eEabsb = self._e156 * self._ePcollect * self._qet._eQPabsb * self._qet._ePQP # * self._e_downconvert * self._fSA_qpabsorb 
+
+        self._total_L = self._electronics._l_squid + self._electronics._l_p + self.calc_maskL()       
 
         print("---------------- LEDIT DETECTOR PARAMETERS ----------------")
         print("nP %s" % self._n_channel)
