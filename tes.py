@@ -28,7 +28,7 @@ class TES:
         self._fOp = fOp
         # volume of a single TES 
         self._volume_TES = self._t * self._l * self._w
-        self._L = L
+        self._L = L 
         #self._K = sigma * V  # P_bath vs T, eq 3.1 in thesis.
         self._sigma = sigma
         self._n = 5  # used to define G, refer to eqs 3.1 and 3.3

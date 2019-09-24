@@ -53,14 +53,11 @@ class Detector:
 
         # Total volume of Tungsten
         self._total_TES_vol = self._tes._volume
-        # ++++ for PD2 would get from ledit and compare 
 
         # ------------- QET Fins -----------------
         # Percentage of surface area covered by QET Fins 
-        # SZ: this is not a percentage 
         # SZ: should be multiplied by n_fin??? 
         self._SA_active = self._n_channel * self._tes._nTES * self._qet._a_fin
-        # ++++ for PD2 would get from ledit and compare   
 
         # Average area per cell, and corresponding length
         a_cell = self._absorber.get_pattern_SA() / (n_channel * self._tes._nTES) # 1/2 channels on each side
@@ -93,23 +90,14 @@ class Detector:
 
         # Fraction of surface area which has phonon absorbing aluminum
         self._fSA_qpabsorb = (self._SA_passive + self._SA_active) / self._absorber.get_SA()
-
+        print("fSA qpabsorb: ", self._fSA_qpabsorb)
         # Fraction of Al which is QET fin which can produce signal
         self._ePcollect = self._SA_active / (self._SA_active + self._SA_passive)
-
-
-        # Do the estimation of this?
-        # this value from material properties is never actually used ???  
-        self._t_pabsb = DetectorMaterial(absorber.get_name())._t_pabsb # TODO SET THIS PROPERLY
  
-       
-        # Use PD2 values to estimate tau_pabsb: this estimation doensn't seem to be working 
-        # Doesn't match the matlab code  
         PD2_absb_time = 20e-6
         absb_lscat = absorber.scattering_length()
-        #PD2_fSA_qpabsb = 0.0071453736535236241
-        PD2_fSA_qpabsb = 0.0214
-        PD2_lscat = 0.001948849104859335
+        PD2_fSA_qpabsb = 0.0214 # percentage of total surface area 
+        PD2_lscat = 0.0019488
 
         self._t_pabsb = PD2_absb_time * (absb_lscat / PD2_lscat) * (PD2_fSA_qpabsb / self._fSA_qpabsorb)
 
@@ -140,7 +128,7 @@ class Detector:
         self._nkpb = 4
 
         # ----------- Electronics ----------
-        self._total_L = self._electronics._l_squid + self._electronics._l_p + self._tes._L # OMG WAS ADDING TES LENGTH 
+        self._total_L = self._electronics._l_squid + self._electronics._l_p + self._tes._L  
 
         # ---------- Response Variables to Be Set in Simulation of Noise ---------------
         self._response_omega = 0

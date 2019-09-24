@@ -21,10 +21,8 @@ class PD2(Detector):
         # Because current through rails is in same direction, to first order all flux through parallel tes rails 
         # cancels and only inductance comes from the (circular) bias lines. Here is a rough calculation of the 
         # inductance due to these lines. 
-        # what about the inductance between bias lines?
-        # do we just add it to the other inductance?
         # between central bias line and inner circle bias line:
-        l = 2*r
+        l = 2*r # vetical length 
         dl = 4100e-6 # vertical distance between lines off central bias line 
         n = 12 # number of lines off central bias line 
         d_i = 22000e-6 # distance between bias lines
@@ -77,7 +75,8 @@ class PD2(Detector):
         self._tes._res_o = self._tes._total_res_n * self._tes._fOp  
         
         # Percentage of surface area covered by QET Fins
-        self._qet._a_fin = 28660e-12+28668e-12+28683e-12+28660e-12+28668e-12+28683e-12+self._qet._nhole *self._qet._ahole # check this 
+        self._qet._a_fin = 28660e-12+28668e-12+28683e-12+28660e-12+28668e-12+28683e-12+self._qet._nhole *self._qet._ahole # check this
+        print("Afin: ", self._qet._a_fin)
         self._SA_active = self._n_channel * self._tes._nTES * self._qet._a_fin
         
         # Average area per cell, annd corresponding length 
@@ -104,24 +103,12 @@ class PD2(Detector):
  
         # Fraction of surface area which has phonon absorbing aluminum
         self._fSA_qpabsorb = (self._SA_passive + self._SA_active) / self._absorber.get_SA()
+        print("fSA: ", self._fSA_qpabsorb)
         # Fraction of Al which is QET fin which can produce signal
         self._ePcollect = self._SA_active / (self._SA_active + self._SA_passive)
 
-        #self._t_pabsb = absb_time * (absb_lscat / lscat) * (fSA_qpabsb / self._fSA_qpabsorb)
-        #self._t_pabsb = 20e-6 
+        self._t_pabsb = 20e-6 # this is the measured value 
         
-        # Use PD2 values to estimate tau_pabsb: this estimation doensn't seem to be working 
-        # Doesn't match the matlab code  
-        PD2_absb_time = 20e-6
-        absb_lscat = self._absorber.scattering_length()
-        #PD2_fSA_qpabsb = 0.0071453736535236241
-        PD2_fSA_qpabsb = 0.0214 # changed to match actual PD2 aluminum surface area - SZ 
-        PD2_lscat = 0.001948849104859335
-
-        print("absorber scattering length ", absb_lscat)
-        print("PD2_fSA_qpabsb ", PD2_fSA_qpabsb)
-        self._t_pabsb = PD2_absb_time * (absb_lscat / PD2_lscat) * (PD2_fSA_qpabsb / self._fSA_qpabsorb)
-
         self._w_collect = 1/self._t_pabsb
 
         #self._w_collect = 1/self._t_pabsb 
@@ -129,7 +116,7 @@ class PD2(Detector):
         # Total collection efficiency:
         self._eEabsb = self._e156 * self._ePcollect * self._qet._eQPabsb * self._qet._ePQP # * self._e_downconvert * self._fSA_qpabsorb 
 
-        self._total_L = self._electronics._l_squid + self._electronics._l_p + self.calc_maskL()       
+        self._total_L = self._electronics._l_squid + self._electronics._l_p + self.calc_maskL() 
 
         print("---------------- LEDIT DETECTOR PARAMETERS ----------------")
         print("nP %s" % self._n_channel)

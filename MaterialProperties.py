@@ -46,11 +46,9 @@ class DetectorMaterial():
             # Monte Carlo calculations', https://doi.org/10.1103/PhysRevB.48.13502
             # We're using the simplified Maris rate calculation
             a_ah_dc = 4.1e4*1e-60 /(2*pi)**5  # [s^4] from Ge_prop_lattice
-            
-            # Ballistic Phonon Absorption Time 
-            t_pabsb = 1.7927e-05
-     
-   
+            # want percentage of phonons downconvert at surface 
+            fDownSurf = 1e-10 # zero for now
+ 
         # Nuclear Number
         self._A = A
         # Atomic Number
@@ -90,10 +88,10 @@ class DetectorMaterial():
         self.a_ah_dc = a_ah_dc
         # Phonon Heat Capacity Coefficient
         self._gC_v = 12*pi**4/5*k*self._rho_n/Td**3
-        # Ballistic Phonon Absorption Time 
-        self._t_pabsb = t_pabsb
         # Photon Background Ratio (compared to Ge)
         self._fUThK = fUThK
+        # Percent Phonons that Downconvert at Bare Si Surface 
+        self._fDownSurf = fDownSurf
 
 
     def get_A(self):
@@ -143,8 +141,6 @@ class DetectorMaterial():
 
     def get_gC_v(self):
         return self._gC_v
-    #def get_t_pabsb(self):
-    #    return self._t_pabsb 
 
     def get_fUThK(self):
         return self._fUThK

@@ -72,4 +72,5 @@ class Absorber:
     #   1) Absorber Volume
     #    2) Absorber Surface Area
     # 12/6/13: MCP
+        print("Absorber lscat: ", 4*self._volume/self._SA)
         return 4 * self._volume / self._SA
