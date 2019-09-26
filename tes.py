@@ -70,7 +70,6 @@ class TES:
 
         # Resistance of 1 TES 
         self._res1tes = self._resistivity*self._l/(self._w*self._t)
-        print("Resistance of 1 TES: ", self._res1tes)
         # Have a desired output resistance and optimise length to fix n_TES.
         self._total_res_n = total_res_n
         self._nTES = m.ceil(self._resistivity * self._l  / (self._w * self._t * self._total_res_n))
@@ -129,8 +128,6 @@ class TES:
         # ------ Parameters set when simulating noise -----
         self._fSp_xtra = 0
 
-
-        # Debugging Printing Info
        
         print("---------------- TES PARAMETERS ----------------")
         print("wTc %s" % self._wTc)
@@ -139,6 +136,7 @@ class TES:
         print("t %s" % self._t)
         print("l %s" % self._l)
         print("w %s" % self._w)
+        print("res1tes %s", self._res1tes)
         print("n_fin %s" % self._n_fin)
         print("vol1TES %s" % self._volume_TES)
         print("vol1 %s" % self._volume)

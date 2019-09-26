@@ -5,6 +5,9 @@ from scipy.constants import k as kb
 from scipy.constants import e
 
 # """Final Result: sigPt_of = sqrt(Det.nP)*sigPt_of_1chan [eV]"""
+# Plotting variables
+lgc_plt = False
+lgc_pltsimp = False
 
 def dynamical_response(detector):
     n_omega = int(1e5)
@@ -12,9 +15,6 @@ def dynamical_response(detector):
 
     detector.set_response_omega(omega)
 
-    # Plotting variables
-    lgc_plt = True
-    lgc_pltsimp = False
 
     w_Pabsb = detector._w_collect
     dPtdE = detector._eEabsb / (1 + 1j * omega/w_Pabsb)
@@ -139,7 +139,7 @@ def dynamical_response(detector):
         plt.semilogx()
         plt.semilogy()
         plt.grid()
-        plt.show()
+        #plt.show()
 
         plt.plot(omega/(2*np.pi), np.angle(dIdPt) * (180/np.pi))
         plt.xlabel('Frequency [Hz]')
@@ -147,7 +147,7 @@ def dynamical_response(detector):
         plt.title('Phase of dIdPt')
         plt.semilogx()
         plt.grid()
-        plt.show()
+        #plt.show()
 
         plt.plot(omega/(2*np.pi), np.abs(detector.get_dIdV()))
         plt.semilogx()
@@ -156,7 +156,7 @@ def dynamical_response(detector):
         plt.ylabel('dIdV [1/Ω]')
         plt.title('Magnitude of dIdV')
         plt.grid()
-        plt.show()
+        #plt.show()
 
         plt.plot(omega / (2 * np.pi), np.angle(detector.get_dIdV()) * 180 / np.pi, c='b', label='Normal')
         plt.plot(omega / (2 * np.pi), np.angle(dIdV_chk) * 180 / np.pi, c='r',label='Check')
@@ -166,7 +166,7 @@ def dynamical_response(detector):
         plt.semilogx()
         plt.grid()
         plt.legend()
-        plt.show()
+        #plt.show()
 
         plt.plot(np.real(z_tot), np.imag(z_tot), label='Z_tot', c='black')
         plt.plot(np.real(z_tes), np.imag(z_tes), label='Z_tes', c='blue')
@@ -175,7 +175,7 @@ def dynamical_response(detector):
         plt.title("Im(Z) vs Re(Z)")
         plt.grid()
         plt.legend(loc='best')
-        plt.show()
+        #plt.show()
 
         plt.plot(t, dIdV_step)
         plt.plot(t, dIdV0 * np.ones(n_t), c='green')
@@ -184,7 +184,7 @@ def dynamical_response(detector):
         plt.ylabel('dIdV Step Function [1/Ohm]')
         plt.title('Step function voltage response')
         plt.grid()
-        plt.show()
+        #plt.show()
 
 
     print("---------- Response Parameters------------")
@@ -274,42 +274,37 @@ def simulate_noise(detector):
     
     sigPt_of_1chan = np.sqrt(1/(domega/(2*np.pi)*4*np.abs(dPtdE)**2/Spt_tot).sum())/e
     n_channel = detector._n_channel
-    print(">>> n_channel %s" % n_channel)
     sigPt_of = np.sqrt(n_channel) * sigPt_of_1chan
+    if lgc_plt:
+	plt.plot(omega/(2*np.pi),np.sqrt(SI_squid)*1e12,'yellow', label='Squid')
+	plt.plot(omega/(2*np.pi),np.sqrt(Si_Rl)*1e12,'red', label='R_load')
+	plt.plot(omega/(2*np.pi),np.sqrt(Si_Rt)*1e12,'green', label='R_tes')
+	plt.plot(omega/(2*np.pi),np.sqrt(Si_Gtb)*1e12,'cyan', label='G TES-Bath')
+	plt.plot(omega / (2 * np.pi), np.sqrt(Si_tot) * 1e12, 'black', label='Total')
+	plt.grid()
+	plt.legend(loc='best')
+	plt.semilogx()
+	plt.semilogy()
+	plt.title("TES Current Noise", fontsize=20)
+	plt.xlabel("F [Hz]", fontsize=15)
+	plt.ylabel("S_I [pA/√Hz]", fontsize=15)
+	#plt.show()
 
-    plt.plot(omega/(2*np.pi),np.sqrt(SI_squid)*1e12,'yellow', label='Squid')
-    plt.plot(omega/(2*np.pi),np.sqrt(Si_Rl)*1e12,'red', label='R_load')
-    plt.plot(omega/(2*np.pi),np.sqrt(Si_Rt)*1e12,'green', label='R_tes')
-    plt.plot(omega/(2*np.pi),np.sqrt(Si_Gtb)*1e12,'cyan', label='G TES-Bath')
-    plt.plot(omega / (2 * np.pi), np.sqrt(Si_tot) * 1e12, 'black', label='Total')
-    plt.grid()
-    plt.legend(loc='best')
-    plt.semilogx()
-    plt.semilogy()
-    plt.title("TES Current Noise", fontsize=20)
-    plt.xlabel("F [Hz]", fontsize=15)
-    plt.ylabel("S_I [pA/√Hz]", fontsize=15)
-    plt.show()
-
-    plt.plot(omega/(2*np.pi),np.sqrt(SPt_squid),'yellow', label='Squid')
-    plt.plot(omega/(2*np.pi),np.sqrt(Spt_Rl),'red', label='R_load')
-    plt.plot(omega/(2*np.pi),np.sqrt(Spt_Rt),'green', label='R_tes')
-    plt.plot(omega/(2*np.pi),np.sqrt(Spt_Gtb),'cyan', label='G TES-Bath')
-    plt.plot(omega/(2*np.pi),np.sqrt(Spt_tot),'black', label='Total')
-    plt.title("TES Power Noise", fontsize=20)
-    plt.xlabel("F [Hz]", fontsize=15)
-    plt.ylabel("S_P [W/√Hz]", fontsize=15)
-    plt.grid()
-    plt.legend(loc='best')
-    plt.semilogy()
-    plt.semilogx()
-    plt.show()
+	plt.plot(omega/(2*np.pi),np.sqrt(SPt_squid),'yellow', label='Squid')
+	plt.plot(omega/(2*np.pi),np.sqrt(Spt_Rl),'red', label='R_load')
+	plt.plot(omega/(2*np.pi),np.sqrt(Spt_Rt),'green', label='R_tes')
+	plt.plot(omega/(2*np.pi),np.sqrt(Spt_Gtb),'cyan', label='G TES-Bath')
+	plt.plot(omega/(2*np.pi),np.sqrt(Spt_tot),'black', label='Total')
+	plt.title("TES Power Noise", fontsize=20)
+	plt.xlabel("F [Hz]", fontsize=15)
+	plt.ylabel("S_P [W/√Hz]", fontsize=15)
+	plt.grid()
+	plt.legend(loc='best')
+	plt.semilogy()
+	plt.semilogx()
+	#plt.show()
     
     print("---------------- NOISE PARAMETERS ----------------")
-    print("dPtdE %s" %dPtdE)
-    print("Si_tot %s" %Si_tot)
-    print("Spt_tot %s" %Spt_tot)
-    print("dIdPt %s" %dIdPt)
     print("--------------------------------------------------\n")
     print(">>>>>>>>>>>>>>>>>>>>>> RESOLUTION IS %s" % sigPt_of)
     return sigPt_of

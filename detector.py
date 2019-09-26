@@ -7,7 +7,6 @@ import sys
 
 # Some hard-coded numbers:
 k_b = 1.38e-3 # J/K
-t_tes = 40e-9 # m [set by fab constraints, and noise concerns, for now] 
 n = 5 # used to define G (related to phonon/electron DOF)
 
 class Detector:
@@ -30,8 +29,8 @@ class Detector:
 
         """
         # Figure out where these come from!!! 
-        w_rail_main = 8e-6
-        w_rail_qet = 4e-6 
+        self._w_rail_main = 8e-6
+        self._w_rail_qet = 4e-6 
 
         self._name = name
         self._fridge = fridge
@@ -41,8 +40,6 @@ class Detector:
         self._l_fin = qet._l_fin
         self._h_fin = qet._h_fin
         self._l_overlap = qet.l_overlap
-        self._w_rail_main = w_rail_main
-        self._w_rail_qet = w_rail_qet
         self._electronics = electronics
         self._sigma_energy = 0
         self._qet = qet 
@@ -68,23 +65,19 @@ class Detector:
         print("y_cell: ", y_cell)
         if self._l_cell > y_cell:
             # Design is not close packed. Get passive Al/QET
-            a_passive_qet = self._l_cell * w_rail_main + (self._l_cell - y_cell) * w_rail_qet
+            a_passive_qet = self._l_cell * self._w_rail_main + (self._l_cell - y_cell) * self._w_rail_qet
 
         else:
             # Design is close packed. No vertical rail to QET
             x_cell = a_cell / y_cell
             a_passive_qet = x_cell * self._w_rail_main
-        print("x_cell: ", self._l_cell)
-        print("w_rail_main ", w_rail_main)
-        print("w_rail_qet ", w_rail_qet)
-        print("a_passive_qet: ", a_passive_qet)
+        
         tes_passive = a_passive_qet * n_channel * self._tes._nTES
         outer_ring = 2 * np.pi * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main
         inner_ring = outer_ring / (np.sqrt(2))
         inner_vertical_rail = 3 * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main * (1 - np.sqrt(2)/2.0)
         outer_vertical_rail = (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main * (1 + np.sqrt(2)/2.0)
 
-        print("tes_passive ", tes_passive)
         # Total Passive Surface Area
         # 1. TES Passive Area
         # 2. Outer Ring
@@ -92,10 +85,8 @@ class Detector:
         # 4. Inner Vertical Rail
         # 5. Outer Vertical Rail
         self._SA_passive = tes_passive + outer_ring + inner_ring + inner_vertical_rail + outer_vertical_rail
-        print("SA_passive = ",self._SA_passive)
         # Fraction of surface area which has phonon absorbing aluminum
         self._fSA_qpabsorb = (self._SA_passive + self._SA_active) / self._absorber.get_SA()
-        print("fSA qpabsorb: ", self._fSA_qpabsorb)
         # Fraction of Al which is QET fin which can produce signal
         self._ePcollect = self._SA_active / (self._SA_active + self._SA_passive)
  

@@ -88,7 +88,7 @@ class PD2(Detector):
         print("y_cell ", y_cell)
          
         # Design is not close packed. Get passive Al/QET
-        a_passive_qet = self._l_cell*w_rail_main + (self._l_cell-y_cell)*w_rail_qet
+        a_passive_qet = self._l_cell*self._w_rail_main + (self._l_cell-y_cell)*self._w_rail_qet
         tes_passive = a_passive_qet *self._n_channel * self._tes._nTES
         outer_ring = 2* np.pi * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main
         inner_ring = outer_ring / (np.sqrt(2))

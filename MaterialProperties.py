@@ -167,7 +167,8 @@ class TESMaterial:
         # much larger than predicted resistivity of W at low temperatures possibly because
         # A) we are thickness limited at 40nm so scattering length much smaller than expected at low T 
         # B) Our W has a lot of crystal defects, limiting the scattering length
-        self._rho_electrical = rho_electrical # 9.6e-8 Ohm*m at 100mK [Normal Resistivity] 
+        self._rho_electrical = rho_electrical # 9.6e-8 Ohm*m at 100mK [Normal Resistivity]
+        # not sure where these Tc values are coming from but new TES chip (Caleb) has Tc = 40e-3 K  
         self._Tc = Tc
         #self._wTc_1090 = 3.9e-4* Tc/40e-3 # matlab has 3.65e-4 -SZ 
         self._wTc_1090 = 3.65e-4* Tc/40e-3 # matlab has 3.65e-4 -SZ 
