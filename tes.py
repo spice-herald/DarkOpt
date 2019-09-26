@@ -5,7 +5,7 @@ from MaterialProperties import TESMaterial
 class TES:
     # n_TES always a derived quantity, shouldn't be an input  
     def __init__(self, l, w, foverlap, n_fin, sigma, T_eq, total_res_n, 
-                 material=TESMaterial(), fOp=0.45, L=0, Qp=0):
+                 material=TESMaterial(), fOp=0.45, Qp=0):
         """
         TES Class
         
@@ -19,7 +19,7 @@ class TES:
         :param fOp: TES Operating point resistance ratio 
         :param L: Inductance [H] 
         """
-        self._t = 40e-9 # thickness is limited by fabrication constraints. same as matlab. 
+        self._t = 40e-9 # thickness is limited by fabrication constraints + noise. same as matlab. 
         self._l = l # length of tes
         self._w = w # width of tes 
         self._foverlap_width = foverlap # fraction overlap
@@ -28,7 +28,7 @@ class TES:
         self._fOp = fOp
         # volume of a single TES 
         self._volume_TES = self._t * self._l * self._w
-        self._L = L 
+        self._L = 0 # set Inductance to zero for now
         #self._K = sigma * V  # P_bath vs T, eq 3.1 in thesis.
         self._sigma = sigma
         self._n = 5  # used to define G, refer to eqs 3.1 and 3.3
@@ -70,13 +70,13 @@ class TES:
 
         # Resistance of 1 TES 
         self._res1tes = self._resistivity*self._l/(self._w*self._t)
+        print("Resistance of 1 TES: ", self._res1tes)
         # Have a desired output resistance and optimise length to fix n_TES.
         self._total_res_n = total_res_n
         self._nTES = m.ceil(self._resistivity * self._l  / (self._w * self._t * self._total_res_n))
         self._total_res_n = self._res1tes/self._nTES
-        #self._nTES = 1185
         
-        self._tot_volume = self._volume * self._nTES #1185 but number of TES changed later??? 
+        self._tot_volume = self._volume * self._nTES
         self._K = self._tot_volume * sigma
         # Phonon electron thermal coupling
         self._G = self._n * self._K * (T_eq ** (self._n-1))
@@ -139,6 +139,7 @@ class TES:
         print("t %s" % self._t)
         print("l %s" % self._l)
         print("w %s" % self._w)
+        print("n_fin %s" % self._n_fin)
         print("vol1TES %s" % self._volume_TES)
         print("vol1 %s" % self._volume)
         print("nTES %s" % self._nTES)

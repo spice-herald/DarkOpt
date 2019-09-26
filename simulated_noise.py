@@ -139,7 +139,7 @@ def dynamical_response(detector):
         plt.semilogx()
         plt.semilogy()
         plt.grid()
-        #plt.show()
+        plt.show()
 
         plt.plot(omega/(2*np.pi), np.angle(dIdPt) * (180/np.pi))
         plt.xlabel('Frequency [Hz]')
@@ -147,7 +147,7 @@ def dynamical_response(detector):
         plt.title('Phase of dIdPt')
         plt.semilogx()
         plt.grid()
-        #plt.show()
+        plt.show()
 
         plt.plot(omega/(2*np.pi), np.abs(detector.get_dIdV()))
         plt.semilogx()
@@ -156,7 +156,7 @@ def dynamical_response(detector):
         plt.ylabel('dIdV [1/Ω]')
         plt.title('Magnitude of dIdV')
         plt.grid()
-        #plt.show()
+        plt.show()
 
         plt.plot(omega / (2 * np.pi), np.angle(detector.get_dIdV()) * 180 / np.pi, c='b', label='Normal')
         plt.plot(omega / (2 * np.pi), np.angle(dIdV_chk) * 180 / np.pi, c='r',label='Check')
@@ -166,7 +166,7 @@ def dynamical_response(detector):
         plt.semilogx()
         plt.grid()
         plt.legend()
-        #plt.show()
+        plt.show()
 
         plt.plot(np.real(z_tot), np.imag(z_tot), label='Z_tot', c='black')
         plt.plot(np.real(z_tes), np.imag(z_tes), label='Z_tes', c='blue')
@@ -175,7 +175,7 @@ def dynamical_response(detector):
         plt.title("Im(Z) vs Re(Z)")
         plt.grid()
         plt.legend(loc='best')
-        #plt.show()
+        plt.show()
 
         plt.plot(t, dIdV_step)
         plt.plot(t, dIdV0 * np.ones(n_t), c='green')
@@ -184,7 +184,7 @@ def dynamical_response(detector):
         plt.ylabel('dIdV Step Function [1/Ohm]')
         plt.title('Step function voltage response')
         plt.grid()
-        #plt.show()
+        plt.show()
 
 
     print("---------- Response Parameters------------")

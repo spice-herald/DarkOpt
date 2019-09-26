@@ -86,11 +86,7 @@ class PD2(Detector):
         print("l_cell ", self._l_cell)
         y_cell = 2*self._qet._l_fin + self._tes._l 
         print("y_cell ", y_cell)
-        
-        # changed to match matlab + ledit  -- SZ 
-        w_rail_main = 8e-6
-        w_rail_qet = 4e-6
-        
+         
         # Design is not close packed. Get passive Al/QET
         a_passive_qet = self._l_cell*w_rail_main + (self._l_cell-y_cell)*w_rail_qet
         tes_passive = a_passive_qet *self._n_channel * self._tes._nTES

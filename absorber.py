@@ -37,6 +37,11 @@ class Absorber:
         self._m = self._rho * self._volume
         pass
 
+        print("---------------- ABSORBER PARAMETERS ----------------")
+        print("Absorber SA_face %s" % self._SA_face)
+        print("Absorber SA %s" % self._SA)
+        print("------------------------------------------------\n")
+
     def get_name(self):
         return self._name
 
@@ -74,3 +79,6 @@ class Absorber:
     # 12/6/13: MCP
         print("Absorber lscat: ", 4*self._volume/self._SA)
         return 4 * self._volume / self._SA
+
+
+

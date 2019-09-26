@@ -23,7 +23,8 @@ tungsten = TESMaterial()
 #PD2 input valies 
 tes_l = 140e-6 # same as matlab
 #tes_l = 300e-6 # same as matlab
-tes_w = 3.5e-6 # matlab = 4e-6 
+#tes_w = 3.5e-6 # matlab = 4e-6 
+tes_w = 1.5e-6 # matlab = 4e-6 
 foverlap = 1.2 # same as matlab (why greater than 1??)
 #foverlap = 0.8 # same as matlab (why greater than 1??)
 l_overlap = 10e-6 # same as matlab 
@@ -40,6 +41,7 @@ qet = QET( l_fin, h_fin, l_overlap, tes)
 
 
 det = PD2("PD2", fSnolab, eSLAC, absorber, qet, tes, 1)
+
 det.set_leditvals()
 
-eres = simulate_noise(det)
+#eres = simulate_noise(det)
