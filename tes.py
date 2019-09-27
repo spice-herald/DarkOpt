@@ -136,7 +136,7 @@ class TES:
         print("t %s" % self._t)
         print("l %s" % self._l)
         print("w %s" % self._w)
-        print("res1tes %s", self._res1tes)
+        print("res1tes %s" % self._res1tes)
         print("n_fin %s" % self._n_fin)
         print("vol1TES %s" % self._volume_TES)
         print("vol1 %s" % self._volume)

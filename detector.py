@@ -60,9 +60,7 @@ class Detector:
         a_cell = self._absorber.get_pattern_SA() / (n_channel * self._tes._nTES) # 1/2 channels on each side
         self._l_cell = np.sqrt(a_cell)
         
-        print("l_cell: ", self._l_cell)
         y_cell = 2 * self._qet._l_fin + self._tes._l
-        print("y_cell: ", y_cell)
         if self._l_cell > y_cell:
             # Design is not close packed. Get passive Al/QET
             a_passive_qet = self._l_cell * self._w_rail_main + (self._l_cell - y_cell) * self._w_rail_qet

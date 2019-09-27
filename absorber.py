@@ -38,6 +38,7 @@ class Absorber:
         pass
 
         print("---------------- ABSORBER PARAMETERS ----------------")
+        print("Absorber lscat ", 4*self._volume/self._SA)
         print("Absorber SA_face %s" % self._SA_face)
         print("Absorber SA %s" % self._SA)
         print("------------------------------------------------\n")
@@ -77,7 +78,6 @@ class Absorber:
     #   1) Absorber Volume
     #    2) Absorber Surface Area
     # 12/6/13: MCP
-        print("Absorber lscat: ", 4*self._volume/self._SA)
         return 4 * self._volume / self._SA
 
 

@@ -12,7 +12,6 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     # [Notice that if the resistance of the TES changes with current, then this doesn't work]
 
     zeta_o = np.log(_TES._fOp/(1 - _TES._fOp))/2
-    print("zeta_o ", zeta_o)
     
     # Attempting to replicate SimpleEquilibrium_1TES line 51 with Tc_ResPt.m line 65-66. wTc doesn't show up
     # anywhere else! wTc calculated using this way in TES.py 32-33
@@ -57,7 +56,6 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     # Current At Equilibrium
 
     ro = _TES._res_o
-    print("tes ro ",ro )
     Io = np.sqrt(po/ro)
 
     _TES.set_Io(Io)
@@ -74,7 +72,6 @@ def simple_equilibrium(detector, beta=0, Qp=0):
     fCsn = _TES._material._fCsn # matches matlab 
     gC_v = _TES._material._gC_v # matches matlab 
     vol = _TES._tot_volume
-    print("vol ",vol)
     C = fCsn * gC_v * To * vol
     _TES.set_C(C)
     
