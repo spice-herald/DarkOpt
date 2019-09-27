@@ -12,7 +12,7 @@
  
 - Currently assumes bare crystal surface is elastic process, no down conversion
 	- Think it is < 1%
-	- # bounces before phonons go subgap ?
+	- Number of bounces before phonons go subgap ?
 	- Need Down Conversion but now bellow 1 meV  
 - Lowering W Tc and Fin Tc (are the set values correct?)  
 
