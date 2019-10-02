@@ -115,10 +115,13 @@ class PD2(Detector):
         self._total_L = self._electronics._l_squid + self._electronics._l_p + self.calc_maskL() 
 
         print("---------------- LEDIT DETECTOR PARAMETERS ----------------")
+        print("sigma %s " % self._tes._sigma)
         print("nP %s" % self._n_channel)
         print("vol1tes ",  self._tes._volume)
         print("N_TES %s" % self._tes._nTES)
         print("tot tes vol %s" % self._tes._tot_volume)
+        print("volFinCon %s" % self._tes._vol_WFinCon )
+        print("WAlOverlap %s" % self._tes._vol_WAl_overlap )
         print("K %s" % self._tes._K)
         print("G %s" % self._tes._G)
         print("Rn %s" % self._tes._total_res_n)
