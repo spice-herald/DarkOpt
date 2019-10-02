@@ -4,12 +4,12 @@ from scipy.special import kv as besselk
 
 class QET:
 
-    def __init__(self, l_fin, h_fin, l_overlap, TES, eQPabsb=0.0, ePQP=0.52,
+    def __init__(self, l_fin, h_fin, TES, eQPabsb=0.0, ePQP=0.52,
                  wempty=6e-6, wempty_tes=7.5e-6, ahole=1e-10):
 
         self._l_fin = l_fin
         self._h_fin = h_fin
-        self.l_overlap = l_overlap
+        self.l_overlap = TES._l_overlap
         self._tes = TES
         self._eQPabsb = eQPabsb
         self._ePQP = ePQP
@@ -29,7 +29,7 @@ class QET:
         print("loverlap %s" % self.l_overlap)
         print("ld %s" % (567 * h_fin))
         eff_absb = 1.22e-4
-        print("la %s " % (1 /eff_absb*h_fin**2/l_overlap))
+        print("la %s " % (1 /eff_absb*h_fin**2/self.l_overlap))
         print("Afin_empty %s" % self._afin_empty)
         print("Afin %s" % self._a_fin)
         print("------------------------------------------------\n")
@@ -39,6 +39,7 @@ class QET:
         # From Effqp_2D_moffatt.m in Matt's dropbox 
         # Here we are using Robert Moffatt's full QP model. There are some pretty big assumptions:
         # 1) Diffusion length scales with Al thickness (trapping surface dominated and diffusion thickness limited)
+        # 2) Absorption length scales with Al thickness**2/l_overlap 
         # Future: scale boundary impedance with W thickness 
         # INPUTS: 
         #    1) fin length [um]
@@ -76,7 +77,7 @@ class QET:
         ld = 567 * h_fin  # [µm] this is the fit in Jeff's published LTD 16 data
 
         # Surface impedance length
-        la = 1 /eff_absb*h_fin**2/loverlap  # [µm] these match the values used by Noah 
+        la = (1 /eff_absb)*(h_fin**2/loverlap)  # [µm] these match the values used by Noah 
         la_chk = (1e6 + 1600 / (900 ** 2) * 5) * (h_fin ** 2)  # µm
 
         # -------- Dimensionless Scales -------
@@ -91,5 +92,3 @@ class QET:
         / (besseli(1, rhoo) * (besselk(0, rhoi) + lambdaA * besselk(1, rhoi)) +
         (besseli(0, rhoi) - lambdaA * besseli(1, rhoi)) * besselk(1, rhoo))
         self._eQPabsb = fQP
-
-

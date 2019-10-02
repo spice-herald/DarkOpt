@@ -35,8 +35,8 @@ T_eq = -100
 res_n = 300e-3 
 
 # define the TES and QET with PD2 input values  
-tes = TES(tes_l, tes_w, foverlap, n_fin, sigma, T_eq, res_n, tungsten )
-qet = QET( l_fin, h_fin, l_overlap, tes)
+tes = TES(tes_l, tes_w, foverlap, l_overlap, n_fin, sigma, T_eq, res_n, tungsten )
+qet = QET( l_fin, h_fin, tes)
 
 
 det = PD2("PD2", fSnolab, eSLAC, absorber, qet, tes, 1)

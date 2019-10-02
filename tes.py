@@ -4,31 +4,23 @@ from MaterialProperties import TESMaterial
 
 class TES:
     # n_TES always a derived quantity, shouldn't be an input  
-    def __init__(self, l, w, foverlap, n_fin, sigma, T_eq, total_res_n, 
+    def __init__(self, l, w, foverlap, l_overlap, n_fin, sigma, T_eq, total_res_n, 
                  material=TESMaterial(), fOp=0.45, Qp=0):
         """
-        TES Class
-        
-        :param t: Thickness of TES [m]
-        :param l: Length of TES [m]
-        :param w: Width of TES [m] 
-        :param foverlap: Fraction of the Al fin edge that is adjacent to the TES which is covered with Al
+	:param foverlap: Fraction of the Al fin edge that is adjacent to the TES which is covered with Al
          w_fincon = (Perimeter/n_fin)*foverlap                 
-        :param n_fin: Number of Fins to form QET
-        :param resistivity: Resistivity
-        :param fOp: TES Operating point resistance ratio 
-        :param L: Inductance [H] 
         """
-        self._t = 40e-9 # thickness is limited by fabrication constraints + noise. same as matlab. 
+        self._t = 40e-9 # thickness of the TES. limited by fabrication constraints + noise. same as matlab. 
         self._l = l # length of tes
         self._w = w # width of tes 
         self._foverlap_width = foverlap # fraction overlap
-        self._n_fin = n_fin 
-        self._resistivity = material._rho_electrical
-        self._fOp = fOp
+        self._l_overlap = l_overlap # length of W/Al overlap 
+        self._n_fin = n_fin # number of fins to form QET  
+        self._resistivity = material._rho_electrical # electrical resistivity of TES 
+        self._fOp = fOp # Operating Resistance/Normal Resistance ratio 
         # volume of a single TES 
         self._volume_TES = self._t * self._l * self._w
-        self._L = 0 # set Inductance to zero for now
+        self._L = 0 # [H] set Inductance to zero for now
         #self._K = sigma * V  # P_bath vs T, eq 3.1 in thesis.
         self._sigma = sigma
         self._n = 5  # used to define G, refer to eqs 3.1 and 3.3
@@ -76,6 +68,7 @@ class TES:
         self._total_res_n = self._res1tes/self._nTES
         
         self._tot_volume = self._volume * self._nTES
+        #self._tot_volume = 9.7e-14 # MESSING 
         self._K = self._tot_volume * sigma
         # Phonon electron thermal coupling
         self._G = self._n * self._K * (T_eq ** (self._n-1))
@@ -130,6 +123,7 @@ class TES:
 
        
         print("---------------- TES PARAMETERS ----------------")
+        print("sigma %s" % self._sigma)
         print("wTc %s" % self._wTc)
         print("Tc %s" % self._T_c)
         print("rho %s" % self._resistivity)
@@ -141,6 +135,8 @@ class TES:
         print("vol1TES %s" % self._volume_TES)
         print("vol1 %s" % self._volume)
         print("nTES %s" % self._nTES)
+        print("tot_volume %s" % self._tot_volume)
+        print("K %s " % self._K)
         print("volFinCon %s" % self._vol_WFinCon)
         print("WAlOverlap %s" % self._vol_WAl_overlap)
         print("veff_WFinCon %s" % self._veff_WFinCon)
