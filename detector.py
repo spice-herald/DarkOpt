@@ -48,9 +48,6 @@ class Detector:
         # Set the QP Absorbtion Efficiency 
         self._qet.set_qpabsb_eff(self._l_fin, self._h_fin, self._l_overlap, self._l_TES) 
 
-        # Total volume of Tungsten
-        self._total_TES_vol = self._tes._volume
-
         # ------------- QET Fins -----------------
         # Percentage of surface area covered by QET Fins 
         # SZ: should be multiplied by n_fin??? 

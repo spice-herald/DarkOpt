@@ -41,6 +41,7 @@ class Absorber:
         print("Absorber lscat ", 4*self._volume/self._SA)
         print("Absorber SA_face %s" % self._SA_face)
         print("Absorber SA %s" % self._SA)
+        print("Absorber mass %s" % self._m)
         print("------------------------------------------------\n")
 
     def get_name(self):
