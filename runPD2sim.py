@@ -41,6 +41,6 @@ qet = QET( l_fin, h_fin, l_overlap, tes)
 
 det = PD2("PD2", fSnolab, eSLAC, absorber, qet, tes, 1)
 
-det.set_leditvals()
+#det.set_leditvals()
 
 eres = simulate_noise(det)
