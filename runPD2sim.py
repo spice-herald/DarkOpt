@@ -13,8 +13,7 @@ from MaterialProperties import TESMaterial
 
 fSnolab = Fridge("SNOLAB", 20e-3, 145e-3, 900e-3, 4.8, 0)
 # Absorber: Silicon. Height 1mm. Radius 38.1mm. W safety 3mm. 
-#absorber = Absorber("Si", "cylinder", 1e-3, 38.1e-3, 3e-3) # same as matlab
-absorber = Absorber("Si", "cylinder", 1e-3, 38.1e-3, 3e-3) # same as matlab
+absorber = Absorber("Si", "cylinder", 1e-3, 38.1e-3, 3e-3, False) # same as matlab
 eSnolab = Electronics(fSnolab, fSnolab.get_TCP(), fSnolab.get_TMC())
 eSLAC = Electronics(fSnolab, fSnolab.get_TMC(), fSnolab.get_TMC(), 5e-3, 6e-3, 25e-9, 25e-9, 4e-12)
 
@@ -32,15 +31,21 @@ l_fin = 200e-6 # same as matlab
 h_fin = 600e-9 # same as matlab
 sigma = tungsten._gPep_v 
 T_eq = -100  
-res_n = 300e-3 
+#res_n = 300e-3 # this was the design value 
+res_n = 89e-3 # this was the measured value --> change true TES width
 
+ahole = 100e-12 
 # define the TES and QET with PD2 input values  
-tes = TES(tes_l, tes_w, foverlap, l_overlap, n_fin, sigma, T_eq, res_n, tungsten )
-qet = QET( l_fin, h_fin, tes)
+tes = TES(tes_l, tes_w, l_overlap, n_fin, sigma, T_eq, res_n,0.45,  tungsten, True )
+qet = QET( l_fin, h_fin, tes, ahole )
 
+#qet.set_qpabsb_eff(l_fin, h_fin, l_overlap, tes_l, n_fin)
+#eff = qet._eQPabsb
+#print("QP Absorption Efficiency ", eff)
 
-det = PD2("PD2", fSnolab, eSLAC, absorber, qet, tes, 1)
+det = PD2("PD2", fSnolab, eSLAC, absorber, qet, tes, 1, 2)
 
-#det.set_leditvals()
+det.set_leditvals()
 
 eres = simulate_noise(det)
+print("RESOLUTION ", eres) 
