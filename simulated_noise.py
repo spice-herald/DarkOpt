@@ -186,17 +186,17 @@ def dynamical_response(detector):
         plt.grid()
         #plt.show()
 
-
-    print("---------- Response Parameters------------")
-    print("Gep %s" %Gep)
-    print("LG  %s" %LG)
-    print("C %s" %C)
-    print("Io %s" %Io)
-    print("Lt %s" %Lt)
-    print("Rl %s" %Rl)
-    print("Ro %s" %Ro)
-    print("beta  %s" %beta)
-    print("-----------------------------------------\n")
+    if detector._tes._print == True:
+        print("---------- Response Parameters------------")
+        print("Gep %s" %Gep)
+        print("LG  %s" %LG)
+        print("C %s" %C)
+        print("Io %s" %Io)
+        print("Lt %s" %Lt)
+        print("Rl %s" %Rl)
+        print("Ro %s" %Ro)
+        print("beta  %s" %beta)
+        print("-----------------------------------------\n")
 def Ftfn(Tl, Th, n, isBallistic):
 
     if isBallistic:
@@ -217,12 +217,14 @@ def simulate_noise(detector):
     TES.set_fSp_xtra(0)
     lgc_xtraNoise = False
 
+    print_noise = False 
     # Squid Noise -------------------------
     SI_squid = detector._electronics._si_squid ** 2 * np.ones(n_omega) # A^2 / Hz
 
     dIdPt = detector.get_dIdP()
     # converting to units of power
     SPt_squid = SI_squid / abs(dIdPt ** 2)  # W / Hz
+    if print_noise == True: print("SQUID NOISE: ", SPt_squid[0])
 
     # Johnson Load Noise ------------------
 
@@ -235,6 +237,7 @@ def simulate_noise(detector):
     dIdV = detector.get_dIdV()
     Si_Rl = abs(dIdV ** 2) * Sv_l # A^2 / Hz
     Spt_Rl = Si_Rl / abs(dIdPt ** 2)
+    if print_noise == True: print("Rl Noise:", Spt_Rl[0])
 
     # Johnson TES noise ------------------
     To = TES._T_eq
@@ -246,6 +249,7 @@ def simulate_noise(detector):
 
     Si_Rt = abs(dIdV - Io * dIdPt) ** 2 * Sv_t # A^2 / Hz
     Spt_Rt = Si_Rt / abs(dIdPt ** 2) # W^2 / Hz
+    if print_noise == True: print("Rt Noise:",Spt_Rt[0] )
 
     # Phonon Cooling Noise across TES-Bath conductance ----------------
     Gep = TES._G
@@ -255,6 +259,7 @@ def simulate_noise(detector):
 
     Si_Gtb = abs(dIdPt ** 2) * Spt_Gtb
 
+    if print_noise == True: print("Gtb Noise:",Spt_Gtb[0] )
     # Unexplained Noise scaling as Pt
     Spt_xtra_Sp = Spt_Gtb * TES._fSp_xtra ** 2
     Si_extra_Sp = Si_Gtb * TES._fSp_xtra ** 2
@@ -275,6 +280,7 @@ def simulate_noise(detector):
     sigPt_of_1chan = np.sqrt(1/(domega/(2*np.pi)*4*np.abs(dPtdE)**2/Spt_tot).sum())/e
     n_channel = detector._n_channel
     sigPt_of = np.sqrt(n_channel) * sigPt_of_1chan
+    
     if lgc_plt:
         plt.plot(omega/(2*np.pi),np.sqrt(SI_squid)*1e12,'yellow', label='Squid')
         plt.plot(omega/(2*np.pi),np.sqrt(Si_Rl)*1e12,'red', label='R_load')
@@ -302,10 +308,11 @@ def simulate_noise(detector):
         plt.legend(loc='best')
         plt.semilogy()
         plt.semilogx()
-        #plt.show()
+        plt.show()
     
-    print("---------------- NOISE PARAMETERS ----------------")
-    print("--------------------------------------------------\n")
-    print(">>>>>>>>>>>>>>>>>>>>>> RESOLUTION IS %s" % sigPt_of)
+    if detector._tes._print == True:
+        print("---------------- NOISE PARAMETERS ----------------")
+        print("--------------------------------------------------\n")
+        print(">>>>>>>>>>>>>>>>>>>>>> RESOLUTION IS %s" % sigPt_of)
     return sigPt_of
-    
+
