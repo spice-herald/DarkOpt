@@ -4,8 +4,8 @@ from MaterialProperties import TESMaterial
 
 class TES:
     # n_TES always a derived quantity, shouldn't be an input  
-    def __init__(self, l, w, foverlap, l_overlap, n_fin, sigma, T_eq, total_res_n, 
-                 material=TESMaterial(), fOp=0.45, Qp=0):
+    def __init__(self, l, w, l_overlap, n_fin, sigma, T_eq, total_res_n, e_WAl,
+                 material=TESMaterial(), printing=True,  fOp=0.45, Qp=0):
         """
 	:param foverlap: Fraction of the Al fin edge that is adjacent to the TES which is covered with Al
          w_fincon = (Perimeter/n_fin)*foverlap                 
@@ -13,7 +13,11 @@ class TES:
         self._t = 40e-9 # thickness of the TES. limited by fabrication constraints + noise. same as matlab. 
         self._l = l # length of tes
         self._w = w # width of tes 
-        self._foverlap_width = foverlap # fraction overlap
+        #self._foverlap_width = foverlap # fraction overlap SZ: this will now be calculated
+        # The next two shouldn't change (to avoid shorts)
+        self._width_no_Al = 12e-6 # width around TES where no Al
+        self._Al_erase = 6e-6 # width between fins with no Al 
+        self._foverlap_width = (2*l+2*self._width_no_Al+4*l_overlap-n_fin*self._Al_erase)/(2*l+2*self._width_no_Al+4*l_overlap)
         self._l_overlap = l_overlap # length of W/Al overlap 
         self._n_fin = n_fin # number of fins to form QET  
         self._resistivity = material._rho_electrical # electrical resistivity of TES 
@@ -31,16 +35,25 @@ class TES:
         self._T_c = material._Tc # Critical temperature of W 
         self._Qp = Qp  # Parasitic heating
 
-        wTc_1090 = 1.4e-3 * self._T_c / 68e-3  # [K], line 65-66 Tc_ResPt.m
+        wTc_1090 = 1.4e-3 * self._T_c / 68e-3  # [K], line 65-66 Tc_ResPt.m [Not Used in TES]
         self._wTc = material._wTc #0.000177496649192233 #wTc_1090 #/ 2 / np.log(3)  # Same as above, putting this in due to SimpleEquilibrium line 51
         self._material._gPep_v
 
+
         # Volume of the W/Al overlap
-        self._vol_WAl_overlap = 10e-6 * 2 * self._l * self._foverlap_width * self._t
+        # These two assume PD2 Style Fin: 
+        #self._vol_WAl_overlap = l_overlap * 2 * self._l * self._foverlap_width * self._t # Matt's estimate
+        #self._vol_WAl_overlap = (2*l+ 2*self._width_no_Al+ 4*l_overlap)*l_overlap*self._foverlap_width*self._t #SZ: new estimate
+        # need new estimate for "modern" fin connectors...
+        # instead of l_overlap want r of fin... l_overlap = radius of circle
+        self._A_overlap = (0.5*3.1415*l_overlap*l_overlap+36e-12)*(n_fin -2) + 2*(0.5*3.1415*l_overlap*l_overlap+36e-12)
+        self._vol_WAl_overlap = (0.5*3.1415*l_overlap*l_overlap+36e-12)*(n_fin -2)*self._t + 2*(0.5*3.1415*l_overlap*l_overlap+36e-12)*self._t
 
         #  Volume of the W only Fin connector
         #self._vol_WFinCon =  2.5e-6 * (n_fin * 4e-6 * self._t + (2 * self._l + self._foverlap_width))
-        self._vol_WFinCon = 2.5e-6 * n_fin * 4e-6 * self._t + 2.5e-6 * (2 * self._l * self._foverlap_width) * self._t
+        #self._vol_WFinCon = 2.5e-6 * n_fin * 4e-6 * self._t + 2.5e-6 * (2 * self._l * self._foverlap_width) * self._t
+        # re-estimate for new desing (PD4):
+        self._vol_WFinCon = n_fin*(19.040e-12+ 2*0.605e-12)*self._t  
 
         # Volume of the W only portion of the fin connector
         # Since the temperature in the fin connector is lower than the temperature
@@ -55,7 +68,7 @@ class TES:
         # effective volume
         # TODO this value is uncertain! Needs to be properly measured.
         # self._veff_WAloverlap = 0.35
-        self._veff_WAloverlap = 0.45 # -- changed to .45 to match matlab - SZ 2019  
+        self._veff_WAloverlap = e_WAl # -- changed to .45 to match matlab - SZ 2019  
 
         self._volume = self._volume_TES + self._veff_WFinCon * self._vol_WFinCon + \
                        self._veff_WAloverlap * self._vol_WAl_overlap
@@ -121,32 +134,34 @@ class TES:
         # ------ Parameters set when simulating noise -----
         self._fSp_xtra = 0
 
-       
-        print("---------------- TES PARAMETERS ----------------")
-        print("sigma %s" % self._sigma)
-        print("wTc %s" % self._wTc)
-        print("Tc %s" % self._T_c)
-        print("rho %s" % self._resistivity)
-        print("t %s" % self._t)
-        print("l %s" % self._l)
-        print("w %s" % self._w)
-        print("res1tes %s" % self._res1tes)
-        print("n_fin %s" % self._n_fin)
-        print("vol1TES %s" % self._volume_TES)
-        print("vol1 %s" % self._volume)
-        print("nTES %s" % self._nTES)
-        print("tot_volume %s" % self._tot_volume)
-        print("K %s " % self._K)
-        print("volFinCon %s" % self._vol_WFinCon)
-        print("WAlOverlap %s" % self._vol_WAl_overlap)
-        print("veff_WFinCon %s" % self._veff_WFinCon)
-        print("veff_WAloverlap %s" % self._veff_WAloverlap)
-        print("Rn %s" % self._total_res_n)
-        print("Ro %s" % self._res_o)
-        print("fOp %s" % self._fOp)
-        print("Ro %s" % self._res_o)
-        print("L %s" % self._L)
-        print("------------------------------------------------\n")
+        self._print = printing
+        if self._print == True:
+            print("---------------- TES PARAMETERS ----------------")
+            print("sigma %s" % self._sigma)
+            print("wTc %s" % self._wTc)
+            print("Tc %s" % self._T_c)
+            print("rho %s" % self._resistivity)
+            print("t %s" % self._t)
+            print("l %s" % self._l)
+            print("w %s" % self._w)
+            print("foverlap %s" % self._foverlap_width)
+            print("res1tes %s" % self._res1tes)
+            print("n_fin %s" % self._n_fin)
+            print("vol1TES %s" % self._volume_TES)
+            print("vol1 %s" % self._volume)
+            print("nTES %s" % self._nTES)
+            print("tot_volume %s" % self._tot_volume)
+            print("K %s " % self._K)
+            print("volFinCon %s" % self._vol_WFinCon)
+            print("WAlOverlap %s" % self._vol_WAl_overlap)
+            print("veff_WFinCon %s" % self._veff_WFinCon)
+            print("veff_WAloverlap %s" % self._veff_WAloverlap)
+            print("Rn %s" % self._total_res_n)
+            print("Ro %s" % self._res_o)
+            print("fOp %s" % self._fOp)
+            print("Ro %s" % self._res_o)
+            print("L %s" % self._L)
+            print("------------------------------------------------\n")
       
     
     def set_G(self, val):
