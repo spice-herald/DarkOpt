@@ -4,7 +4,7 @@ from MaterialProperties import DetectorMaterial
 
 class Absorber:
 
-    def __init__(self, name, shape, h, r, w_safety):
+    def __init__(self, name, shape, h, r, w_safety, printing):
         """
         Absorber Medium of Detector. Assumed in shape of cylinder. 
         
@@ -18,8 +18,9 @@ class Absorber:
         material = DetectorMaterial(name)
 
         self._name = name
+        self._shape = shape 
         self._h = h # if cube - length of one side
-        self._r = r # if cube r = h 
+        self._r = r # if cube r = h, if square r is side length of square
         self._w_safety = w_safety  
         self._rho = material.get_rho_mass()
         if shape == "cylinder":
@@ -27,6 +28,11 @@ class Absorber:
             self._SA_face = np.pi * (self._r ** 2)
             self._SA_pattern = np.pi * (self._r - self._w_safety) ** 2
             self._SA = 2 * (self._SA_face + np.pi * self._r * self._h)
+        elif shape == "square":
+            self._volume = self._h*(self._r**2)
+            self._SA_face = self._r**2
+            self._SA_pattern = (self._r - 2*self._w_safety)**2
+            self._SA = 2*self._SA_face + self._h*4*self._r  
         elif shape == "cube": 
             self._volume = self._h**3
             self._SA_face = self._h**2
@@ -37,12 +43,15 @@ class Absorber:
         self._m = self._rho * self._volume
         pass
 
-        print("---------------- ABSORBER PARAMETERS ----------------")
-        print("Absorber lscat ", 4*self._volume/self._SA)
-        print("Absorber SA_face %s" % self._SA_face)
-        print("Absorber SA %s" % self._SA)
-        print("Absorber mass %s" % self._m)
-        print("------------------------------------------------\n")
+        self._print = printing
+        
+        if self._print == True:
+            print("---------------- ABSORBER PARAMETERS ----------------")
+            print("Absorber lscat ", 4*self._volume/self._SA)
+            print("Absorber SA_face %s" % self._SA_face)
+            print("Absorber SA %s" % self._SA)
+            print("Absorber mass %s" % self._m)
+            print("------------------------------------------------\n")
 
     def get_name(self):
         return self._name
