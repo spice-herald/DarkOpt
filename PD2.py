@@ -9,8 +9,8 @@ class PD2(Detector):
     A class to create a PD2 Detector object that includes the actual geometrical values 
     obtained from the l-edit mask  
     """
-    def __init__(self, name, fridge, electronics, absorber, qet, tes, n_channel):
-        super().__init__(name, fridge, electronics, absorber, qet, tes, n_channel)
+    def __init__(self, name, fridge, electronics, absorber, qet, tes, n_channel, type_qp):
+        super().__init__(name, fridge, electronics, absorber, qet, tes, n_channel, type_qp)
 
     def calc_maskL(self):
         # ---- Calculate mask Inductance 
@@ -44,12 +44,16 @@ class PD2(Detector):
         # _volume_TES is the same
 
         # Volume of the W/Al overlap
-        # two end connectors 
+        # two end connectors
+        # PD2 10um
         endcon_wal_overlap = 128.535e-12+228.535e-12+258e-12 # area from ledit
         midcon_wal_overlap = 480e-12 # area from ledit
-         
+        # PD3 20um 
+        endcon_wal_overlap = 1665e-12 
+        midcon_wal_overlap = 960e-12
+
         self._tes._vol_WAl_overlap = (4*midcon_wal_overlap + 2*endcon_wal_overlap)*self._tes._t 
-        
+        self._tes._A_overlap =  4*midcon_wal_overlap + 2*endcon_wal_overlap
         # Volume of the W only fin connector 
         #self._tes._vol_WFinCon = 2.5e-6 * n_fin * 4e-6 * self._t + 2.5e-6 * (2 * self._l * self._foverlap_width) * self._t
         midcon_w_only = 88.9e-12 # area from ledit
@@ -60,7 +64,6 @@ class PD2(Detector):
         self._tes._volume = self._tes._volume_TES + self._tes._veff_WFinCon * self._tes._vol_WFinCon + \
                        self._tes._veff_WAloverlap * self._tes._vol_WAl_overlap
         
-        print("Total Volume 1 TES: ", self._tes._volume_TES, " + ", self._tes._veff_WFinCon, " * ", self._tes._vol_WFinCon, " + ", self._tes._veff_WAloverlap, " * ", self._tes._vol_WAl_overlap)
         # reset n_tes 
         self._tes._nTES = 975 + 28+28 
 
@@ -76,16 +79,12 @@ class PD2(Detector):
         
         # Percentage of surface area covered by QET Fins
         self._qet._a_fin = 28660e-12+28668e-12+28683e-12+28660e-12+28668e-12+28683e-12+self._qet._nhole *self._qet._ahole # check this
-        print("Afin: ", self._qet._a_fin)
         self._SA_active = self._n_channel * self._tes._nTES * self._qet._a_fin
         
         # Average area per cell, annd corresponding length 
         a_cell = self._absorber.get_pattern_SA()/(self._n_channel*self._tes._nTES)
         self._l_cell = np.sqrt(a_cell)
-        print("a_cell ", a_cell)
-        print("l_cell ", self._l_cell)
         y_cell = 2*self._qet._l_fin + self._tes._l 
-        print("y_cell ", y_cell)
          
         # Design is not close packed. Get passive Al/QET
         a_passive_qet = self._l_cell*self._w_rail_main + (self._l_cell-y_cell)*self._w_rail_qet
@@ -107,7 +106,9 @@ class PD2(Detector):
         
         self._w_collect = 1/self._t_pabsb
 
-        #self._w_collect = 1/self._t_pabsb 
+        ci = (48e-6*4+ (25.8e-6 + 15e-6 + 5e-6)*2)
+        #self._qet.set_qpabsb_eff(self._l_fin, self._h_fin, self._tes._A_overlap, ci, self._l_TES)
+        self._qet.set_qpabsb_eff_matt(self._l_fin, self._h_fin, self._l_overlap, self._tes._l, self._tes._n_fin)
 
         # Total collection efficiency:
         self._eEabsb = self._e156 * self._ePcollect * self._qet._eQPabsb * self._qet._ePQP # * self._e_downconvert * self._fSA_qpabsorb 
@@ -127,13 +128,18 @@ class PD2(Detector):
         print("Rn %s" % self._tes._total_res_n)
         print("Ro %s" % self._tes._res_o)
         print("SAactive %s" % self._SA_active)
+        fSA_active = self._SA_active/self._absorber.get_SA()
+        print("fSA_active %s" % fSA_active)
         print("lcell %s" % self._l_cell)
         print("SApassive %s" % self._SA_passive)
+        fSA_passive = self._SA_passive/self._absorber.get_SA()
+        print("fSA_passive %s" % fSA_passive)
         print("fSA_QPabsb %s" % self._fSA_qpabsorb)
         print("ePcollect %s" % self._ePcollect)
         print("tau_pabsb %s" % self._t_pabsb)
         print("w_pabsb %s" % (1/self._t_pabsb))
         print("eE156 %s" % self._e156)
+        print("QP_eff %s " % self._qet._eQPabsb)
         print("eEabsb %s" % self._eEabsb)
         print("Kpb %s" % self._kpb)
         print("nKpb %s" % self._nkpb)
