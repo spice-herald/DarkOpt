@@ -171,8 +171,9 @@ class TESMaterial:
         # not sure where these Tc values are coming from but new TES chip (Caleb) has Tc = 40e-3 K  
         self._Tc = Tc
         #self._wTc_1090 = 3.9e-4* Tc/40e-3 # matlab has 3.65e-4 -SZ 
-        self._wTc_1090 = 3.65e-4* Tc/40e-3 # matlab has 3.65e-4 -SZ 
-        self._wTc = self._wTc_1090/2/log(3)
+        self._wTc_1090 = 3.65e-4* Tc/40e-3 # matlab has 3.65e-4 -SZ
+        a_factor = 0.73 # factor to match measured tau_eft = 66 microseconds
+        self._wTc = a_factor*self._wTc_1090/2/log(3)
 
 class QETMaterial(QET):
     def __init__(self, name):
@@ -221,3 +222,4 @@ class QETMaterial(QET):
         self._Z = Z
         # Efficiency phonons --> quasiparticles
         self._ePQP = ePQP
+        self._Tc = Tc
