@@ -4,8 +4,8 @@ from MaterialProperties import TESMaterial
 
 class TES:
     # n_TES always a derived quantity, shouldn't be an input  
-    def __init__(self, l, w, l_overlap, n_fin, sigma, T_eq, total_res_n, e_WAl,
-                 material=TESMaterial(), printing=True,  fOp=0.45, Qp=0):
+    def __init__(self, l, w, l_overlap, n_fin, sigma, T_eq, total_res_n, e_WAl, con_type,
+                 material=TESMaterial(), printing=False,  fOp=0.45, Qp=0):
         """
 	:param foverlap: Fraction of the Al fin edge that is adjacent to the TES which is covered with Al
          w_fincon = (Perimeter/n_fin)*foverlap                 
@@ -30,6 +30,7 @@ class TES:
         self._n = 5  # used to define G, refer to eqs 3.1 and 3.3
         self._T_eq = T_eq  # equilibrium temperature
         self._material = material
+        self._con_type = con_type 
 
         # Critical temperature, default 40mK
         self._T_c = material._Tc # Critical temperature of W 
@@ -46,8 +47,19 @@ class TES:
         #self._vol_WAl_overlap = (2*l+ 2*self._width_no_Al+ 4*l_overlap)*l_overlap*self._foverlap_width*self._t #SZ: new estimate
         # need new estimate for "modern" fin connectors...
         # instead of l_overlap want r of fin... l_overlap = radius of circle
-        self._A_overlap = (0.5*3.1415*l_overlap*l_overlap+36e-12)*(n_fin -2) + 2*(0.5*3.1415*l_overlap*l_overlap+36e-12)
-        self._vol_WAl_overlap = (0.5*3.1415*l_overlap*l_overlap+36e-12)*(n_fin -2)*self._t + 2*(0.5*3.1415*l_overlap*l_overlap+36e-12)*self._t
+        if con_type == 'modern':
+                self._A_overlap = (0.5*3.1415*l_overlap*l_overlap+36e-12)*(n_fin -2) + 2*(0.5*3.1415*l_overlap*l_overlap+36e-12)
+                self._vol_WAl_overlap = (0.5*3.1415*l_overlap*l_overlap+36e-12)*(n_fin -2)*self._t + 2*(0.5*3.1415*l_overlap*l_overlap+36e-12)*self._t
+	
+	# elliptical connector type for small TES designs (cm squares/cubes)
+        elif con_type == 'ellipse':
+                wempty = 6e-6 
+                wempty_tes = 7.5e-6
+                con_major = (self._l/2) + l_overlap 
+                con_minor = l_overlap+ wempty_tes 
+                con_ellipse = 3.1415*con_major*con_minor 
+                self._A_overlap = con_ellipse - 2*self._l*wempty_tes - wempty*n_fin*l_overlap 
+                self._vol_WAl_overlap = self._A_overlap*self._t  
 
         #  Volume of the W only Fin connector
         #self._vol_WFinCon =  2.5e-6 * (n_fin * 4e-6 * self._t + (2 * self._l + self._foverlap_width))
