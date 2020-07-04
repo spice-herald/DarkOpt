@@ -29,7 +29,7 @@ class Detector:
 
         """
         # Width of Main Bias Rails and QET Rails 
-        self._w_rail_main = 3e-6
+        self._w_rail_main = 6e-6
         self._w_rail_qet = 3e-6 
 
         self._name = name
