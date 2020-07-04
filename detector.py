@@ -6,12 +6,12 @@ import numpy as np
 import sys
 
 # Some hard-coded numbers:
-k_b = 1.38e-3 # J/K
+k_b = 1.38e-23 # J/K
 n = 5 # used to define G (related to phonon/electron DOF)
 
 class Detector:
 
-    def __init__(self, name, fridge, electronics, absorber, qet, tes, n_channel, type_qp_eff):
+    def __init__(self, name, fridge, electronics, absorber, qet, tes, passive, n_channel, type_qp_eff):
         
         """
         
@@ -49,7 +49,10 @@ class Detector:
         # UPDATED QP EFFICIENCY: depends on True Overlap Area
         a_overlap = self._tes._A_overlap
         if type_qp_eff == 0: # Updated estimate with small ci, changing effective l_overlap
-            ci = tes._n_fin*2*self._l_overlap
+            if tes._con_type == 'modern':            
+                ci = tes._n_fin*2*self._l_overlap
+            elif tes._con_type == 'ellipse':
+                ci = 2*tes._l + (7.5e-6)*4 - tes._n_fin*(6e-6)
             self._qet.set_qpabsb_eff(self._l_fin, self._h_fin, a_overlap, ci, self._l_TES) 
         if type_qp_eff == 1: # Updated estimate with same ci, changing effective l_overlap 
             ci = 2*tes._l
@@ -63,9 +66,10 @@ class Detector:
 
         # Average area per cell, and corresponding length
         a_cell = self._absorber.get_pattern_SA() / (n_channel * self._tes._nTES) # 1/2 channels on each side
-        
-        if a_cell*n_channel*self._tes._nTES > self._absorber.get_pattern_SA(): 
-            #print("~~ERROR~~ Invalid Design, QET cells don't fit.")
+       
+        QET_block = (2*self._qet._l_fin + self._tes._l)*(2*self._qet._l_fin) 
+        if QET_block*self._tes._nTES > self._absorber.get_pattern_SA(): 
+            #print("----- ERROR: Invalid Design - QET cells don't fit.")
             self._cells_fit = "false"
         else: self._cells_fit = "true"
         
@@ -76,12 +80,14 @@ class Detector:
         y_cell = 2 * self._qet._l_fin + self._tes._l # length qet 
         
         if self._l_cell > y_cell:
+            #print("---- Not Close Packed")
             # Design is not close packed. Get passive Al/QET
             a_passive_qet = self._l_cell * self._w_rail_main + (self._l_cell - y_cell) * self._w_rail_qet
             #a_passive_qet = self._w_cell*self._w_rail_main + (self._h_cell - y_cell)* self._w_rail_qet
             #a_passive_qet = self._w_cell*self._w_rail_main + (self._h_cell - y_cell)*self._w_rail_qet
             self._close_packed = "false"
         else:
+            #print("---- Close Packed")
             # Design is close packed. No vertical rail to QET
             x_cell = a_cell / y_cell
             a_passive_qet = x_cell * self._w_rail_main
@@ -110,7 +116,10 @@ class Detector:
         if absorber._shape == "cylinder": # Indicates PD2-like Rail Layout
             self._SA_passive = tes_passive + outer_ring + inner_ring + inner_vertical_rail + outer_vertical_rail + total_alignment
         if absorber._shape == "square": # New Square Rail Layout Design
-            self._SA_passive = tes_passive + 2*(self._absorber._r - 2*self._absorber._w_safety)*self._w_rail_main + 2*one_alignment_window 
+            if passive == 1:
+                self._SA_passive = tes_passive + 2*(self._absorber._r - 2*self._absorber._w_safety)*self._w_rail_main + 2*one_alignment_window
+            elif passive == 0:            
+                self._SA_passive = 0 # FOR THEORETICAL UNDERSTANDING, DELETE  
         
         # Fraction of surface area which has phonon absorbing aluminum
         self._fSA_qpabsorb = (self._SA_passive + self._SA_active) / self._absorber.get_SA()
@@ -168,6 +177,7 @@ class Detector:
 
         # ----------- Electronics ----------
         self._total_L = self._electronics._l_squid + self._electronics._l_p + self._tes._L 
+        self._total_L = 0 
 
         # ---------- Response Variables to Be Set in Simulation of Noise ---------------
         self._response_omega = 0

@@ -24,9 +24,9 @@ class Absorber:
         self._w_safety = w_safety  
         self._rho = material.get_rho_mass()
         if shape == "cylinder":
-            self._volume = np.pi * (self._r ** 2) * self._h
-            self._SA_face = np.pi * (self._r ** 2)
-            self._SA_pattern = np.pi * (self._r - self._w_safety) ** 2
+            self._volume = np.pi * (self._r**2) * self._h
+            self._SA_face = np.pi * (self._r**2)
+            self._SA_pattern = np.pi * (self._r - self._w_safety)**2
             self._SA = 2 * (self._SA_face + np.pi * self._r * self._h)
         elif shape == "square":
             self._volume = self._h*(self._r**2)
