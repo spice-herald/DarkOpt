@@ -9,7 +9,7 @@ class TES:
     def __init__(self, length, width, l_overlap, n_fin, sigma, rn, rl, L_tot, h=40e-9,
                  zeta_WAl_fin=0.45, zeta_W_fin=0.88, con_type='ellipse',
                  material=TESMaterial(), operating_point=0.45, alpha=None, beta=0, 
-                 n=5, Qp=0, t_mc=10e-3, lgcprint=False):
+                 n=5, Qp=0, t_mc=10e-3):
         
         """
         length : float
@@ -59,49 +59,41 @@ class TES:
             Parasitic heating [J]
         t_mc : float, optional
             Temperature of the mixing chamber [K]
-        lgcprint : bool, optional
-            If True, the TES parameters are printed
-        
         """
   
         self.h = h # thickness of the TES. limited by fabrication constraints + noise. same as matlab. 
         self.l = length # length of tes
         self.w = width # width of tes 
         self.rn = rn
+        self.fOp = operating_point # Operating Resistance/Normal Resistance ratio 
+        self.r0 = self.rn * self.fOp # operating resistance
         self.rl = rl
         self.L = L_tot
-        #self._foverlap_width = foverlap # fraction overlap SZ: this will now be calculated
+       
         # The next two shouldn't change (to avoid shorts)
         self.width_no_Al = 12e-6 # width around TES where no Al
         self.Al_erase = 6e-6 # width between fins with no Al 
+        
         self.foverlap_width = (2*length+2*self.width_no_Al+4*l_overlap-n_fin*self.Al_erase)/(2*length+2*self.width_no_Al+4*l_overlap)
         self.l_overlap = l_overlap # length of W/Al overlap 
         self.n_fin = n_fin # number of fins to form QET  
         self.resistivity = material._rho_electrical # electrical resistivity of TES 
-        self.fOp = operating_point # Operating Resistance/Normal Resistance ratio 
-        # volume of a single TES 
-        self.volume_TES = self.h * self.l * self.w
-        #self._K = sigma * V  # P_bath vs T, eq 3.1 in thesis.
+        
+        self.volume_TES = self.h * self.l * self.w # volume of a single TES 
         self.sigma = sigma
         self.n = n  # used to define G, refer to eqs 3.1 and 3.3
         self.beta = beta
         self.material = material
         self.con_type = con_type 
     
-        # Critical temperature, default 40mK
         self.T_c = material._Tc # Critical temperature of W 
         self.Qp = Qp  # Parasitic heating
         self.t_mc = t_mc
-        
         wTc_1090 = 1.4e-3 * self.T_c / 68e-3  # [K], line 65-66 Tc_ResPt.m [Not Used in TES]
-        self.wTc = material._wTc #0.000177496649192233 #wTc_1090 #/ 2 / np.log(3)  # Same as above, putting this in due to SimpleEquilibrium line 51
+        self.wTc = material._wTc 
         self.material._gPep_v
 
-
-        # Volume of the W/Al overlap
-        # These two assume PD2 Style Fin: 
-        #self._vol_WAl_overlap = l_overlap * 2 * self._l * self._foverlap_width * self._t # Matt's estimate
-        #self._vol_WAl_overlap = (2*l+ 2*self._width_no_Al+ 4*l_overlap)*l_overlap*self._foverlap_width*self._t #SZ: new estimate
+        
         # need new estimate for "modern" fin connectors...
         # instead of l_overlap want r of fin... l_overlap = radius of circle
         if con_type == 'modern':
@@ -146,41 +138,21 @@ class TES:
         self.res1tes = self.resistivity*self.l/(self.w*self.h)
         # Have a desired output resistance and optimise length to fix n_TES.
         self.nTES = m.ceil(self.resistivity * self.l  / (self.w * self.h * self.rn))
-        self.total_res_n = self.res1tes/self.nTES
-        
         self.tot_volume = self.volume * self.nTES
-
         self.K = self.tot_volume * sigma
         
-        # Operating Resistance
-        self.r0 = self.rn * self.fOp
-        
-        
-        
-        
-
-        
-    
-
 
         #  ---- Bias Point Temperature ----
         # let's calculate the temperature of the operating point resistance.
         # [Notice that if the resistance of the TES changes with current, then this doesn't work]
         zeta_o = np.log(self.fOp/(1 - self.fOp))/2
-    
-        # Attempting to replicate SimpleEquilibrium_1TES line 51 with Tc_ResPt.m line 65-66. wTc doesn't show up
-        # anywhere else! wTc calculated using this way in TES.py 32-33
-
         self.t0 = zeta_o * self.wTc + self.T_c # K    
         self.Gep = self.n * self.K * self.t0 ** (self.n-1)
     
         # ----- Alpha/Beta at Transition Point -----
-
         self.alpha = 2*self.t0/self.wTc/np.exp(zeta_o)/(np.exp(zeta_o)+np.exp(-zeta_o))
 
         # ---- TES properties at equilibrium ----
-
-        # Bias Power (Phonon/Electron coupling G already set in TES.py)
         self.p0 = self.K * ((self.t0 ** self.n) - (self.t_mc ** self.n)) - self.Qp # W
 
         # Loop Gain
@@ -192,10 +164,7 @@ class TES:
         # Bias Voltage
         self.vbias = self.i0 * (self.rl + self.r0)  # V
 
-
         # Heat Capacity
-
-        # Tungsten values taken from MaterialProperties.m line 385 / 376
         fCsn = material._fCsn # matches matlab 
         gC_v = material._gC_v # matches matlab 
         self.C = fCsn * gC_v * self.t0 * self.tot_volume
@@ -229,33 +198,43 @@ class TES:
         self.fSp_xtra = 0
         
         
-        if lgcprint:
-            print("---------------- TES PARAMETERS ----------------")
-            print(f"sigma = {self.sigma}"  )
-            print("wTc =  %s" % self.wTc)
-            print("Tc =  %s" % self.T_c)
-            print("rho =  %s" % self.resistivity)
-            print("t =  %s" % self.h)
-            print("l =  %s" % self.l)
-            print("w =  %s" % self.w)
-            print("foverlap =  %s" % self.foverlap_width)
-            print("res1tes =  %s" % self.res1tes)
-            print("n_fin =  %s" % self.n_fin)
-            print("vol1TES =  %s" % self.volume_TES)
-            print("vol1 =  %s" % self.volume)
-            print("nTES =  %s" % self.nTES)
-            print("tot_volume =  %s" % self.tot_volume)
-            print("K =  %s " % self.K)
-            print("volFinCon =  %s" % self.vol_WFinCon)
-            print("WAlOverlap =  %s" % self.vol_WAl_overlap)
-            print("veff_WFinCon =  %s" % self.veff_WFinCon)
-            print("veff_WAloverlap =  %s" % self.veff_WAloverlap)
-            print("Rn =  %s" % self.total_res_n)
-            print("P0 =  %s" % self.r0)
-            print("fOp =  %s" % self.fOp)
-            print("P0 =  %s" % self.p0)
-            print("L =  %s" % self.L)
-            print("------------------------------------------------\n")
+        
+    def print(self):
+        """
+        Method to print TES parameters
+        """
+
+        print("---------------- TES PARAMETERS ----------------")
+        print(f"sigma = {self.sigma}"  )
+        print("wTc =  %s" % self.wTc)
+        print("Tc =  %s" % self.T_c)
+        print("rho =  %s" % self.resistivity)
+        print("t =  %s" % self.h)
+        print("l =  %s" % self.l)
+        print("w =  %s" % self.w)
+        print("foverlap =  %s" % self.foverlap_width)
+        print("res1tes =  %s" % self.res1tes)
+        print("n_fin =  %s" % self.n_fin)
+        print("vol1TES =  %s" % self.volume_TES)
+        print("vol1 =  %s" % self.volume)
+        print("nTES =  %s" % self.nTES)
+        print("tot_volume =  %s" % self.tot_volume)
+        print("K =  %s " % self.K)
+        print("volFinCon =  %s" % self.vol_WFinCon)
+        print("WAlOverlap =  %s" % self.vol_WAl_overlap)
+        print("veff_WFinCon =  %s" % self.veff_WFinCon)
+        print("veff_WAloverlap =  %s" % self.veff_WAloverlap)
+        print("Rn =  %s" % self.rn)
+        print("P0 =  %s" % self.r0)
+        print("fOp =  %s" % self.fOp)
+        print("P0 =  %s" % self.p0)
+        print("L =  %s" % self.L)
+        print(f"tau_el = {self.tau_el}")
+        print(f"tau_etf = {self.tau_etf}")
+        print(f"tau_0 = {self.tau0}")
+        print(f"tau_+ = {self.taup_p}")
+        print(f"tau_- = {self.taup_m}")
+        print("------------------------------------------------\n")
       
     
     

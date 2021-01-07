@@ -9,8 +9,8 @@ class QET:
     Al fin dimentions.
     """
 
-    def __init__(self, l_fin, h_fin, n_fin, l_tes, l_overlap, ahole, ePQP=0.52,
-                 wempty=6e-6, wempty_tes=7.5e-6):
+    def __init__(self, l_fin, h_fin, TES, ahole, ePQP=0.52, eff_absb = 1.22e-4,
+                 wempty=6e-6, wempty_tes=7.5e-6, type_qp_eff=0):
         
         """
         l_fin : float, 
@@ -30,22 +30,30 @@ class QET:
         ePQP : float, optional
             Phonon to QP Conversion Effciency, 
             Kaplan downconversion limits this to 52%
-        wempty : float,
+        eff_absb : float, optional
+            W/Al transmition/trapping probability
+        wempty : float, optional
             ?
-        wempty_tes : float, 
+        wempty_tes : float, optional
             ?
+        type_qp_eff : int, optional
+            how the efficiency should be calculated.
+            0 : 'modern' estimate of overlap radius (small)
+            1 : 'modern' estimate, but different effective l_overlap
+            2 : Matt's method
         """
         
 
         self.l_fin = l_fin
         self.h_fin = h_fin
-        self.n_fin = n_fin
         self.TES = TES
-        l_tes = TES.l_tes
+        n_fin = TES.n_fin
+        l_tes = TES.l
         l_overlap = TES.l_overlap
         self.eQPabsb = None #gets set by method
         self.ePQP = ePQP # efficiency of phonon in subrate breaking cooper pair
                           # in Al
+        self.eff_absb = eff_absb
         # ---- QET Active Area ----
         self.wempty = wempty
         self.wempty_tes = wempty_tes
@@ -54,22 +62,25 @@ class QET:
         self.afin_empty = n_fin * l_fin * wempty + 2 * l_tes * wempty_tes + self.nhole * ahole 
         #self._a_fin = np.pi * (self._l_fin ** 2) + 2 * self._l_fin * TES._l - self._afin_empty # SZ: bug?? 
         self.a_fin = np.pi*l_fin*(l_fin + (l_tes/2)) - self.afin_empty
-
-#         if TES._print == True:
-#             print("---------------- QET PARAMETERS ----------------")
-#             print("ePQP %s" % self._ePQP)
-#             print("lfin %s" % self._l_fin)
-#             print("hfin %s" % self._h_fin)
-#             print("loverlap %s" % self.l_overlap)
-#             print("ld %s" % (567 * h_fin))
-#             eff_absb = 1.22e-4
-#             print("la %s " % (1 /eff_absb*h_fin**2/self.l_overlap))
-#             print("Afin_empty %s" % self._afin_empty)
-#             print("Afin %s" % self._a_fin)
-#             print("------------------------------------------------\n")
         
+        
+        
+        a_overlap = TES.A_overlap
+        if type_qp_eff == 0: # Updated estimate with small ci, changing effective l_overlap
+            if TES.con_type == 'modern':            
+                self.ci = n_fin*2*l_overlap
+            elif TES.con_type == 'ellipse':
+                self.ci = 2*l_tes + (7.5e-6)*4 - n_fin*(6e-6)
+            self.set_qpabsb_eff() 
+        if type_qp_eff == 1: # Updated estimate with same ci, changing effective l_overlap 
+            self.ci = 2*l_tes
+            self._qet.set_qpabsb_eff() 
+        if type_qp_eff == 2: # Original estimate that assumes entire perimeter is W/Al overlap with ci = 2*l_TES
+            self.set_qpabsb_eff_matt()
 
-    def set_qpabsb_eff_matt(self, eff_absb=1.22e-4, method=0):
+
+
+    def set_qpabsb_eff_matt(self):
         """
         Calculate the QP collection efficiciency using Matt's method. Sets class atribute
         slef.eQPabsb
@@ -100,12 +111,12 @@ class QET:
         # DOI: 10.1007/s10909-015-1406-7
         # -------------------------------------------------------------------------------------------------------------
         
-        l_tes = self.l_tes*1e6 #convert to [um]
+        l_tes = self.TES.l*1e6 #convert to [um]
         l_fin = self.l_fin*1e6 #convert to [um]
         h_fin = self.h_fin*1e6 #convert to [um]
-        l_overlap = self.l_overlap*1e6 #convert to [um]
-        n_fin = self.n_fin
-        
+        l_overlap = self.TES.l_overlap*1e6 #convert to [um]
+        n_fin = self.TES.n_fin
+        eff_absb = self.eff_absb
         # We assume pie shaped QP collection fins
         ci = 2 * l_tes # inner circle circumferance 
         ri = ci / (2 * np.pi) # inner radius
@@ -125,11 +136,12 @@ class QET:
         # -------- Relevant length scales ------------
         # Diffusion length
         ld = 567 * h_fin  # [µm] this is the fit in Jeff's published LTD 16 data
-
+        self.ld = ld
         # Surface impedance length
         la = (1 /eff_absb)*(h_fin**2/l_overlap)  # [µm] these match the values used by Noah 
         la_chk = (1e6 + 1600 / (900 ** 2) * 5) * (h_fin ** 2)  # µm
-
+        self.la = la
+        
         # -------- Dimensionless Scales -------
         rhoi = ri / ld
         rhoo = ro / ld
@@ -143,7 +155,7 @@ class QET:
         (besseli(0, rhoi) - lambdaA * besseli(1, rhoi)) * besselk(1, rhoo))
         self.eQPabsb = fQP
     
-    def set_qpabsb_eff(self, l_fin, h_fin, aoverlap, ci, l_TES, eff_absb=1.22e-4):
+    def set_qpabsb_eff(self):
         # From Effqp_2D_moffatt.m in Matt's dropbox 
         # Here we are using Robert Moffatt's full QP model. There are some pretty big assumptions:
         # 1) Diffusion length scales with Al thickness (trapping surface dominated and diffusion thickness limited)
@@ -164,11 +176,14 @@ class QET:
         # DOI: 10.1007/s10909-015-1406-7
         # -------------------------------------------------------------------------------------------------------------
         
-        l_tes = self.l_tes*1e6 #convert to [um]
+        l_tes = self.TES.l*1e6 #convert to [um]
         l_fin = self.l_fin*1e6 #convert to [um]
         h_fin = self.h_fin*1e6 #convert to [um]
-        l_overlap = self.l_overlap*1e6 #convert to [um]
-        n_fin = self.n_fin
+        l_overlap = self.TES.l_overlap*1e6 #convert to [um]
+        n_fin = self.TES.n_fin
+        aoverlap = self.TES.A_overlap*1e12 #[um^2]
+        eff_absb = self.eff_absb
+        ci = self.ci*1e6 #convert to [um]
         # We assume pie shaped QP collection fins
         ri = ci / (2 * np.pi) # inner radius
         #print("ri    ", ri)
@@ -176,7 +191,7 @@ class QET:
         #co1 = 2 * l_TES + 2 * np.pi * l_fin
 
         # Another approximation...
-        a = l_fin + l_TES/2
+        a = l_fin + l_tes/2
         b = l_fin
 
         # https://www.mathsisfun.com/geometry/ellipse-perimeter.html
@@ -189,16 +204,18 @@ class QET:
 
         #print("aoverlap        ", aoverlap)
         # re-define loverlap based on actual area aoverlap 
+        
         loverlap = np.sqrt((aoverlap/np.pi) + (ri**2)) - ri
         #print("l_overlap prime  ", loverlap) 
         #print("Overlap ", loverlap)
         # -------- Relevant length scales ------------
         # Diffusion length
         ld = 567 * h_fin  # [µm] this is the fit in Jeff's published LTD 16 data
-
+        self.ld = ld
         # Surface impedance length
         la = (1 /eff_absb)*(h_fin**2/loverlap)  # [µm] these match the values used by Noah 
         la_chk = (1e6 + 1600 / (900 ** 2) * 5) * (h_fin ** 2)  # µm
+        self.la = la
         #print("la                 ", la) 
         # -------- Dimensionless Scales -------
         rhoi = ri / ld
@@ -213,3 +230,19 @@ class QET:
         (besseli(0, rhoi) - lambdaA * besseli(1, rhoi)) * besselk(1, rhoo))
         #print("fQP   ", fQP)
         self.eQPabsb = fQP
+        
+        
+    def print(self):
+
+        print("---------------- QET PARAMETERS ----------------")
+        print("ePQP =  %s" % self.ePQP)
+        print(f"eQPabsb = {self.eQPabsb}")
+        print("lfin =  %s" % self.l_fin)
+        print("hfin =  %s" % self.h_fin)
+        print("loverlap =  %s" % self.TES.l_overlap)
+        print("ld =  %s" % self.ld)
+        print("la =  %s " % self.la)
+        print("Afin_empty =  %s" % self.afin_empty)
+        print("Afin =  %s" % self.a_fin)
+        print("------------------------------------------------\n")
+        
