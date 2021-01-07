@@ -4,7 +4,7 @@ from MaterialProperties import TESMaterial
 
 class TES:
     """
-    Class to store TES properties
+    Class to store TES properties. Calculated the TES and fin connector volumes.
     """
     def __init__(self, length, width, l_overlap, n_fin, sigma, rn, rl, L, h=40e-9,
                  zeta_WAl_fin=0.45, zeta_W_fin=0.88, con_type='ellipse',
@@ -81,7 +81,6 @@ class TES:
         self._fOp = operating_point # Operating Resistance/Normal Resistance ratio 
         # volume of a single TES 
         self._volume_TES = self._h * self._l * self._w
-        self._L = 0 # [H] set Inductance to zero for now
         #self._K = sigma * V  # P_bath vs T, eq 3.1 in thesis.
         self._sigma = sigma
         self._n = n  # used to define G, refer to eqs 3.1 and 3.3
@@ -258,30 +257,30 @@ class TES:
         
         if lgcprint:
             print("---------------- TES PARAMETERS ----------------")
-            print("sigma %s" % self._sigma)
-            print("wTc %s" % self._wTc)
-            print("Tc %s" % self._T_c)
-            print("rho %s" % self._resistivity)
-            print("t %s" % self._h)
-            print("l %s" % self._l)
-            print("w %s" % self._w)
-            print("foverlap %s" % self._foverlap_width)
-            print("res1tes %s" % self._res1tes)
-            print("n_fin %s" % self._n_fin)
-            print("vol1TES %s" % self._volume_TES)
-            print("vol1 %s" % self._volume)
-            print("nTES %s" % self._nTES)
-            print("tot_volume %s" % self._tot_volume)
-            print("K %s " % self._K)
-            print("volFinCon %s" % self._vol_WFinCon)
-            print("WAlOverlap %s" % self._vol_WAl_overlap)
-            print("veff_WFinCon %s" % self._veff_WFinCon)
-            print("veff_WAloverlap %s" % self._veff_WAloverlap)
-            print("Rn %s" % self._total_res_n)
-            print("Ro %s" % self._res_o)
-            print("fOp %s" % self._fOp)
-            print("Ro %s" % self._res_o)
-            print("L %s" % self._L)
+            print(f"sigma = {self._sigma}"  )
+            print("wTc =  %s" % self._wTc)
+            print("Tc =  %s" % self._T_c)
+            print("rho =  %s" % self._resistivity)
+            print("t =  %s" % self._h)
+            print("l =  %s" % self._l)
+            print("w =  %s" % self._w)
+            print("foverlap =  %s" % self._foverlap_width)
+            print("res1tes =  %s" % self._res1tes)
+            print("n_fin =  %s" % self._n_fin)
+            print("vol1TES =  %s" % self._volume_TES)
+            print("vol1 =  %s" % self._volume)
+            print("nTES =  %s" % self._nTES)
+            print("tot_volume =  %s" % self._tot_volume)
+            print("K =  %s " % self._K)
+            print("volFinCon =  %s" % self._vol_WFinCon)
+            print("WAlOverlap =  %s" % self._vol_WAl_overlap)
+            print("veff_WFinCon =  %s" % self._veff_WFinCon)
+            print("veff_WAloverlap =  %s" % self._veff_WAloverlap)
+            print("Rn =  %s" % self._total_res_n)
+            print("P0 =  %s" % self._r0)
+            print("fOp =  %s" % self._fOp)
+            print("P0 =  %s" % self._p0)
+            print("L =  %s" % self._L)
             print("------------------------------------------------\n")
       
     
