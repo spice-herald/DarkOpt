@@ -62,8 +62,6 @@ class TES:
         lgcprint : bool, optional
             If True, the TES parameters are printed
         
-            
-        
         """
   
         self._h = h # thickness of the TES. limited by fabrication constraints + noise. same as matlab. 
@@ -76,7 +74,7 @@ class TES:
         # The next two shouldn't change (to avoid shorts)
         self._width_no_Al = 12e-6 # width around TES where no Al
         self._Al_erase = 6e-6 # width between fins with no Al 
-        self._foverlap_width = (2*l+2*self._width_no_Al+4*l_overlap-n_fin*self._Al_erase)/(2*l+2*self._width_no_Al+4*l_overlap)
+        self._foverlap_width = (2*length+2*self._width_no_Al+4*l_overlap-n_fin*self._Al_erase)/(2*length+2*self._width_no_Al+4*l_overlap)
         self._l_overlap = l_overlap # length of W/Al overlap 
         self._n_fin = n_fin # number of fins to form QET  
         self._resistivity = material._rho_electrical # electrical resistivity of TES 
@@ -140,7 +138,7 @@ class TES:
         # effective volume
         # TODO this value is uncertain! Needs to be properly measured.
         # self._veff_WAloverlap = 0.35
-        self._veff_WAloverlap = zeta_WAL_fin # -- changed to .45 to match matlab - SZ 2019  
+        self._veff_WAloverlap = zeta_WAl_fin # -- changed to .45 to match matlab - SZ 2019  
 
         self._volume = self._volume_TES + self._veff_WFinCon * self._vol_WFinCon + \
                        self._veff_WAloverlap * self._vol_WAl_overlap
@@ -148,8 +146,7 @@ class TES:
         # Resistance of 1 TES 
         self._res1tes = self._resistivity*self._l/(self._w*self._h)
         # Have a desired output resistance and optimise length to fix n_TES.
-        self._total_res_n = total_res_n
-        self._nTES = m.ceil(self._resistivity * self._l  / (self._w * self._h * self._total_res_n))
+        self._nTES = m.ceil(self._resistivity * self._l  / (self._w * self._h * self._rn))
         self._total_res_n = self._res1tes/self._nTES
         
         self._tot_volume = self._volume * self._nTES
@@ -159,7 +156,7 @@ class TES:
         
         
         # Operating Resistance
-        self._ro = self._rn * self._fOp
+        self._r0 = self._rn * self._fOp
         
         
         
@@ -173,7 +170,7 @@ class TES:
         # let's calculate the temperature of the operating point resistance.
         # [Notice that if the resistance of the TES changes with current, then this doesn't work]
 
-        zeta_o = np.log(_TES._fOp/(1 - _TES._fOp))/2
+        zeta_o = np.log(self._fOp/(1 - self._fOp))/2
     
         # Attempting to replicate SimpleEquilibrium_1TES line 51 with Tc_ResPt.m line 65-66. wTc doesn't show up
         # anywhere else! wTc calculated using this way in TES.py 32-33
@@ -197,7 +194,7 @@ class TES:
         self._p0 = self._K * ((self._t0 ** self._n) - (self._t_mc ** self._n)) - self._Qp # W
 
         # Loop Gain
-        self._LG = self._alpha * self._p0 / (self._t0 * self._G)
+        self._LG = self._alpha * self._p0 / (self._t0 * self._Gep)
 
 
         # Current At Equilibrium
@@ -211,18 +208,18 @@ class TES:
 
         # Tungsten values taken from MaterialProperties.m line 385 / 376
         fCsn = material._fCsn # matches matlab 
-        gC_v = _material._gC_v # matches matlab 
+        gC_v = material._gC_v # matches matlab 
         self._C = fCsn * gC_v * self._t0 * self._tot_volume
 
 
         # Inverse Bandwidth
-        self._tau0 = self._C/self._G
+        self._tau0 = self._C/self._Gep
 
 
         # Sensor Bandwidth
         r_ratio = self._rl / self._r0
         self._tau_etf = self._tau0 / (1 + self._LG * (1 - r_ratio)/(1 + self._beta + r_ratio))
-        self._w_etf(1/self._tau_etf)
+        self._w_etf = 1/self._tau_etf
 
 
         
@@ -240,10 +237,10 @@ class TES:
         # Exponential rise time for current biased circuit
         self._tau_I = self._tau0 / (1 - self._LG)
         # Bandwidth associated with current rise time.
-        self._w_I = 1/self_.tau_I
+        self._w_I = 1/self._tau_I
         # L/R time constant under assumption of no pole mixing
         self._tau_el = self._L / (self._rl + self._r0 * (1 + self._beta))
-        self._w_el = 1/self_.tau_el
+        self._w_el = 1/self._tau_el
    
         # Pole frequencies taking into account pole mixing
         wp_avg = (1/self._tau_el)/2+(1/self._tau_I)/2

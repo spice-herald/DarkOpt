@@ -1,6 +1,6 @@
 from numpy import pi, log
 from scipy.constants import k, N_A
-from QET import QET
+
 
 class DetectorMaterial():
 
@@ -175,7 +175,7 @@ class TESMaterial:
         a_factor = 0.73 # factor to match measured tau_eft = 66 microseconds
         self._wTc = a_factor*self._wTc_1090/2/log(3)
 
-class QETMaterial(QET):
+class QETMaterial():
     def __init__(self, name):
         self._name = name
         if name == 'Al':
