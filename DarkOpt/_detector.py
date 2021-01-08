@@ -4,6 +4,7 @@ from MaterialProperties import TESMaterial, DetectorMaterial, QETMaterial
 #from electronics import Electronics
 import numpy as np
 import scipy.constants as constants
+import qetpy as qp
 #import sys
 
 # Some hard-coded numbers:
@@ -12,7 +13,8 @@ import scipy.constants as constants
 
 class Detector:
 
-    def __init__(self, name, absorber, QET, passive=1, n_channel=1):
+    def __init__(self, name, absorber, QET, passive=1, n_channel=1, 
+                freqs=np.linspace(.1, 1e6, int(5e3))):
         
         """
         :param name: Detector Name
@@ -42,6 +44,8 @@ class Detector:
         self._sigma_energy = 0
         self.QET = QET 
         tes = QET.TES
+        self.freqs = freqs
+        self.eres = None
 
 
         # ------------- QET Fins ----------------------------------------------
@@ -167,6 +171,9 @@ class Detector:
         #self._total_L =  
 
         
+        
+        
+        
         # ---------- Response Variables to Be Set in Simulation of Noise ---------------
         self._response_omega = 0
         self._response_dPtdE = 0
@@ -180,6 +187,37 @@ class Detector:
         
         self.fSA_active = self._SA_active/self._absorber.get_SA()
         self.fSA_passive = self._SA_passive/self._absorber.get_SA()
+        
+        ##########################################################################################
+        ##########################################################################################
+        ##########################################################################################
+        #Simulate noise
+        
+        self.noise = qp.sim.TESnoise(freqs=self.freqs,
+                                     rload=tes.rl,
+                                     r0=tes.r0,
+                                     rshunt=tes.rsh,
+                                     beta=tes.beta,
+                                     loopgain=tes.LG,
+                                     inductance=tes.L,
+                                     tau0=tes.tau0,
+                                     G=tes.Gep,
+                                     qetbias=tes.vbias/tes.rsh,
+                                     tc=tes.t0,
+                                     tload=tes.tload,
+                                     tbath=tes.t_mc,
+                                     n=tes.n,
+                                     )
+        
+    def calc_res(self):
+        eres = qp.sim.energy_res_estimate(self.freqs, 
+                                          self._t_pabsb, 
+                                          self.noise.s_ptot(),
+                                          self._eEabsb)
+        self.eres = eres
+        return self.eres
+    
+    
         
         
     def print(self):

@@ -351,7 +351,7 @@ def calc_res(detector, freqs=np.linspace(.1,1e6,int(1e5))):
                     G=tes.Gep,
                     qetbias=tes.vbias/5e-3,
                     tc=tes.t0,
-                    tload=30e-3,
+                    tload=35e-3,
                     tbath=tes.t_mc,
                     n=tes.n,
                    )

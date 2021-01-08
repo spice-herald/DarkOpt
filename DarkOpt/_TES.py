@@ -6,8 +6,8 @@ class TES:
     """
     Class to store TES properties. Calculated the TES and fin connector volumes.
     """
-    def __init__(self, length, width, l_overlap, n_fin, sigma, rn, rl, L_tot, h=40e-9,
-                 zeta_WAl_fin=0.45, zeta_W_fin=0.88, con_type='ellipse',
+    def __init__(self, length, width, l_overlap, n_fin, sigma, rn, rsh, rp, L_tot, tload=30e-3,
+                 h=40e-9, zeta_WAl_fin=0.45, zeta_W_fin=0.88, con_type='ellipse',
                  material=TESMaterial(), operating_point=0.45, alpha=None, beta=0, 
                  n=5, Qp=0, t_mc=10e-3):
         
@@ -24,13 +24,17 @@ class TES:
             Electron-phonon coupling constant [W/K^5/m^3]
         rn : float 
             Normal state resistance of channel in [Ohms]
-        rl : float
-            The load resistance of the TES bias circuit, 
-            i.e. the shunt resistance + the parasitic resistance
-            on the TES side [Ohms]
+        rsh : float
+            The shunt resistance of the TES bias circuit [Ohms] 
+        rp : float
+            The parasitic resistance on the TES side [Ohms]
         L_tot : float
             total inductance (SQUID input coil + parasitic wire
             inductance) [H]
+        tload : float, optional
+            The effective noise temperature for the passive johnson 
+            noise from the shunt resistor and parasitic resistance
+            in [Ohms]
         h : float
             thickness of TES in [m]
         zeta_WAl_fin : float, optional
@@ -67,8 +71,11 @@ class TES:
         self.rn = rn
         self.fOp = operating_point # Operating Resistance/Normal Resistance ratio 
         self.r0 = self.rn * self.fOp # operating resistance
-        self.rl = rl
+        self.rsh = rsh
+        self.rp = rp
+        self.rl = rsh + rp
         self.L = L_tot
+        self.tload = tload
        
         # The next two shouldn't change (to avoid shorts)
         self.width_no_Al = 12e-6 # width around TES where no Al
@@ -150,8 +157,10 @@ class TES:
         self.Gep = self.n * self.K * self.t0 ** (self.n-1)
     
         # ----- Alpha/Beta at Transition Point -----
-        self.alpha = 2*self.t0/self.wTc/np.exp(zeta_o)/(np.exp(zeta_o)+np.exp(-zeta_o))
-
+        if alpha is None:
+            self.alpha = 2*self.t0/self.wTc/np.exp(zeta_o)/(np.exp(zeta_o)+np.exp(-zeta_o))
+        else:
+            self.alpha = alpha
         # ---- TES properties at equilibrium ----
         self.p0 = self.K * ((self.t0 ** self.n) - (self.t_mc ** self.n)) - self.Qp # W
 
