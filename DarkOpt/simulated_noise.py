@@ -4,6 +4,8 @@ import numpy as np
 from scipy.constants import k as kb
 from scipy.constants import e
 
+import qetpy as qp
+
 # """Final Result: sigPt_of = sqrt(Det.nP)*sigPt_of_1chan [eV]"""
 # Plotting variables
 lgc_plt_i = False
@@ -14,7 +16,8 @@ lgc_pltsimp = False
 
 def dynamical_response(detector):
     n_omega = int(1e5)
-    omega = np.logspace(-1, 5.5, n_omega) * 2 * np.pi
+    #omega = np.logspace(-1, 5.5, n_omega) * 2 * np.pi
+    omega = np.linspace(.1, 1e6, n_omega) * 2 * np.pi
 
     detector.set_response_omega(omega)
 
@@ -287,8 +290,10 @@ def simulate_noise(detector):
     domega[n_omega-1] = (omega[n_omega-1] - omega[n_omega - 2]) / 2
     
     dPtdE = detector._response_dPtdE
-    
-    sigPt_of_1chan = np.sqrt(1/(domega/(2*np.pi)*4*np.abs(dPtdE)**2/Spt_tot).sum())/e
+    #return domega
+    #sigPt_of_1chan = np.sqrt(1/(domega/(2*np.pi)*4*np.abs(dPtdE)**2/Spt_tot).sum())/e
+    domega = omega[1]-omega[0]
+    sigPt_of_1chan = np.sqrt(1/(1/(2*np.pi)*4*np.abs(dPtdE)**2/Spt_tot).sum())/np.sqrt(domega)/e
     if print_noise == True: print("sigPt of 1 channel ", sigPt_of_1chan)
     n_channel = detector._n_channel
     sigPt_of = np.sqrt(n_channel) * sigPt_of_1chan
@@ -329,3 +334,30 @@ def simulate_noise(detector):
 #         print(">>>>>>>>>>>>>>>>>>>>>> RESOLUTION IS %s" % sigPt_of)
     return sigPt_of
 
+
+def calc_res(detector, freqs=np.linspace(.1,1e6,int(1e5))):
+    
+    tes = detector.QET.TES
+             
+    
+    noise = qp.sim.TESnoise(freqs=freqs,
+                    rload=tes.rl,
+                    r0=tes.r0,
+                    rshunt=5e-3,
+                    beta=tes.beta,
+                    loopgain=tes.LG,
+                    inductance=tes.L,
+                    tau0=tes.tau0,
+                    G=tes.Gep,
+                    qetbias=tes.vbias/5e-3,
+                    tc=tes.t0,
+                    tload=30e-3,
+                    tbath=tes.t_mc,
+                    n=tes.n,
+                   )
+    return qp.sim.energy_res_estimate(freqs, 
+                               detector._t_pabsb, 
+                               noise.s_ptot(),
+                               detector._eEabsb)
+                   
+                   
