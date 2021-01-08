@@ -4,7 +4,7 @@ from MaterialProperties import DetectorMaterial
 
 class Absorber:
 
-    def __init__(self, name, shape, h, r, w_safety, printing):
+    def __init__(self, name, shape, h, r, w_safety):
         """
         Absorber Medium of Detector. Assumed in shape of cylinder. 
         
@@ -43,15 +43,15 @@ class Absorber:
         self._m = self._rho * self._volume
         pass
 
-        self._print = printing
         
-        if self._print == True:
-            print("---------------- ABSORBER PARAMETERS ----------------")
-            print("Absorber lscat ", 4*self._volume/self._SA)
-            print("Absorber SA_face %s" % self._SA_face)
-            print("Absorber SA %s" % self._SA)
-            print("Absorber mass %s" % self._m)
-            print("------------------------------------------------\n")
+        
+    def print(self):
+        print("---------------- ABSORBER PARAMETERS ----------------")
+        print("Absorber lscat ", 4*self._volume/self._SA)
+        print("Absorber SA_face %s" % self._SA_face)
+        print("Absorber SA %s" % self._SA)
+        print("Absorber mass %s" % self._m)
+        print("------------------------------------------------\n")
 
     def get_name(self):
         return self._name
