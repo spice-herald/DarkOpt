@@ -19,9 +19,9 @@ nice_fonts = {
         "axes.labelsize": 14,
         "font.size": 12,
         # Make the legend/label fonts a little smaller
-        "legend.fontsize": 10,
-        "xtick.labelsize": 10,
-        "ytick.labelsize": 10,
+        "legend.fontsize": 12,
+        "xtick.labelsize": 12,
+        "ytick.labelsize": 12,
 }
 
 rcParams.update(nice_fonts)
@@ -254,17 +254,17 @@ class Detector:
 
 
         ax.plot(f, np.sqrt(s_itfn), color=cs[3],
-               linewidth=1.1, label='TFN', zorder = 30, linestyle='-')
+               linewidth=1.8, label='TFN', zorder = 30, linestyle='-')
         
         ax.plot(f, np.sqrt(s_ites), color=cs[1],
-               linewidth=1.1, label='TES', zorder = 10, linestyle='-')
+               linewidth=1.8, label='TES', zorder = 10, linestyle='-')
         
-        ax.plot(f, np.sqrt(s_iload), color=cs[4],
-               linewidth=1.1, label='Load', zorder = 20, linestyle=':')
-        ax.plot(f, np.sqrt(s_ielec),  color=cs[0],
-               linewidth=.95, label='Electronics', zorder = 5, linestyle='--')
+        ax.plot(f, np.sqrt(s_iload), color=cs[0],
+               linewidth=1.8, label='Load', zorder = 20, linestyle=':')
+        ax.plot(f, np.sqrt(s_ielec),  color=cs[4],
+               linewidth=1.8, label='Electronics', zorder = 5, linestyle='--')
         ax.plot(f, np.sqrt(s_itot), color='k',
-               linewidth=1.2, label='Total', zorder = 200, linestyle='-')
+               linewidth=1.8, label='Total', zorder = 200, linestyle='-')
         ax.set_ylabel(r'Current Noise [A/$\sqrt{\mathrm{Hz}}$]')
         ax.tick_params(which="both", direction="in", right=True, top=True, zorder=300)
         ax.set_xlabel(r'Frequency [Hz]')
@@ -272,10 +272,13 @@ class Detector:
         ax.set_xscale('log')
         #plt.loglog(f, np.abs(1e-16/(1+1j*2*np.pi*f*20e-6)), linestyle ='-', lw=1.5, 
         #           color = 'xkcd:periwinkle', zorder=5000000)
+        plt.grid(True, alpha=.5, linestyle='--')
         if xlims is not None:
             ax.set_xlim(xlims)
         if ylims is not None:
             ax.set_ylim(ylims)
+        plt.legend(facecolor='white', framealpha=1)
+        ax.set_title('Current Referenced Noise')
         fig.tight_layout()
         
     def plot_sp(self, figsize=(6.75, 4.455), xlims=None, ylims=None):
@@ -298,28 +301,32 @@ class Detector:
 
 
         ax.plot(f, np.sqrt(s_ptfn), color=cs[3],
-               linewidth=1.1, label='TFN', zorder = 30, linestyle='-')
+               linewidth=1.8, label='TFN', zorder = 30, linestyle='-')
         
         ax.plot(f, np.sqrt(s_ptes), color=cs[1],
-               linewidth=1.1, label='TES', zorder = 10, linestyle='-')
+               linewidth=1.8, label='TES', zorder = 10, linestyle='-')
         
-        ax.plot(f, np.sqrt(s_pload), color=cs[4],
-               linewidth=1.1, label='Load', zorder = 20, linestyle=':')
-        ax.plot(f, np.sqrt(s_pelec),  color=cs[0],
-               linewidth=.95, label='Electronics', zorder = 5, linestyle='--')
+        ax.plot(f, np.sqrt(s_pload), color=cs[0],
+               linewidth=1.8, label='Load', zorder = 20, linestyle=':')
+        ax.plot(f, np.sqrt(s_pelec),  color=cs[4],
+               linewidth=1.8, label='Electronics', zorder = 5, linestyle='--')
         ax.plot(f, np.sqrt(s_ptot), color='k',
-               linewidth=1.2, label='Total', zorder = 200, linestyle='-')
+               linewidth=1.8, label='Total', zorder = 200, linestyle='-')
         ax.set_ylabel(r'NEP [W/$\sqrt{\mathrm{Hz}}$]')
         ax.tick_params(which="both", direction="in", right=True, top=True, zorder=300)
+        plt.grid(True, alpha=.5, linestyle='--')
         ax.set_xlabel(r'Frequency [Hz]')
         ax.set_yscale('log')
         ax.set_xscale('log')
+        
         #plt.loglog(f, np.abs(1e-16/(1+1j*2*np.pi*f*20e-6)), linestyle ='-', lw=1.5, 
         #           color = 'xkcd:periwinkle', zorder=5000000)
         if xlims is not None:
             ax.set_xlim(xlims)
         if ylims is not None:
             ax.set_ylim(ylims)
+        plt.legend(facecolor='white', framealpha=1)
+        ax.set_title('Power Referenced Noise')
         fig.tight_layout()
         
         
