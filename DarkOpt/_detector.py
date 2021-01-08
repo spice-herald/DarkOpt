@@ -224,7 +224,7 @@ class Detector:
         return self._response_dIdP
 
     def set_ztes(self, val):
-        self._response_zQET.TES = val
+        self._response_z_tes = val
 
     def set_ztot(self, val):
         self._response_z_tot = val
