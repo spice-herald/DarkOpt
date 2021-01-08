@@ -19,12 +19,6 @@ class QET:
             hight of Al fins [m]
         TES : TES Object, 
             TES Object
-        n_fin : int, 
-            Number of fins in QET
-        l_tes : float, 
-            lenght of TES [m]
-        l_overlap : float
-            lenght of Al/W overlap region in [m]
         ahole : float
             ?
         ePQP : float, optional
