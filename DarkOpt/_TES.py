@@ -225,7 +225,7 @@ class TES:
         print("veff_WFinCon =  %s" % self.veff_WFinCon)
         print("veff_WAloverlap =  %s" % self.veff_WAloverlap)
         print("Rn =  %s" % self.rn)
-        print("P0 =  %s" % self.r0)
+        print("R0 =  %s" % self.r0)
         print("fOp =  %s" % self.fOp)
         print("P0 =  %s" % self.p0)
         print("L =  %s" % self.L)

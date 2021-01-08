@@ -190,33 +190,35 @@ class Detector:
         self._response_dIdV0 = 0
         self._response_dIdV_step = 0
         self._response_t = 0
-
+        
+        self.fSA_active = self._SA_active/self._absorber.get_SA()
+        self.fSA_passive = self._SA_passive/self._absorber.get_SA()
+        
         
     def print(self):
                 
         print("---------------- DETECTOR PARAMETERS ----------------")
-        print("nP %s" % self._n_channel)
-        print("SAactive %s" % self._SA_active)
-        fSA_active = self._SA_active/self._absorber.get_SA()
-        print("fSA_active %s" % fSA_active)
-        print("lcell %s" % self._l_cell)
-        print("SApassive %s" % self._SA_passive)
-        fSA_passive = self._SA_passive/self._absorber.get_SA()
-        print("fSA_passive %s" % fSA_passive)
-        print("Alignment_area %s" % self.total_alignment)
-        print("fSA_QPabsb %s" % self._fSA_qpabsorb)
-        print("ePcollect %s" % self._ePcollect)
-        print("tau_pabsb %s" % self._t_pabsb)
-        print("w_pabsb %s" % (1/self._t_pabsb))
-        print("eE156 %s" % self._e156)
-        print("QP_eff %s" % self.QET.eQPabsb)
-        print("eEabsb %s" % self._eEabsb)
-        print("Kpb %s" % self._kpb)
-        print("nKpb %s" % self._nkpb)
-        print("NQET.TES %s" % self.QET.TES.nTES)
+        print("nP =  %s" % self._n_channel)
+        print("SAactive =  %s" % self._SA_active)
+        print("fSA_active =  %s" % self.fSA_active)
+        print("lcell =  %s" % self._l_cell)
+        print("SApassive =  %s" % self._SA_passive)
+        print(f'fraction total Al cov =  {self._fSA_qpabsorb}')
+        print("fSA_passive =  %s" % self.fSA_passive)
+        print("Alignment_area =  %s" % self.total_alignment)
+        print("fSA_QPabsb =  %s" % self._fSA_qpabsorb)
+        print("ePcollect =  %s" % self._ePcollect)
+        print("tau_pabsb =  %s" % self._t_pabsb)
+        print("w_pabsb =  %s" % (1/self._t_pabsb))
+        print("eE156 =  %s" % self._e156)
+        print("QP_eff =  %s" % self.QET.eQPabsb)
+        print("eEabsb =  %s" % self._eEabsb)
+        print("Kpb =  %s" % self._kpb)
+        print("nKpb =  %s" % self._nkpb)
+        print("NQET.TES =  %s" % self.QET.TES.nTES)
         #print("l_squid %s" % self._electronics._l_squid)
         #print("l_p %s" % self._electronics._l_p)
-        print("total_L %s" % self.QET.TES.L)
+        print("total_L =  %s" % self.QET.TES.L)
         #print("total_L %s" % self._total_L)
         print("------------------------------------------------\n")
         
