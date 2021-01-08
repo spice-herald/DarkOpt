@@ -1,7 +1,6 @@
 from _TES import TES
 from _QET import QET
 from MaterialProperties import TESMaterial, DetectorMaterial, QETMaterial
-#from electronics import Electronics
 import numpy as np
 import scipy.constants as constants
 import qetpy as qp
@@ -50,14 +49,11 @@ class Detector:
         self._w_railQET = 3e-6 
 
         self._name = name
-        #self._fridge = fridge
         self._absorber = absorber
         self._n_channel = n_channel
-        #self._lQET.TES = tes.l
         self._l_fin = QET.l_fin
         self._h_fin = QET.h_fin
         self._l_overlap = QET.TES.l_overlap
-        #self._electronics = electronics
         self._sigma_energy = 0
         self.QET = QET 
         tes = QET.TES
@@ -88,8 +84,6 @@ class Detector:
             #print("---- Not Close Packed")
             # Design is not close packed. Get passive Al/QET
             a_passiveQET = self._l_cell * self._w_rail_main + (self._l_cell - y_cell) * self._w_railQET
-            #a_passiveQET = self._w_cell*self._w_rail_main + (self._h_cell - y_cell)* self._w_railQET
-            #a_passiveQET = self._w_cell*self._w_rail_main + (self._h_cell - y_cell)*self._w_railQET
             self._close_packed = False
         else:
             #print("---- Close Packed")
@@ -176,40 +170,16 @@ class Detector:
 
         # Total collection efficiency:
         self._eEabsb = self._e156 * self._ePcollect * self.QET.eQPabsb * self.QET.ePQP # * self._e_downconvert * self._fSA_qpabsorb 
-
-        # ------------ Thermal Conductance to Bath ---------------
-        self._kpb = 1.55e-4
-        # Thermal conductance coefficient between detector and bath
-        self._nkpb = 4
-
-        # ----------- Electronics ----------
-        #self._total_L = self._electronics._l_squid + self._electronics._l_p + tes._L 
-        #self._total_L = 0 
-        #self._total_L =  
-
-        
-        
-        
-        
-        # ---------- Response Variables to Be Set in Simulation of Noise ---------------
-        self._response_omega = 0
-        self._response_dPtdE = 0
-        self._response_dIdP = 0
-        self._response_z_tes = 0
-        self._response_z_tot = 0
-        self._response_dIdV = 0
-        self._response_dIdV0 = 0
-        self._response_dIdV_step = 0
-        self._response_t = 0
         
         self.fSA_active = self._SA_active/self._absorber.get_SA()
         self.fSA_passive = self._SA_passive/self._absorber.get_SA()
-        
-        ##########################################################################################
-        ##########################################################################################
-        ##########################################################################################
+
+        # ------------ Thermal Conductance to Bath ---------------
+        self._kpb = 1.55e-4 #### where did this come from/does it even do anything?
+        # Thermal conductance coefficient between detector and bath
+        self._nkpb = 4
+
         #Simulate noise
-        
         self.noise = qp.sim.TESnoise(freqs=self.freqs,
                                      rload=tes.rl,
                                      r0=tes.r0,
@@ -243,15 +213,12 @@ class Detector:
         s_ites = noise.s_ites()
         s_iload = noise.s_iload()
         s_itot = noise.s_itot()
-        
-        ####
+  
         cmap = 'viridis'
         cmap = cm.get_cmap(cmap)
         cs = cmap(np.linspace(0, 1,5))
        
         fig, ax = plt.subplots(figsize=figsize)
-
-
 
         ax.plot(f, np.sqrt(s_itfn), color=cs[3],
                linewidth=1.8, label='TFN', zorder = 30, linestyle='-')
@@ -270,8 +237,6 @@ class Detector:
         ax.set_xlabel(r'Frequency [Hz]')
         ax.set_yscale('log')
         ax.set_xscale('log')
-        #plt.loglog(f, np.abs(1e-16/(1+1j*2*np.pi*f*20e-6)), linestyle ='-', lw=1.5, 
-        #           color = 'xkcd:periwinkle', zorder=5000000)
         plt.grid(True, alpha=.5, linestyle='--')
         if xlims is not None:
             ax.set_xlim(xlims)
@@ -290,15 +255,12 @@ class Detector:
         s_ptes = noise.s_ptes()
         s_pload = noise.s_pload()
         s_ptot = noise.s_ptot()
-        
-        ####
+
         cmap = 'viridis'
         cmap = cm.get_cmap(cmap)
         cs = cmap(np.linspace(0, 1,5))
        
         fig, ax = plt.subplots(figsize=figsize)
-
-
 
         ax.plot(f, np.sqrt(s_ptfn), color=cs[3],
                linewidth=1.8, label='TFN', zorder = 30, linestyle='-')
@@ -318,9 +280,8 @@ class Detector:
         ax.set_xlabel(r'Frequency [Hz]')
         ax.set_yscale('log')
         ax.set_xscale('log')
-        
         #plt.loglog(f, np.abs(1e-16/(1+1j*2*np.pi*f*20e-6)), linestyle ='-', lw=1.5, 
-        #           color = 'xkcd:periwinkle', zorder=5000000)
+        #           color = 'xkcd:periwinkle', zorder=5000000) #pulse shape
         if xlims is not None:
             ax.set_xlim(xlims)
         if ylims is not None:
@@ -340,8 +301,9 @@ class Detector:
         plt.title('Responsivity')
         ax.set_ylabel(r'$\left|\frac{\partial I}{\partial P}\left(\omega\right)\right|/\left|\frac{\partial I}{\partial P}\left(0\right)\right|$')
         
-    def print(self):
-                
+        
+        
+    def print(self):    
         print("---------------- DETECTOR PARAMETERS ----------------")
         print("nP =  %s" % self._n_channel)
         print("SAactive =  %s" % self._SA_active)
@@ -361,10 +323,7 @@ class Detector:
         print("Kpb =  %s" % self._kpb)
         print("nKpb =  %s" % self._nkpb)
         print("NQET.TES =  %s" % self.QET.TES.nTES)
-        #print("l_squid %s" % self._electronics._l_squid)
-        #print("l_p %s" % self._electronics._l_p)
         print("total_L =  %s" % self.QET.TES.L)
-        #print("total_L %s" % self._total_L)
         print("------------------------------------------------\n")
         
 
