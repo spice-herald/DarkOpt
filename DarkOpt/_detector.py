@@ -5,16 +5,33 @@ from MaterialProperties import TESMaterial, DetectorMaterial, QETMaterial
 import numpy as np
 import scipy.constants as constants
 import qetpy as qp
-#import sys
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
 
-# Some hard-coded numbers:
-#k_b = 1.38e-23 # J/K
-#n = 5 # used to define G (related to phonon/electron DOF)
+#import matplotlib.colors as mcolors
+from matplotlib import cm  
+
+nice_fonts = {
+        # Use LaTeX to write all text
+        #"text.usetex": True,
+        "font.family": "serif",
+        # Use 10pt font in plots, to match 10pt font in document
+        "axes.labelsize": 14,
+        "font.size": 12,
+        # Make the legend/label fonts a little smaller
+        "legend.fontsize": 10,
+        "xtick.labelsize": 10,
+        "ytick.labelsize": 10,
+}
+
+rcParams.update(nice_fonts)
+
+
 
 class Detector:
 
     def __init__(self, name, absorber, QET, passive=1, n_channel=1, 
-                freqs=np.linspace(.1, 1e6, int(5e3))):
+                freqs=np.linspace(.1, 1e6, int(1e5))):
         
         """
         :param name: Detector Name
@@ -217,7 +234,95 @@ class Detector:
         self.eres = eres
         return self.eres
     
-    
+    def plot_si(self, figsize=(6.75, 4.455), xlims=None, ylims=None):
+        noise = self.noise
+        f = self.freqs
+        
+        s_ielec = noise.s_isquid()
+        s_itfn = noise.s_itfn()
+        s_ites = noise.s_ites()
+        s_iload = noise.s_iload()
+        s_itot = noise.s_itot()
+        
+        ####
+        cmap = 'viridis'
+        cmap = cm.get_cmap(cmap)
+        cs = cmap(np.linspace(0, 1,5))
+       
+        fig, ax = plt.subplots(figsize=figsize)
+
+
+
+        ax.plot(f, np.sqrt(s_itfn), color=cs[3],
+               linewidth=1.1, label='TFN', zorder = 30, linestyle='-')
+        
+        ax.plot(f, np.sqrt(s_ites), color=cs[1],
+               linewidth=1.1, label='TES', zorder = 10, linestyle='-')
+        
+        ax.plot(f, np.sqrt(s_iload), color=cs[4],
+               linewidth=1.1, label='Load', zorder = 20, linestyle=':')
+        ax.plot(f, np.sqrt(s_ielec),  color=cs[0],
+               linewidth=.95, label='Electronics', zorder = 5, linestyle='--')
+        ax.plot(f, np.sqrt(s_itot), color='k',
+               linewidth=1.2, label='Total', zorder = 200, linestyle='-')
+        ax.set_ylabel(r'Current Noise [A/$\sqrt{\mathrm{Hz}}$]')
+        ax.tick_params(which="both", direction="in", right=True, top=True, zorder=300)
+        ax.set_xlabel(r'Frequency [Hz]')
+        ax.set_yscale('log')
+        ax.set_xscale('log')
+        #plt.loglog(f, np.abs(1e-16/(1+1j*2*np.pi*f*20e-6)), linestyle ='-', lw=1.5, 
+        #           color = 'xkcd:periwinkle', zorder=5000000)
+        if xlims is not None:
+            ax.set_xlim(xlims)
+        if ylims is not None:
+            ax.set_ylim(ylims)
+        fig.tight_layout()
+        
+    def plot_sp(self, figsize=(6.75, 4.455), xlims=None, ylims=None):
+        noise = self.noise
+        f = self.freqs
+        
+        s_pelec = noise.s_psquid()
+        s_ptfn = noise.s_ptfn()
+        s_ptes = noise.s_ptes()
+        s_pload = noise.s_pload()
+        s_ptot = noise.s_ptot()
+        
+        ####
+        cmap = 'viridis'
+        cmap = cm.get_cmap(cmap)
+        cs = cmap(np.linspace(0, 1,5))
+       
+        fig, ax = plt.subplots(figsize=figsize)
+
+
+
+        ax.plot(f, np.sqrt(s_ptfn), color=cs[3],
+               linewidth=1.1, label='TFN', zorder = 30, linestyle='-')
+        
+        ax.plot(f, np.sqrt(s_ptes), color=cs[1],
+               linewidth=1.1, label='TES', zorder = 10, linestyle='-')
+        
+        ax.plot(f, np.sqrt(s_pload), color=cs[4],
+               linewidth=1.1, label='Load', zorder = 20, linestyle=':')
+        ax.plot(f, np.sqrt(s_pelec),  color=cs[0],
+               linewidth=.95, label='Electronics', zorder = 5, linestyle='--')
+        ax.plot(f, np.sqrt(s_ptot), color='k',
+               linewidth=1.2, label='Total', zorder = 200, linestyle='-')
+        ax.set_ylabel(r'NEP [W/$\sqrt{\mathrm{Hz}}$]')
+        ax.tick_params(which="both", direction="in", right=True, top=True, zorder=300)
+        ax.set_xlabel(r'Frequency [Hz]')
+        ax.set_yscale('log')
+        ax.set_xscale('log')
+        #plt.loglog(f, np.abs(1e-16/(1+1j*2*np.pi*f*20e-6)), linestyle ='-', lw=1.5, 
+        #           color = 'xkcd:periwinkle', zorder=5000000)
+        if xlims is not None:
+            ax.set_xlim(xlims)
+        if ylims is not None:
+            ax.set_ylim(ylims)
+        fig.tight_layout()
+        
+        
         
         
     def print(self):
