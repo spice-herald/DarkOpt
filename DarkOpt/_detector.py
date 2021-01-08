@@ -1,5 +1,5 @@
-from tes import TES
-from QET import QET
+from _TES import TES
+from _QET import QET
 from MaterialProperties import TESMaterial, DetectorMaterial, QETMaterial
 #from electronics import Electronics
 import numpy as np
@@ -11,7 +11,7 @@ import numpy as np
 
 class Detector:
 
-    def __init__(self, name, fridge, electronics, absorber, QET, passive, n_channel, type_qp_eff):
+    def __init__(self, name, absorber, QET, passive=1, n_channel=1):
         
         """
         
@@ -33,51 +33,51 @@ class Detector:
         self._w_railQET = 3e-6 
 
         self._name = name
-        self._fridge = fridge
+        #self._fridge = fridge
         self._absorber = absorber
         self._n_channel = n_channel
-        self._lQET.TES = tes._l
-        self._l_fin = QET._l_fin
-        self._h_fin = QET._h_fin
+        #self._lQET.TES = tes.l
+        self._l_fin = QET.l_fin
+        self._h_fin = QET.h_fin
         self._l_overlap = QET.l_overlap
-        self._electronics = electronics
+        #self._electronics = electronics
         self._sigma_energy = 0
         self.QET = QET 
- 
+        tes = QET.TES
 
 #         # Set the QP Absorbtion Efficiency
 #         # UPDATED QP EFFICIENCY: depends on True Overlap Area
-#         a_overlap = self.QET.TES._A_overlap
+#         a_overlap = tes._A_overlap
 #         if type_qp_eff == 0: # Updated estimate with small ci, changing effective l_overlap
 #             if tes._con_type == 'modern':            
 #                 ci = tes._n_fin*2*self._l_overlap
 #             elif tes._con_type == 'ellipse':
 #                 ci = 2*tes._l + (7.5e-6)*4 - tes._n_fin*(6e-6)
-#             self.QET.set_qpabsb_eff(self._l_fin, self._h_fin, a_overlap, ci, self._lQET.TES) 
+#             self.QET.set_qpabsb_eff(self._l_fin, self._h_fin, a_overlap, ci, self._ltes) 
 #         if type_qp_eff == 1: # Updated estimate with same ci, changing effective l_overlap 
 #             ci = 2*tes._l
-#             self.QET.set_qpabsb_eff(self._l_fin, self._h_fin, a_overlap, ci, self._lQET.TES) 
-#         if type_qp_eff == 2: # Original estimate that assumes entire perimeter is W/Al overlap with ci = 2*lQET.TES
+#             self.QET.set_qpabsb_eff(self._l_fin, self._h_fin, a_overlap, ci, self._ltes) 
+#         if type_qp_eff == 2: # Original estimate that assumes entire perimeter is W/Al overlap with ci = 2*ltes
 #             self.QET.set_qpabsb_eff_matt(self._l_fin, self._h_fin, self._l_overlap, tes._l, tes._n_fin)
 
         # ------------- QET Fins ----------------------------------------------
         # Surface area covered by QET Fins 
-        self._SA_active = self._n_channel * self.QET.TES._nTES * self.QET._a_fin
+        self._SA_active = n_channel * tes.nTES * QET.a_fin
 
         # Average area per cell, and corresponding length
-        a_cell = self._absorber.get_pattern_SA() / (n_channel * self.QET.TES._nTES) # 1/2 channels on each side
+        a_cell = self._absorber.get_pattern_SA() / (n_channel * tes.nTES) # 1/2 channels on each side
        
-        QET_block = (2*self.QET._l_fin + self.QET.TES._l)*(2*self.QET._l_fin) 
-        if QET_block*self.QET.TES._nTES > self._absorber.get_pattern_SA(): 
+        QET_block = (2*QET.l_fin + tes.l)*(2*QET.l_fin) 
+        if QET_block*tes.nTES > self._absorber.get_pattern_SA(): 
             #print("----- ERROR: Invalid Design - QET cells don't fit.")
-            self._cells_fit = "false"
-        else: self._cells_fit = "true"
+            self._cells_fit = False
+        else: self._cells_fit = True
         
         self._l_cell = np.sqrt(a_cell)
         self._w_cell = np.sqrt(a_cell/2) # hypothetical optimum but only gives a couple percent decrease in passive Al
         self._h_cell = 2*self._w_cell
 
-        y_cell = 2 * self.QET._l_fin + self.QET.TES._l # length QET 
+        y_cell = 2 * QET.l_fin + tes.l # length QET 
         
         if self._l_cell > y_cell:
             #print("---- Not Close Packed")
@@ -85,15 +85,15 @@ class Detector:
             a_passiveQET = self._l_cell * self._w_rail_main + (self._l_cell - y_cell) * self._w_railQET
             #a_passiveQET = self._w_cell*self._w_rail_main + (self._h_cell - y_cell)* self._w_railQET
             #a_passiveQET = self._w_cell*self._w_rail_main + (self._h_cell - y_cell)*self._w_railQET
-            self._close_packed = "false"
+            self._close_packed = False
         else:
             #print("---- Close Packed")
             # Design is close packed. No vertical rail to QET
             x_cell = a_cell / y_cell
             a_passiveQET = x_cell * self._w_rail_main
-            self._close_packed = "true"
+            self._close_packed = True
         
-        tes_passive = a_passiveQET * n_channel * self.QET.TES._nTES
+        tes_passive = a_passiveQET * n_channel * tes.nTES
         
         # Passive Al Rails for PD2 Like Layout
         outer_ring = 2 * np.pi * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main
@@ -168,7 +168,7 @@ class Detector:
         self._e156 = 0.8690 # should scale with Al coverage.... 
 
         # Total collection efficiency:
-        self._eEabsb = self._e156 * self._ePcollect * self.QET._eQPabsb * self.QET._ePQP # * self._e_downconvert * self._fSA_qpabsorb 
+        self._eEabsb = self._e156 * self._ePcollect * self.QET.eQPabsb * self.QET.ePQP # * self._e_downconvert * self._fSA_qpabsorb 
 
         # ------------ Thermal Conductance to Bath ---------------
         self._kpb = 1.55e-4
@@ -176,9 +176,11 @@ class Detector:
         self._nkpb = 4
 
         # ----------- Electronics ----------
-        self._total_L = self._electronics._l_squid + self._electronics._l_p + self.QET.TES._L 
-        self._total_L = 0 
+        #self._total_L = self._electronics._l_squid + self._electronics._l_p + tes._L 
+        #self._total_L = 0 
+        #self._total_L =  
 
+        
         # ---------- Response Variables to Be Set in Simulation of Noise ---------------
         self._response_omega = 0
         self._response_dPtdE = 0
