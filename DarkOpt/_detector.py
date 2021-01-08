@@ -43,20 +43,6 @@ class Detector:
         self.QET = QET 
         tes = QET.TES
 
-#         # Set the QP Absorbtion Efficiency
-#         # UPDATED QP EFFICIENCY: depends on True Overlap Area
-#         a_overlap = tes._A_overlap
-#         if type_qp_eff == 0: # Updated estimate with small ci, changing effective l_overlap
-#             if tes._con_type == 'modern':            
-#                 ci = tes._n_fin*2*self._l_overlap
-#             elif tes._con_type == 'ellipse':
-#                 ci = 2*tes._l + (7.5e-6)*4 - tes._n_fin*(6e-6)
-#             self.QET.set_qpabsb_eff(self._l_fin, self._h_fin, a_overlap, ci, self._ltes) 
-#         if type_qp_eff == 1: # Updated estimate with same ci, changing effective l_overlap 
-#             ci = 2*tes._l
-#             self.QET.set_qpabsb_eff(self._l_fin, self._h_fin, a_overlap, ci, self._ltes) 
-#         if type_qp_eff == 2: # Original estimate that assumes entire perimeter is W/Al overlap with ci = 2*ltes
-#             self.QET.set_qpabsb_eff_matt(self._l_fin, self._h_fin, self._l_overlap, tes._l, tes._n_fin)
 
         # ------------- QET Fins ----------------------------------------------
         # Surface area covered by QET Fins 
@@ -137,7 +123,8 @@ class Detector:
         #print("      PD2 fSA QP Absb: ", PD2_fSA_qpabsb)
         #print("      Scat Length      ", absb_lscat)
         #print("      fSA WP Absb      ", self._fSA_qpabsorb)
-
+        
+        # Scale collection time based of PD2 time. Where does this come from?
         self._t_pabsb = PD2_absb_time * (absb_lscat / PD2_lscat) * (PD2_fSA_qpabsb / self._fSA_qpabsorb)
 
         self._w_collect = 1/self._t_pabsb
