@@ -369,36 +369,5 @@ class Detector:
         
 
 
-    def set_response_omega(self, omega):
-        self._response_omega = omega
-
-    def set_dPtdE(self, val):
-        self._response_dPtdE = val
-
-    def set_dIdP(self, val):
-        self._response_dIdP = val
-
-    def get_dIdP(self):
-        return self._response_dIdP
-
-    def set_ztes(self, val):
-        self._response_z_tes = val
-
-    def set_ztot(self, val):
-        self._response_z_tot = val
-
-    def set_dIdV(self, val):
-        self._response_dIdV = val
-
-    def get_dIdV(self):
-        return self._response_dIdV
-
-    def set_dIdV0(self, val):
-        self._response_dIdV0 = val
-
-    def set_dIdV_step(self, val):
-        self._response_dIdV_step = val
-
-    def set_t(self, val):
-        self._response_t = val
+    
 
