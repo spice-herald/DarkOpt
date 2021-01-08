@@ -20,7 +20,7 @@ class QET:
         TES : TES Object, 
             TES Object
         ahole : float
-            ?
+            area of holes in fin [m^2]
         ePQP : float, optional
             Phonon to QP Conversion Effciency, 
             Kaplan downconversion limits this to 52%

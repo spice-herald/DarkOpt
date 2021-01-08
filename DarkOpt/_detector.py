@@ -1,5 +1,6 @@
 from _TES import TES
 from _QET import QET
+from _absorber import Absorber
 from _MaterialProperties import TESMaterial, DetectorMaterial, QETMaterial
 import numpy as np
 import scipy.constants as constants
@@ -29,11 +30,11 @@ rcParams.update(nice_fonts)
 
 class Detector:
 
-    def __init__(self, name, absorber, QET, passive=1, n_channel=1, 
-                freqs=np.linspace(.1, 1e6, int(1e5))):
+    def __init__(self, absorber, QET, passive=1, n_channel=1, 
+                freqs=None):
         
         """
-        :param name: Detector Name
+        
         :param fridge: Fridge in which detector is in
         :param absorber: Absorbing part of detector
         :param n_channel: Number of channels
@@ -48,7 +49,7 @@ class Detector:
         self._w_rail_main = 6e-6
         self._w_railQET = 3e-6 
 
-        self._name = name
+        #self._name = name
         self._absorber = absorber
         self._n_channel = n_channel
         self._l_fin = QET.l_fin
@@ -57,6 +58,8 @@ class Detector:
         self._sigma_energy = 0
         self.QET = QET 
         tes = QET.TES
+        if freqs is None:
+            freqs = np.linspace(.1, 1e6, int(1e5))
         self.freqs = freqs
         self.eres = None
 
@@ -117,7 +120,7 @@ class Detector:
             self._SA_passive = tes_passive + outer_ring + inner_ring + inner_vertical_rail + outer_vertical_rail + total_alignment
         if absorber._shape == "square": # New Square Rail Layout Design
             if passive == 1:
-                self._SA_passive = tes_passive + 2*(self._absorber._r - 2*self._absorber._w_safety)*self._w_rail_main + 2*one_alignment_window
+                self._SA_passive = tes_passive + 2*(self._absorber._width - 2*self._absorber._w_safety)*self._w_rail_main + 2*one_alignment_window
             elif passive == 0:            
                 self._SA_passive = 0 # FOR THEORETICAL UNDERSTANDING, DELETE  
         
@@ -328,5 +331,133 @@ class Detector:
         
 
 
+def create_detector(abs_type, abs_shape, abs_height, abs_width, w_safety,
+                    tes_length, tes_width, tes_l_overlap, n_fin, sigma, rn, 
+                    rp, L_tot, l_fin, h_fin, ahole, n_channel=1,
+                    rsh=5e-3, tload=30e-3, tes_h=40e-9, zeta_WAl_fin=0.45, 
+                    zeta_W_fin=0.88, con_type='ellipse', material=TESMaterial(), 
+                    operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
+                    t_mc=10e-3, ePQP=0.52, eff_absb = 1.22e-4, wempty=6e-6, 
+                    wempty_tes=7.5e-6, type_qp_eff=0, freqs=None):
+    """
+    Helper function to create Absorber, TES, QET, and Detector 
+    objects. A detector object is returned
+    
+    Parameters:
+    -----------
+    abs_type : string
+        detector substrate type, can be
+        either 'Si' or 'Ge'
+    abs_shape : string 
+        the geometric shape of the 
+        absorber 'cylinder', 'square', or 'cube' 
+    abs_height : float
+        the height of the absorber [m]
+    abs_width : float
+        If a square or cube, the length is assumed
+        to be the same as the width. If the shape
+        is a cylinder, then the width
+    w_safety : float, 
+        Safety margin from edge where TES are not put [m]
+    tes_length : float
+        length of TES in [m]
+    tes_width : float
+        width of TES in [m]
+    tes_l_overlap : float
+        lenght of Al/W overlap region in [m]
+    n_fin : int
+        number of Al fins for QET
+    sigma : float
+        Electron-phonon coupling constant [W/K^5/m^3]
+    rn : float 
+        Normal state resistance of channel in [Ohms]
+    rsh : float
+        The shunt resistance of the TES bias circuit [Ohms] 
+    rp : float
+        The parasitic resistance on the TES side [Ohms]
+    L_tot : float
+        total inductance (SQUID input coil + parasitic wire
+        inductance) [H]
+    l_fin : float, 
+        Length of Al fins [m]
+    h_fin : float, 
+        hight of Al fins [m]
+    ahole : float
+        area of holes in fin [m^2]
+    n_channel : int, optional
+        Number of chennels in detector 
+    tload : float, optional
+        The effective noise temperature for the passive johnson 
+        noise from the shunt resistor and parasitic resistance
+        in [Ohms]
+    tes_h : float
+        thickness of TES in [m]
+    zeta_WAl_fin : float, optional
+        eff factor for the contribution of the W/Al overlap 
+        region to the volume and heat capacity (0,1)
+    zeta_W_fin : float, optional
+        eff factor for the contribution of the W only part 
+        of the fin connector to the volume and heat capacity (0,1)
+    con_type : string, optional
+        Either 'ellipse' or 'modern' fin connector style
+    material : Material Object, optional
+        Object containing W properties
+    operating_point : float, optional
+        The operational resistance [%Rn]
+        (fractional percentage of normal resistance)
+    alpha : float, optional
+        The logarithmic temperature sensitivity.
+        If None, it will be estimated.
+    beta : float, optional
+        The logarithmic current sensitivity.
+        If not changed, the small beta (beta=0) 
+        approximation will be used.
+    n : int, optional
+        Thermal powerlaw exponent
+    Qp : float, optional
+        Parasitic heating [J]
+    t_mc : float, optional
+        Temperature of the mixing chamber [K]
+    
+    ePQP : float, optional
+        Phonon to QP Conversion Effciency, 
+        Kaplan downconversion limits this to 52%
+    eff_absb : float, optional
+        W/Al transmition/trapping probability
+    wempty : float, optional
+        ?
+    wempty_tes : float, optional
+        ?
+    type_qp_eff : int, optional
+        how the efficiency should be calculated.
+        0 : 'modern' estimate of overlap radius (small)
+        1 : 'modern' estimate, but different effective l_overlap
+        2 : Matt's method
+    freqs : array-like
+        frequencies used for plotting noise and 
+        to calculate the expected energy resolution
+        
+    """
+    
+    absorb = Absorber(name=abs_type, shape=abs_shape, 
+                      height=abs_height, width=abs_width, 
+                      w_safety=w_safety)
+    
+    tes = TES(length=tes_length, width=tes_width, l_overlap=tes_l_overlap, 
+              n_fin=n_fin, sigma=sigma, rn=rn, rp=rp, L_tot=L_tot, rsh=rsh, 
+              tload=tload, h=tes_h, zeta_WAl_fin=zeta_WAl_fin, zeta_W_fin=zeta_W_fin,
+              con_type=con_type, material=material, operating_point=operating_point,
+              alpha=alpha, beta=beta, n=n, Qp=Qp, t_mc=t_mc)
+    
+    qet = QET(l_fin=l_fin, h_fin=h_fin, TES=tes, ahole=ahole, ePQP=ePQP,
+              eff_absb=eff_absb, wempty=wempty, wempty_tes=wempty_tes, 
+              type_qp_eff=type_qp_eff)
+    
+    det = Detector(absorber=absorb, QET=qet, passive=1, 
+                   n_channel=n_channel, freqs=freqs)
+    
+    return det
+    
+              
     
 
