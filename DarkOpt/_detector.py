@@ -329,8 +329,16 @@ class Detector:
         ax.set_title('Power Referenced Noise')
         fig.tight_layout()
         
-        
-        
+    def plot_responsivity(self, figsize=(6.75, 4.455), xlims=None, ylims=None):
+        noise = self.noise
+        f = self.freqs
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.loglog(f, np.abs(noise.dIdP())/np.abs(noise.dIdP())[0], color='k')
+        ax.set_xlabel(r'Frequency [Hz]')
+        ax.tick_params(which="both", direction="in", right=True, top=True, zorder=300)
+        plt.grid(True, alpha=.5, linestyle='--')
+        plt.title('Responsivity')
+        ax.set_ylabel(r'$\left|\frac{\partial I}{\partial P}\left(\omega\right)\right|/\left|\frac{\partial I}{\partial P}\left(0\right)\right|$')
         
     def print(self):
                 
