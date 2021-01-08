@@ -1,6 +1,6 @@
 import numpy as np
 import math as m
-from MaterialProperties import TESMaterial
+from _MaterialProperties import TESMaterial
 
 class TES:
     """

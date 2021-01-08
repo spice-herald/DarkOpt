@@ -1,6 +1,6 @@
 from _TES import TES
 from _QET import QET
-from MaterialProperties import TESMaterial, DetectorMaterial, QETMaterial
+from _MaterialProperties import TESMaterial, DetectorMaterial, QETMaterial
 import numpy as np
 import scipy.constants as constants
 import qetpy as qp

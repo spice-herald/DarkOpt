@@ -1,6 +1,6 @@
 from math import *
 import numpy as np
-from MaterialProperties import DetectorMaterial
+from _MaterialProperties import DetectorMaterial
 
 class Absorber:
 
