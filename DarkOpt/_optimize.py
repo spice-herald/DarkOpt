@@ -13,7 +13,7 @@ from scipy.optimize import minimize
 #import matplotlib.colors as mcolors
 from matplotlib import cm  
 
-def _loss_func(params, absorber, tes, qet, det, rtnDet=False):
+def _loss_func(params, absorber, tes, qet, det, per_Al, rtnDet=False):
     """
     Helper function to define the loss function to 
     minimize to optimize the detector parameters
@@ -37,12 +37,14 @@ def _loss_func(params, absorber, tes, qet, det, rtnDet=False):
     if rtnDet:
         return det1
     else:
-        return det1.calc_res()
+        # weight the energy resolution by the total surface area minus the target
+        # Al surface coverage to find the minimum around the desired coverage
+        return det1.calc_res()*np.abs(det1._fSA_qpabsorb - per_Al)
+    
 
 
 
-
-def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, rn,
+def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_Al, rn,
                     abs_type, abs_shape, abs_height, abs_width, w_safety,
                     tes_width, sigma, rp, L_tot,  ahole, n_channel=1,
                     rsh=5e-3, tload=30e-3, tes_h=40e-9, zeta_WAl_fin=0.45, 
@@ -71,6 +73,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, rn,
         guess for hight of Al fins [m]
     n_fin0 : int
         guess for number of Al fins for QET  
+    per_AL : float,
+        deired fraction of Aluminum surface coverage
     abs_type : string
         detector substrate type, can be
         either 'Si' or 'Ge'
@@ -174,15 +178,19 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, rn,
     
     x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0])
     bounds = [[50e-6, 300e-6], [5e-6, 50e-6],[50e-6, 300e-6], [300e-6, 1000e-6], [2, 8] ]
-    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, False), bounds=bounds )
-    det1 = _loss_func(res['x'], absorb, tes, qet, det, True)
+    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False), bounds=bounds )
+    det1 = _loss_func(res['x'], absorb, tes, qet, det, None, True)
     
-    print(f"resolution: {res['fun']*1e3:.1f} [meV]")
+    print(f"resolution: {det1.calc_res()*1e3:.1f} [meV]")
     print(f"TES Length = {res['x'][0]*1e6:.1f} [μm]")
     print(f"Overlap Legth = {res['x'][1]*1e6:.1f} [μm]")
     print(f"Fin Length = {res['x'][2]*1e6:.1f} [μm]")
     print(f"Fin Height = {res['x'][3]*1e6:.1f} [μm]")
     print(f"N Fins = {int(res['x'][4])}")
+    print(f'Total Al surface coverage = {det1._fSA_qpabsorb*100:.3} [%]')
+    print(f'Number of TESs = {det1.QET.TES.nTES}')
+    print(f'Close Packed: {det1._close_packed}')
+    
     
     return det1, res['fun'], res['x']
     
