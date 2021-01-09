@@ -62,6 +62,7 @@ class Detector:
             freqs = np.linspace(.1, 1e6, int(1e5))
         self.freqs = freqs
         self.eres = None
+ 
 
 
         # ------------- QET Fins ----------------------------------------------
@@ -163,10 +164,11 @@ class Detector:
 
         aluminum = QETMaterial("Al")
 
-        pE_thresh = 2*1.76*constants.k*aluminum._Tc
-        p_baresurface = (self._absorber.get_SA() - self._SA_active - self._SA_passive)/self._absorber.get_SA()
-        p_subgap = p_baresurface**3000
-        p_notsubgap = 1-p_subgap
+        #### these are not used?
+        #pE_thresh = 2*1.76*constants.k*aluminum._Tc
+        #p_baresurface = (self._absorber.get_SA() - self._SA_active - self._SA_passive)/self._absorber.get_SA()
+        #p_subgap = p_baresurface**3000
+        #p_notsubgap = 1-p_subgap
         
         # Let's combine 1), 5), and 6) together and assume that it is the same as the measured/derived value from iZIP4
         self._e156 = 0.8690 # should scale with Al coverage.... 
@@ -331,9 +333,9 @@ class Detector:
         
 
 
-def create_detector(abs_type, abs_shape, abs_height, abs_width, w_safety,
-                    tes_length, tes_width, tes_l_overlap, n_fin, sigma, rn, 
-                    rp, L_tot, l_fin, h_fin, ahole, n_channel=1,
+def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
+                    abs_type, abs_shape, abs_height, abs_width, w_safety,
+                    tes_width, sigma, rp, L_tot,  ahole, n_channel=1,
                     rsh=5e-3, tload=30e-3, tes_h=40e-9, zeta_WAl_fin=0.45, 
                     zeta_W_fin=0.88, con_type='ellipse', material=TESMaterial(), 
                     operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
@@ -345,6 +347,16 @@ def create_detector(abs_type, abs_shape, abs_height, abs_width, w_safety,
     
     Parameters:
     -----------
+    tes_length : float
+        length of TES in [m]
+    tes_l_overlap : float
+        lenght of Al/W overlap region in [m]
+    l_fin : float, 
+        Length of Al fins [m]
+    h_fin : float, 
+        hight of Al fins [m]
+    n_fin : int
+        number of Al fins for QET  
     abs_type : string
         detector substrate type, can be
         either 'Si' or 'Ge'
@@ -359,14 +371,8 @@ def create_detector(abs_type, abs_shape, abs_height, abs_width, w_safety,
         is a cylinder, then the width
     w_safety : float, 
         Safety margin from edge where TES are not put [m]
-    tes_length : float
-        length of TES in [m]
     tes_width : float
         width of TES in [m]
-    tes_l_overlap : float
-        lenght of Al/W overlap region in [m]
-    n_fin : int
-        number of Al fins for QET
     sigma : float
         Electron-phonon coupling constant [W/K^5/m^3]
     rn : float 
@@ -378,10 +384,6 @@ def create_detector(abs_type, abs_shape, abs_height, abs_width, w_safety,
     L_tot : float
         total inductance (SQUID input coil + parasitic wire
         inductance) [H]
-    l_fin : float, 
-        Length of Al fins [m]
-    h_fin : float, 
-        hight of Al fins [m]
     ahole : float
         area of holes in fin [m^2]
     n_channel : int, optional

@@ -56,7 +56,7 @@ class QET:
         self.afin_empty = n_fin * l_fin * wempty + 2 * l_tes * wempty_tes + self.nhole * ahole 
         #self._a_fin = np.pi * (self._l_fin ** 2) + 2 * self._l_fin * TES._l - self._afin_empty # SZ: bug?? 
         self.a_fin = np.pi*l_fin*(l_fin + (l_tes/2)) - self.afin_empty
-        
+        self.type_qp_eff = type_qp_eff
         
         
         a_overlap = TES.A_overlap
