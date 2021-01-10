@@ -13,7 +13,7 @@ from scipy.optimize import minimize
 #import matplotlib.colors as mcolors
 from matplotlib import cm  
 
-def _loss_func(params, absorber, tes, qet, det, per_Al, rtnDet=False):
+def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False):
     """
     Helper function to define the loss function to 
     minimize to optimize the detector parameters
@@ -39,7 +39,12 @@ def _loss_func(params, absorber, tes, qet, det, per_Al, rtnDet=False):
     else:
         # weight the energy resolution by the total surface area minus the target
         # Al surface coverage to find the minimum around the desired coverage
-        return det1.calc_res()*np.abs(det1._fSA_qpabsorb - per_Al)
+        #return det1.calc_res()*np.abs(det1._fSA_qpabsorb - per_Al)
+        if per_Al is None:
+            return det1.calc_res()
+        else:
+            delta = np.abs(det1._fSA_qpabsorb - per_Al)
+            return det1.calc_res()*(per_Al + delta)
     
 
 
