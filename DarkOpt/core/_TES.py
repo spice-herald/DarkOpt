@@ -1,5 +1,6 @@
 import numpy as np
 import math as m
+from scipy import constants
 from darkopt.materials._MaterialProperties import TESMaterial
 
 class TES:
@@ -7,7 +8,7 @@ class TES:
     Class to store TES properties. Calculated the TES and fin connector volumes.
     """
     def __init__(self, length, width, l_overlap, n_fin, sigma, rn, rsh, rp, L_tot, tload=30e-3,
-                 h=40e-9, zeta_WAl_fin=0.45, zeta_W_fin=0.88, con_type='ellipse',
+                 h=40e-9, veff_WAloverlap=0.45, veff_WFinCon=0.88, con_type='ellipse',
                  material=TESMaterial(), operating_point=0.45, alpha=None, beta=0, 
                  n=5, Qp=0, t_mc=10e-3):
         
@@ -37,10 +38,10 @@ class TES:
             in [Ohms]
         h : float
             thickness of TES in [m]
-        zeta_WAl_fin : float, optional
+        veff_WAloverlap : float, optional
             eff factor for the contribution of the W/Al overlap 
             region to the volume and heat capacity (0,1)
-        zeta_W_fin : float, optional
+        veff_WFinCon : float, optional
             eff factor for the contribution of the W only part 
             of the fin connector to the volume and heat capacity (0,1)
         con_type : string, optional
@@ -76,6 +77,7 @@ class TES:
         self.rl = rsh + rp
         self.L = L_tot
         self.tload = tload
+        
        
         # The next two shouldn't change (to avoid shorts)
         self.width_no_Al = 12e-6 # width around TES where no Al
@@ -93,10 +95,10 @@ class TES:
         self.material = material
         self.con_type = con_type 
     
-        self.T_c = material._Tc # Critical temperature of W 
+        self.tc = material._Tc # Critical temperature of W 
         self.Qp = Qp  # Parasitic heating
         self.t_mc = t_mc
-        wTc_1090 = 1.4e-3 * self.T_c / 68e-3  # [K], line 65-66 Tc_ResPt.m [Not Used in TES]
+        wTc_1090 = 1.4e-3 * self.tc / 68e-3  # [K], line 65-66 Tc_ResPt.m [Not Used in TES]
         self.wTc = material._wTc 
         self.material._gPep_v
 
@@ -129,18 +131,19 @@ class TES:
         # This is the efficiency factor for the volume of the fin connector
         # contributing to Gep ... we're assuming that this is also the efficiency
         # factor for the volume contributing to heat capacity as well.
-        self.veff_WFinCon = zeta_W_fin
+        self.veff_WFinCon = veff_WFinCon #zeta_W_fin
 
         # Volume of the W/Al overlap portion of the fin connector
         # The W/Al portion is completely proximitized ... it should have a very low
         # effective volume
         # TODO this value is uncertain! Needs to be properly measured.
         # self._veff_WAloverlap = 0.35
-        self.veff_WAloverlap = zeta_WAl_fin # -- changed to .45 to match matlab - SZ 2019  
+        self.veff_WAloverlap = veff_WAloverlap#zeta_WAl_fin # -- changed to .45 to match matlab - SZ 2019  
 
         self.volume = self.volume_TES + self.veff_WFinCon * self.vol_WFinCon + \
                        self.veff_WAloverlap * self.vol_WAl_overlap
-
+        
+        self.zeta = self.volume_TES/(self.volume + self.volume_TES)
         # Resistance of 1 TES 
         self.res1tes = self.resistivity*self.l/(self.w*self.h)
         # Have a desired output resistance and optimise length to fix n_TES.
@@ -153,7 +156,7 @@ class TES:
         # let's calculate the temperature of the operating point resistance.
         # [Notice that if the resistance of the TES changes with current, then this doesn't work]
         zeta_o = np.log(self.fOp/(1 - self.fOp))/2
-        self.t0 = zeta_o * self.wTc + self.T_c # K    
+        self.t0 = zeta_o * self.wTc + self.tc # K    
         self.Gep = self.n * self.K * self.t0 ** (self.n-1)
     
         # ----- Alpha/Beta at Transition Point -----
@@ -206,6 +209,30 @@ class TES:
         # ------ Parameters set when simulating noise -----
         self.fSp_xtra = 0
         
+        self.phase_sep_legth()
+        
+    def phase_sep_legth(self):
+        """
+        Function to check maximum phase seperation legth based on QET parameters.
+        Eq 4.25 in Matt Pyles Thesis (Page 102) 
+        Matt Christopher Pyle. Optimizing the design and analysis of 
+        cryogenic semiconductor dark matter detectors for maximum 
+        sensitivity. PhD thesis, Stanford U., 2012.
+        """
+        
+        beta_wf = 1/3*(np.pi*constants.k/constants.e)**2 #weidermann-franz coeff
+        zeta = self.zeta
+        sig = self.sigma
+        n = self.n
+        tc = self.tc
+        rho = self.resistivity
+        alpha = self.alpha
+        tb = self.t_mc
+        num = np.pi**2*beta_wf*zeta
+        denom = n*sig*tc**(n-2)*rho*(alpha/n * (1-tb**n/tc**n) - 1 )
+        
+        self.max_phase_length =  np.sqrt(num/denom)
+        self.is_phase_sep = self.max_phase_length < self.l
         
         
     def print(self):
@@ -216,7 +243,7 @@ class TES:
         print("---------------- TES PARAMETERS ----------------")
         print(f"sigma = {self.sigma}"  )
         print("wTc =  %s" % self.wTc)
-        print("Tc =  %s" % self.T_c)
+        print("Tc =  %s" % self.tc)
         print("rho =  %s" % self.resistivity)
         print("t =  %s" % self.h)
         print("l =  %s" % self.l)
@@ -226,6 +253,9 @@ class TES:
         print("n_fin =  %s" % self.n_fin)
         print("vol1TES =  %s" % self.volume_TES)
         print("vol1 =  %s" % self.volume)
+        print(f'Zeta = {self.zeta}')
+        print(f'Max TES length before phase sep = {self.max_phase_length} [m]')
+        print(f'Is TES phase seperated = {self.is_phase_sep}')
         print("nTES =  %s" % self.nTES)
         print("tot_volume =  %s" % self.tot_volume)
         print("K =  %s " % self.K)

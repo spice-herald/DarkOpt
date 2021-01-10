@@ -23,7 +23,7 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False):
                     w_safety=absorber._w_safety)
     tes1 = TES(length=l, width=tes.w, l_overlap=l_overlap, n_fin=n_fin, sigma=tes.sigma,
              rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
-             h=tes.h, zeta_WAl_fin=tes.veff_WAloverlap, zeta_W_fin=tes.veff_WFinCon, 
+             h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
              con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
              alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
     qet1 = QET(l_fin=l_fin, h_fin=h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
@@ -49,8 +49,8 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False):
 def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_Al, rn,
                     abs_type, abs_shape, abs_height, abs_width, w_safety,
                     tes_width, sigma, rp, L_tot,  ahole, n_channel=1,
-                    rsh=5e-3, tload=30e-3, tes_h=40e-9, zeta_WAl_fin=0.45, 
-                    zeta_W_fin=0.88, con_type='ellipse', material=TESMaterial(), 
+                    rsh=5e-3, tload=30e-3, tes_h=40e-9, veff_WAloverlap=0.45, 
+                    veff_WFinCon=0.88, con_type='ellipse', material=TESMaterial(), 
                     operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
                     t_mc=10e-3, ePQP=0.52, eff_absb = 1.22e-4, wempty=6e-6, 
                     wempty_tes=7.5e-6, type_qp_eff=0, freqs=None):
@@ -114,10 +114,10 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
         in [Ohms]
     tes_h : float
         thickness of TES in [m]
-    zeta_WAl_fin : float, optional
+    veff_WAloverlap : float, optional
         eff factor for the contribution of the W/Al overlap 
         region to the volume and heat capacity (0,1)
-    zeta_W_fin : float, optional
+    veff_WFinCon : float, optional
         eff factor for the contribution of the W only part 
         of the fin connector to the volume and heat capacity (0,1)
     con_type : string, optional
@@ -167,9 +167,10 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
     
     tes = TES(length=tes_length0, width=tes_width, l_overlap=tes_l_overlap0, 
               n_fin=n_fin0, sigma=sigma, rn=rn, rp=rp, L_tot=L_tot, rsh=rsh, 
-              tload=tload, h=tes_h, zeta_WAl_fin=zeta_WAl_fin, zeta_W_fin=zeta_W_fin,
-              con_type=con_type, material=material, operating_point=operating_point,
-              alpha=alpha, beta=beta, n=n, Qp=Qp, t_mc=t_mc)
+              tload=tload, h=tes_h, veff_WAloverlap=veff_WAloverlap, 
+              veff_WFinCon=veff_WFinCon, con_type=con_type, material=material, 
+              operating_point=operating_point, alpha=alpha, beta=beta, n=n, 
+              Qp=Qp, t_mc=t_mc)
     
     qet = QET(l_fin=l_fin0, h_fin=h_fin0, TES=tes, ahole=ahole, ePQP=ePQP,
               eff_absb=eff_absb, wempty=wempty, wempty_tes=wempty_tes, 
@@ -193,6 +194,12 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
     print(f'Number of TESs = {det1.QET.TES.nTES}')
     print(f'Close Packed: {det1._close_packed}')
     
+    if det1.QET.TES.is_phase_sep:
+        print('Design is phase seperated')
+    else:     
+        phase_margin = (det1.QET.TES.max_phase_length - det1.QET.TES.l)/det1.QET.TES.l
+        print('---------------------------------')
+        print(f'Phase margin = {phase_margin*100:.1f} [%] (phase_sep_legth - tes_legnth)/tes_legnth)')
     
     return det1, res['fun'], res['x']
     
