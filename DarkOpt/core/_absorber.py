@@ -1,6 +1,6 @@
 from math import *
 import numpy as np
-from darkopt._MaterialProperties import DetectorMaterial
+from darkopt.materials._MaterialProperties import DetectorMaterial
 
 class Absorber:
 
