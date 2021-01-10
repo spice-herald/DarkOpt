@@ -1,6 +1,15 @@
-## Phonon Detector Design
+### Package for Optimizing QET based Phonon sensitive Detectors.
 
-### For Optimizing Future Dark Matter Detectors. 
+
+
+The code structure follows that of a real detector.
+
+A Detector object is composed of an `Absorber` object and a `QET` object. A `QET` is composed of at `TES` object. `Absorber`, `QET`, and `TES` objects have material properties that are passed from `darkopt.materials`.
+
+See `Examples/example.ipynb` for usage of the package
+
+
+
 
 ####	Current issues:
 
@@ -16,4 +25,4 @@
 	- Need Down Conversion but now bellow 1 meV  
 - Lowering W Tc and Fin Tc (are the set values correct?)  
 
-This is a python translation and reorganization of much of Matt Pyle's matlab optimization code.  
+This is based on erlier work from Matt Pyle's matlab optimization code.  
