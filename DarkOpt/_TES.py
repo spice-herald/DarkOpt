@@ -1,6 +1,6 @@
 import numpy as np
 import math as m
-from _MaterialProperties import TESMaterial
+from darkopt._MaterialProperties import TESMaterial
 
 class TES:
     """

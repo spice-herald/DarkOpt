@@ -1,8 +1,8 @@
-from _TES import TES
-from _QET import QET
-from _detector import Detector
-from _absorber import Absorber
-from _MaterialProperties import TESMaterial, DetectorMaterial, QETMaterial
+from darkopt._TES import TES
+from darkopt._QET import QET
+from darkopt._detector import Detector
+from darkopt._absorber import Absorber
+from darkopt._MaterialProperties import TESMaterial, DetectorMaterial, QETMaterial
 import numpy as np
 import scipy.constants as constants
 import qetpy as qp
