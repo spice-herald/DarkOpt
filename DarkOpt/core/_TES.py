@@ -122,8 +122,10 @@ class TES:
         #  Volume of the W only Fin connector
         #self._vol_WFinCon =  2.5e-6 * (n_fin * 4e-6 * self._t + (2 * self._l + self._foverlap_width))
         #self._vol_WFinCon = 2.5e-6 * n_fin * 4e-6 * self._t + 2.5e-6 * (2 * self._l * self._foverlap_width) * self._t
+        
+        
         # re-estimate for new desing (PD4):
-        self.vol_WFinCon = n_fin*(19.040e-12+ 2*0.605e-12)*self.h  
+        self.vol_WFinCon = n_fin*(19.040e-12+ 2*0.605e-12)*self.h  #### where do these number come from?????
 
         # Volume of the W only portion of the fin connector
         # Since the temperature in the fin connector is lower than the temperature
