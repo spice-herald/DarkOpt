@@ -18,6 +18,10 @@ You may need to add the `--user` flag if using a shared Python installation.
 
 This package requires python 3.6 or greater. A current version of Anaconda3 should be sufficient, however a conda environment file as well as a list of dependencies is provided (condaenv.yml and requirements.txt)
 
+#### TODO
+* Add Tc dependent plots
+* 
+* 
 
 ####	Current issues:
 
