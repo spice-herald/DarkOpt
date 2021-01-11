@@ -1,4 +1,4 @@
-from darkopt.core import TES, QET, Absorber
+from darkopt.core import TES, QET, Absorber, Detector
 from darkopt.materials._MaterialProperties import TESMaterial, DetectorMaterial, QETMaterial
 import numpy as np
 import scipy.constants as constants
