@@ -53,7 +53,12 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
                     veff_WFinCon=0.88, con_type='ellipse', material=TESMaterial(), 
                     operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
                     t_mc=10e-3, ePQP=0.52, eff_absb = 1.22e-4, wempty=6e-6, 
-                    wempty_tes=7.5e-6, type_qp_eff=0, freqs=None):
+                    wempty_tes=7.5e-6, type_qp_eff=0, freqs=None, 
+                     bounds = [[50e-6, 300e-6], 
+                               [5e-6, 50e-6],
+                               [50e-6, 300e-6], 
+                               [100e-9, 1000e-9], 
+                               [2, 8] ]):
     """
     Function to minimize the energy resolution of a detector object. The following
     parameters are DOF: 
@@ -158,7 +163,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
     freqs : array-like
         frequencies used for plotting noise and 
         to calculate the expected energy resolution
-        
+    bounds : nested list, optional
+        The upper and lower bounds for the free parameters
     """
     
     absorb = Absorber(name=abs_type, shape=abs_shape, 
@@ -180,7 +186,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
                    n_channel=n_channel, freqs=freqs)
     
     x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0])
-    bounds = [[50e-6, 300e-6], [5e-6, 50e-6],[50e-6, 300e-6], [300e-6, 1000e-6], [2, 8] ]
+    
     res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False), bounds=bounds )
     det1 = _loss_func(res['x'], absorb, tes, qet, det, None, True)
     
