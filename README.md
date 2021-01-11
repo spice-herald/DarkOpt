@@ -1,5 +1,4 @@
-### Package for Optimizing QET based Phonon sensitive Detectors.
-
+## Package for Optimizing QET based Phonon sensitive Detectors.
 
 
 The code structure follows that of a real detector.
@@ -8,7 +7,16 @@ A Detector object is composed of an `Absorber` object and a `QET` object. A `QET
 
 See `Examples/example.ipynb` for usage of the package
 
+### Installation
 
+
+To install the most recent (stable) development version of DarkOpt, clone this repo, then from the top-level directory of the repo, type the following line into your command line
+
+`pip install .`
+
+You may need to add the `--user` flag if using a shared Python installation.
+
+This package requires python 3.6 or greater. A current version of Anaconda3 should be sufficient, however a conda environment file as well as a list of dependencies is provided (condaenv.yml and requirements.txt)
 
 
 ####	Current issues:
