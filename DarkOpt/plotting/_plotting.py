@@ -531,6 +531,365 @@ def plot_loverlap_vs_hfin(l_overlap, h_fin, det, val='energy', figsize=(6.75, 4.
     ax.set_ylabel("W/Al Overlap Length [μm]")
     
     return fig, ax
+
+
+def plot_ltes_vs_tc(l_tes, tc, det, val='energy', figsize=(6.75, 4.455)):
+    """
+    Function to make 2D plot of energy resolution or collection efficiency as a 
+    function of TES length as Al Fin length, given fixed parameters defined in 
+    other passed arguments.
+    
+    l_tes : array,
+        array of tes lengths to calculate energy resolution
+    tc :array
+        array of superconducting trasition temperatures
+        to calculate energy resolution
+    det : Detector object
+        used to set other Detector variables
+        (TES, QET, Absorber params)
+    val : string, optional
+        If 'energy', the energy resolution is calculated, 
+        if 'eff', the absolute phonon efficiency is calculated
+        if 'tau_etf', the ETF fall time is plotted
+        if 'tau_ph', the phonon collection time
+    figsize : tuple, optional
+        Size of figure to be drawn
+        
+    Returns:
+    --------
+    fig, ax : matplotlib Figure and Axes object
+    """
+    absorber = det._absorber
+    qet = det.QET
+    tes = det.QET.TES
+    
+    
+    
+    l_opt = tes.l
+    tc_opt = tes.tc
+    
+    res = np.ones((len(l_tes), len(tc)))
+    for ii in range(len(l_tes)):
+        for jj in range(len(tc)):
+            material = TESMaterial(Tc=tc[jj])
+            
+                  
+            abso1 = Absorber(name=absorber._name, shape=absorber._shape,
+                            height=absorber._h, width=absorber._width,
+                            w_safety=absorber._w_safety)
+            tes1 = TES(length=l_tes[ii], width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
+                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
+                     con_type=tes.con_type, material=material, operating_point=tes.fOp,
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+            qet1 = QET(l_fin=qet.l_fin, h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
+                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
+                       type_qp_eff=qet.type_qp_eff)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
+                            freqs=det.freqs)
+            if val == 'energy':
+                res[ii,jj] = det1.calc_res()
+            elif val == 'eff':
+                res[ii,jj] = det1._eEabsb
+            elif val == 'tau_etf':
+                res[ii,jj] = det1.QET.TES.taup_m
+            elif val == 'tau_ph':
+                res[ii,jj] = det1._t_pabsb
+            else:
+                raise ValueError('Specify what to plot with the val argument')
+                
+    fig, ax = plt.subplots(1,1, figsize=figsize)
+    if val == 'energy':
+        plt.pcolor(tc*1e3, l_tes*1e6, res*1e3, cmap='plasma_r')
+        plt.colorbar(label=r'$\sigma_E\, [\mathrm{meV}]$')
+    elif val == 'eff':
+        plt.pcolor(tc*1e3, l_tes*1e6, res, cmap='plasma')
+        plt.colorbar(label='Total Phonon \nCollection Efficiency')
+    elif val == 'tau_etf':
+        plt.pcolor(tc*1e3, l_tes*1e6, res*1e6, cmap='plasma')
+        plt.colorbar(label=r'$\tau_{\mathrm{ETF}}\, [\mu\mathrm{s}]$')
+    elif val == 'tau_ph':
+        plt.pcolor(tc*1e3, l_tes*1e6, res*1e6, cmap='plasma')
+        plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
+        
+    plt.plot(tc_opt*1e3, l_opt*1e6, linestyle=' ', marker='+', color='k',
+            zorder=10000, ms='8')
+    plt.plot(tc_opt*1e3, l_opt*1e6, linestyle=' ', marker='x', color='k',
+            zorder=10000, ms='8')
+    ax.set_xlabel(r"$T_c$ [mK]")
+    ax.set_ylabel('TES Length [μm]')
+    
+    return fig, ax
+
+
+def plot_lfin_vs_tc(l_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
+    """
+    Function to make 2D plot of energy resolution or collection efficiency as a 
+    function of TES length as Al Fin length, given fixed parameters defined in 
+    other passed arguments.
+    
+    l_fin : array,
+        array of Al fin lengths to calculate energy resolution
+    tc :array
+        array of superconducting trasition temperatures
+        to calculate energy resolution
+    det : Detector object
+        used to set other Detector variables
+        (TES, QET, Absorber params)
+    val : string, optional
+        If 'energy', the energy resolution is calculated, 
+        if 'eff', the absolute phonon efficiency is calculated
+        if 'tau_etf', the ETF fall time is plotted
+        if 'tau_ph', the phonon collection time
+    figsize : tuple, optional
+        Size of figure to be drawn
+        
+    Returns:
+    --------
+    fig, ax : matplotlib Figure and Axes object
+    """
+    absorber = det._absorber
+    qet = det.QET
+    tes = det.QET.TES
+    
+    
+    
+    l_f_opt = qet.l_fin
+    tc_opt = tes.tc
+    
+    res = np.ones((len(l_fin), len(tc)))
+    for ii in range(len(l_fin)):
+        for jj in range(len(tc)):
+            material = TESMaterial(Tc=tc[jj])
+            
+                  
+            abso1 = Absorber(name=absorber._name, shape=absorber._shape,
+                            height=absorber._h, width=absorber._width,
+                            w_safety=absorber._w_safety)
+            tes1 = TES(length=tes.l, width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
+                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
+                     con_type=tes.con_type, material=material, operating_point=tes.fOp,
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+            qet1 = QET(l_fin=l_fin[ii], h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
+                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
+                       type_qp_eff=qet.type_qp_eff)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
+                            freqs=det.freqs)
+            if val == 'energy':
+                res[ii,jj] = det1.calc_res()
+            elif val == 'eff':
+                res[ii,jj] = det1._eEabsb
+            elif val == 'tau_etf':
+                res[ii,jj] = det1.QET.TES.taup_m
+            elif val == 'tau_ph':
+                res[ii,jj] = det1._t_pabsb
+            else:
+                raise ValueError('Specify what to plot with the val argument')
+                
+    fig, ax = plt.subplots(1,1, figsize=figsize)
+    if val == 'energy':
+        plt.pcolor(tc*1e3, l_fin*1e6, res*1e3, cmap='plasma_r')
+        plt.colorbar(label=r'$\sigma_E\, [\mathrm{meV}]$')
+    elif val == 'eff':
+        plt.pcolor(tc*1e3, l_fin*1e6, res, cmap='plasma')
+        plt.colorbar(label='Total Phonon \nCollection Efficiency')
+    elif val == 'tau_etf':
+        plt.pcolor(tc*1e3, l_fin*1e6, res*1e6, cmap='plasma')
+        plt.colorbar(label=r'$\tau_{\mathrm{ETF}}\, [\mu\mathrm{s}]$')
+    elif val == 'tau_ph':
+        plt.pcolor(tc*1e3, l_fin*1e6, res*1e6, cmap='plasma')
+        plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
+        
+    plt.plot(tc_opt*1e3, l_f_opt*1e6, linestyle=' ', marker='+', color='k',
+            zorder=10000, ms='8')
+    plt.plot(tc_opt*1e3, l_f_opt*1e6, linestyle=' ', marker='x', color='k',
+            zorder=10000, ms='8')
+    ax.set_xlabel(r"$T_c$ [mK]")
+    ax.set_ylabel('Al Fin Length [μm]')
+    
+    return fig, ax
+
+
+def plot_hfin_vs_tc(h_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
+    """
+    Function to make 2D plot of energy resolution or collection efficiency as a 
+    function of TES length as Al Fin length, given fixed parameters defined in 
+    other passed arguments.
+    
+    l_fin : array,
+        array of Al fin thicknesses to calculate energy resolution
+    tc :array
+        array of superconducting trasition temperatures
+        to calculate energy resolution
+    det : Detector object
+        used to set other Detector variables
+        (TES, QET, Absorber params)
+    val : string, optional
+        If 'energy', the energy resolution is calculated, 
+        if 'eff', the absolute phonon efficiency is calculated
+        if 'tau_etf', the ETF fall time is plotted
+        if 'tau_ph', the phonon collection time
+    figsize : tuple, optional
+        Size of figure to be drawn
+        
+    Returns:
+    --------
+    fig, ax : matplotlib Figure and Axes object
+    """
+    absorber = det._absorber
+    qet = det.QET
+    tes = det.QET.TES
+    
+    
+    
+    h_f_opt = qet.h_fin
+    tc_opt = tes.tc
+    
+    res = np.ones((len(h_fin), len(tc)))
+    for ii in range(len(h_fin)):
+        for jj in range(len(tc)):
+            material = TESMaterial(Tc=tc[jj])
+            
+                  
+            abso1 = Absorber(name=absorber._name, shape=absorber._shape,
+                            height=absorber._h, width=absorber._width,
+                            w_safety=absorber._w_safety)
+            tes1 = TES(length=tes.l, width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
+                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
+                     con_type=tes.con_type, material=material, operating_point=tes.fOp,
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+            qet1 = QET(l_fin=qet.l_fin, h_fin=h_fin[ii], TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
+                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
+                       type_qp_eff=qet.type_qp_eff)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
+                            freqs=det.freqs)
+            if val == 'energy':
+                res[ii,jj] = det1.calc_res()
+            elif val == 'eff':
+                res[ii,jj] = det1._eEabsb
+            elif val == 'tau_etf':
+                res[ii,jj] = det1.QET.TES.taup_m
+            elif val == 'tau_ph':
+                res[ii,jj] = det1._t_pabsb
+            else:
+                raise ValueError('Specify what to plot with the val argument')
+                
+    fig, ax = plt.subplots(1,1, figsize=figsize)
+    if val == 'energy':
+        plt.pcolor(tc*1e3, h_fin*1e9, res*1e3, cmap='plasma_r')
+        plt.colorbar(label=r'$\sigma_E\, [\mathrm{meV}]$')
+    elif val == 'eff':
+        plt.pcolor(tc*1e3, h_fin*1e9, res, cmap='plasma')
+        plt.colorbar(label='Total Phonon \nCollection Efficiency')
+    elif val == 'tau_etf':
+        plt.pcolor(tc*1e3, h_fin*1e9, res*1e6, cmap='plasma')
+        plt.colorbar(label=r'$\tau_{\mathrm{ETF}}\, [\mu\mathrm{s}]$')
+    elif val == 'tau_ph':
+        plt.pcolor(tc*1e3, h_fin*1e9, res*1e6, cmap='plasma')
+        plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
+        
+    plt.plot(tc_opt*1e3, h_f_opt*1e9, linestyle=' ', marker='+', color='k',
+            zorder=10000, ms='8')
+    plt.plot(tc_opt*1e3, h_f_opt*1e9, linestyle=' ', marker='x', color='k',
+            zorder=10000, ms='8')
+    ax.set_xlabel(r"$T_c$ [mK]")
+    ax.set_ylabel('Al Fin Thickness [nm]')
+    
+    return fig, ax
+
+
+
+def plot_loverlap_vs_tc(l_overlap, tc, det, val='energy', figsize=(6.75, 4.455)):
+    """
+    Function to make 2D plot of energy resolution or collection efficiency as a 
+    function of TES length as Al Fin length, given fixed parameters defined in 
+    other passed arguments.
+    
+    l_loverlap : array,
+        array of W/Al overlap lengths to calculate energy resolution
+    tc :array
+        array of superconducting trasition temperatures
+        to calculate energy resolution
+    det : Detector object
+        used to set other Detector variables
+        (TES, QET, Absorber params)
+    val : string, optional
+        If 'energy', the energy resolution is calculated, 
+        if 'eff', the absolute phonon efficiency is calculated
+        if 'tau_etf', the ETF fall time is plotted
+        if 'tau_ph', the phonon collection time
+    figsize : tuple, optional
+        Size of figure to be drawn
+        
+    Returns:
+    --------
+    fig, ax : matplotlib Figure and Axes object
+    """
+    absorber = det._absorber
+    qet = det.QET
+    tes = det.QET.TES
+    
+    
+    
+    l_overlap_opt = tes.l_overlap
+    tc_opt = tes.tc
+    
+    res = np.ones((len(l_overlap), len(tc)))
+    for ii in range(len(l_overlap)):
+        for jj in range(len(tc)):
+            material = TESMaterial(Tc=tc[jj])
+            
+                  
+            abso1 = Absorber(name=absorber._name, shape=absorber._shape,
+                            height=absorber._h, width=absorber._width,
+                            w_safety=absorber._w_safety)
+            tes1 = TES(length=tes.l, width=tes.w, l_overlap=l_overlap[ii], n_fin=tes.n_fin, sigma=tes.sigma,
+                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
+                     con_type=tes.con_type, material=material, operating_point=tes.fOp,
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+            qet1 = QET(l_fin=qet.l_fin, h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
+                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
+                       type_qp_eff=qet.type_qp_eff)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
+                            freqs=det.freqs)
+            if val == 'energy':
+                res[ii,jj] = det1.calc_res()
+            elif val == 'eff':
+                res[ii,jj] = det1._eEabsb
+            elif val == 'tau_etf':
+                res[ii,jj] = det1.QET.TES.taup_m
+            elif val == 'tau_ph':
+                res[ii,jj] = det1._t_pabsb
+            else:
+                raise ValueError('Specify what to plot with the val argument')
+                
+    fig, ax = plt.subplots(1,1, figsize=figsize)
+    if val == 'energy':
+        plt.pcolor(tc*1e3, l_overlap*1e6, res*1e3, cmap='plasma_r')
+        plt.colorbar(label=r'$\sigma_E\, [\mathrm{meV}]$')
+    elif val == 'eff':
+        plt.pcolor(tc*1e3, l_overlap*1e6, res, cmap='plasma')
+        plt.colorbar(label='Total Phonon \nCollection Efficiency')
+    elif val == 'tau_etf':
+        plt.pcolor(tc*1e3, l_overlap*1e6, res*1e6, cmap='plasma')
+        plt.colorbar(label=r'$\tau_{\mathrm{ETF}}\, [\mu\mathrm{s}]$')
+    elif val == 'tau_ph':
+        plt.pcolor(tc*1e3, l_overlap*1e6, res*1e6, cmap='plasma')
+        plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
+        
+    plt.plot(tc_opt*1e3, l_overlap_opt*1e6, linestyle=' ', marker='+', color='k',
+            zorder=10000, ms='8')
+    plt.plot(tc_opt*1e3, l_overlap_opt*1e6, linestyle=' ', marker='x', color='k',
+            zorder=10000, ms='8')
+    ax.set_xlabel(r"$T_c$ [mK]")
+    ax.set_ylabel('W/Al Overlap [μm]')
+    
+    return fig, ax
+
+
     
     
     

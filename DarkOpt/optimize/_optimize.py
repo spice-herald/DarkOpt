@@ -57,7 +57,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
                      bounds = [[50e-6, 300e-6], 
                                [5e-6, 50e-6],
                                [50e-6, 300e-6], 
-                               [100e-9, 800e-9], 
+                               [100e-9, 600e-9], 
                                [2, 8] ]):
     """
     Function to minimize the energy resolution of a detector object. The following
