@@ -196,7 +196,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
     print(f"Fin Length = {res['x'][2]*1e6:.1f} [μm]")
     print(f"Fin Height = {res['x'][3]*1e6:.1f} [μm]")
     print(f"N Fins = {int(res['x'][4])}")
-    print(f'Total Al surface coverage = {det1._fSA_qpabsorb*100:.3} [%]')
+    print(f'Total Al surface coverage = {det1._fSA_qpabsorb*100:.3f} [%]')
+    print(f'Absolute phonon collection energy efficiency = {det1._eEabsb*100:.2f} [%]'}
     print(f'Number of TESs = {det1.QET.TES.nTES}')
     print(f'Close Packed: {det1._close_packed}')
     
