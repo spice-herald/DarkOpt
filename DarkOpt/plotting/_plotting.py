@@ -87,16 +87,16 @@ def plot_ltes_vs_lfin(l_tes, l_fin, det, val='energy', figsize=(6.75, 4.455)):
                 
     fig, ax = plt.subplots(1,1, figsize=figsize)
     if val == 'energy':
-        plt.pcolor(l_fin*1e6, l*1e6, res*1e3, cmap='plasma_r')
+        plt.pcolor(l_fin*1e6, l_tes*1e6, res*1e3, cmap='plasma_r')
         plt.colorbar(label=r'$\sigma_E\, [\mathrm{meV}]$')
     elif val == 'eff':
-        plt.pcolor(l_fin*1e6, l*1e6, res, cmap='plasma')
+        plt.pcolor(l_fin*1e6, l_tes*1e6, res, cmap='plasma')
         plt.colorbar(label='Total Phonon \nCollection Efficiency')
     elif val == 'tau_etf':
-        plt.pcolor(l_fin*1e6, l*1e6, res*1e6, cmap='plasma')
+        plt.pcolor(l_fin*1e6, l_tes*1e6, res*1e6, cmap='plasma')
         plt.colorbar(label=r'$\tau_{\mathrm{ETF}}\, [\mu\mathrm{s}]$')
     elif val == 'tau_ph':
-        plt.pcolor(l_fin*1e6, l*1e6, res*1e6, cmap='plasma')
+        plt.pcolor(l_fin*1e6, l_tes*1e6, res*1e6, cmap='plasma')
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
         
     plt.plot(l_f_opt*1e6, l_opt*1e6, linestyle=' ', marker='+', color='k',
@@ -171,16 +171,16 @@ def plot_ltes_vs_hfin(l_tes, h_fin, det, val='energy', figsize=(6.75, 4.455)):
                 
     fig, ax = plt.subplots(1,1, figsize=figsize)
     if val == 'energy':
-        plt.pcolor(h_fin*1e9, l*1e6, res*1e3, cmap='plasma_r')
+        plt.pcolor(h_fin*1e9, l_tes*1e6, res*1e3, cmap='plasma_r')
         plt.colorbar(label=r'$\sigma_E\, [\mathrm{meV}]$')
     elif val == 'eff':
-        plt.pcolor(h_fin*1e9, l*1e6, res, cmap='plasma')
+        plt.pcolor(h_fin*1e9, l_tes*1e6, res, cmap='plasma')
         plt.colorbar(label='Total Phonon \nCollection Efficiency')
     elif val == 'tau_etf':
-        plt.pcolor(h_fin*1e9, l*1e6, res*1e6, cmap='plasma')
+        plt.pcolor(h_fin*1e9, l_tes*1e6, res*1e6, cmap='plasma')
         plt.colorbar(label=r'$\tau_{\mathrm{ETF}}\, [\mu\mathrm{s}]$')
     elif val == 'tau_ph':
-        plt.pcolor(h_fin*1e9, l*1e6, res*1e6, cmap='plasma')
+        plt.pcolor(h_fin*1e9, l_tes*1e6, res*1e6, cmap='plasma')
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
         
     plt.plot(h_f_opt*1e9, l_opt*1e6, linestyle=' ', marker='+', color='k',
@@ -254,16 +254,16 @@ def plot_ltes_vs_loverlap(l_tes, l_overlap, det, val='energy', figsize=(6.75, 4.
                 
     fig, ax = plt.subplots(1,1, figsize=figsize)
     if val == 'energy':
-        plt.pcolor(l_overlap*1e6, l*1e6, res*1e3, cmap='plasma_r')
+        plt.pcolor(l_overlap*1e6, l_tes*1e6, res*1e3, cmap='plasma_r')
         plt.colorbar(label=r'$\sigma_E\, [\mathrm{meV}]$')
     elif val == 'eff':
-        plt.pcolor(l_overlap*1e6, l*1e6, res, cmap='plasma')
+        plt.pcolor(l_overlap*1e6, l_tes*1e6, res, cmap='plasma')
         plt.colorbar(label='Total Phonon \nCollection Efficiency')
     elif val == 'tau_etf':
-        plt.pcolor(l_overlap*1e6, l*1e6, res*1e6, cmap='plasma')
+        plt.pcolor(l_overlap*1e6, l_tes*1e6, res*1e6, cmap='plasma')
         plt.colorbar(label=r'$\tau_{\mathrm{ETF}}\, [\mu\mathrm{s}]$')
     elif val == 'tau_ph':
-        plt.pcolor(l_overlap*1e6, l*1e6, res*1e6, cmap='plasma')
+        plt.pcolor(l_overlap*1e6, l_tes*1e6, res*1e6, cmap='plasma')
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
 
         
