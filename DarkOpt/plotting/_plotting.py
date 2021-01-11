@@ -571,7 +571,7 @@ def plot_ltes_vs_tc(l_tes, tc, det, val='energy', figsize=(6.75, 4.455)):
     res = np.ones((len(l_tes), len(tc)))
     for ii in range(len(l_tes)):
         for jj in range(len(tc)):
-            material = materials.TESMaterial(Tc=tc[jj])
+            material = TESMaterial(Tc=tc[jj])
             
                   
             abso1 = Absorber(name=absorber._name, shape=absorber._shape,
@@ -660,7 +660,7 @@ def plot_lfin_vs_tc(l_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
     res = np.ones((len(l_fin), len(tc)))
     for ii in range(len(l_fin)):
         for jj in range(len(tc)):
-            material = materials.TESMaterial(Tc=tc[jj])
+            material = TESMaterial(Tc=tc[jj])
             
                   
             abso1 = Absorber(name=absorber._name, shape=absorber._shape,
@@ -749,7 +749,7 @@ def plot_hfin_vs_tc(h_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
     res = np.ones((len(h_fin), len(tc)))
     for ii in range(len(h_fin)):
         for jj in range(len(tc)):
-            material = materials.TESMaterial(Tc=tc[jj])
+            material = TESMaterial(Tc=tc[jj])
             
                   
             abso1 = Absorber(name=absorber._name, shape=absorber._shape,
@@ -839,7 +839,7 @@ def plot_loverlap_vs_tc(l_overlap, tc, det, val='energy', figsize=(6.75, 4.455))
     res = np.ones((len(l_overlap), len(tc)))
     for ii in range(len(l_overlap)):
         for jj in range(len(tc)):
-            material = materials.TESMaterial(Tc=tc[jj])
+            material = TESMaterial(Tc=tc[jj])
             
                   
             abso1 = Absorber(name=absorber._name, shape=absorber._shape,
