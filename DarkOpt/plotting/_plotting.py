@@ -64,7 +64,7 @@ def plot_ltes_vs_lfin(l_tes, l_fin, det, val='energy', figsize=(6.75, 4.455)):
             abso1 = Absorber(name=absorber._name, shape=absorber._shape,
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
-            tes1 = TES(length=l[ii], width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
+            tes1 = TES(length=l_tes[ii], width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
                      rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
@@ -148,7 +148,7 @@ def plot_ltes_vs_hfin(l_tes, h_fin, det, val='energy', figsize=(6.75, 4.455)):
             abso1 = Absorber(name=absorber._name, shape=absorber._shape,
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
-            tes1 = TES(length=l[ii], width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
+            tes1 = TES(length=l_tes[ii], width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
                      rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
@@ -231,7 +231,7 @@ def plot_ltes_vs_loverlap(l_tes, l_overlap, det, val='energy', figsize=(6.75, 4.
             abso1 = Absorber(name=absorber._name, shape=absorber._shape,
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
-            tes1 = TES(length=l[ii], width=tes.w, l_overlap=l_overlap[jj], n_fin=tes.n_fin, sigma=tes.sigma,
+            tes1 = TES(length=l_tes[ii], width=tes.w, l_overlap=l_overlap[jj], n_fin=tes.n_fin, sigma=tes.sigma,
                      rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
