@@ -48,7 +48,7 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False):
 
 def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                     abs_type, abs_shape, abs_height, abs_width, w_safety,
-                    tes_width, sigma, rp, L_tot,  ahole, h_fin=600e-9, n_channel=1,
+                     sigma, rp, L_tot,  ahole, tes_width=2.5e-6, h_fin=600e-9, n_channel=1,
                     rsh=5e-3, tload=30e-3, tes_h=40e-9, veff_WAloverlap=0.45, 
                     veff_WFinCon=0.88, con_type='ellipse', material=TESMaterial(), 
                     operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
@@ -93,8 +93,6 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
         is a cylinder, then the width
     w_safety : float, 
         Safety margin from edge where TES are not put [m]
-    tes_width : float
-        width of TES in [m]
     sigma : float
         Electron-phonon coupling constant [W/K^5/m^3]
     rn : float 
@@ -108,6 +106,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
         inductance) [H]
     ahole : float
         area of holes in fin [m^2]
+    tes_width : float, optional
+        width of TES in [m]
     h_fin : float, 
         Hight of Al fins [m]
     n_channel : int, optional
