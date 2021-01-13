@@ -16,7 +16,7 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False):
     minimize to optimize the detector parameters
     """
     
-    l, l_overlap, l_fin, h_fin, n_fin = params
+    l, l_overlap, l_fin, n_fin = params
     n_fin = int(n_fin)
     abso1 = Absorber(name=absorber._name, shape=absorber._shape,
                     height=absorber._h, width=absorber._width,
@@ -26,7 +26,7 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False):
              h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
              con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
              alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
-    qet1 = QET(l_fin=l_fin, h_fin=h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
+    qet1 = QET(l_fin=l_fin, h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
                type_qp_eff=qet.type_qp_eff)
     det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
@@ -46,9 +46,9 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False):
 
 
 
-def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_Al, rn,
+def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                     abs_type, abs_shape, abs_height, abs_width, w_safety,
-                    tes_width, sigma, rp, L_tot,  ahole, n_channel=1,
+                    tes_width, sigma, rp, L_tot,  ahole, h_fin=600e-9, n_channel=1,
                     rsh=5e-3, tload=30e-3, tes_h=40e-9, veff_WAloverlap=0.45, 
                     veff_WFinCon=0.88, con_type='ellipse', material=TESMaterial(), 
                     operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
@@ -56,8 +56,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
                     wempty_tes=7.5e-6, type_qp_eff=0, freqs=None, 
                      bounds = [[50e-6, 300e-6], 
                                [5e-6, 50e-6],
-                               [50e-6, 300e-6], 
-                               [100e-9, 600e-9], 
+                               [50e-6, 300e-6],  
                                [2, 8] ]):
     """
     Function to minimize the energy resolution of a detector object. The following
@@ -76,8 +75,6 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
         guess for lenght of Al/W overlap region in [m]
     l_fin0 : float, 
         guess for Length of Al fins [m]
-    h_fin0 : float, 
-        guess for hight of Al fins [m]
     n_fin0 : int
         guess for number of Al fins for QET  
     per_AL : float,
@@ -111,6 +108,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
         inductance) [H]
     ahole : float
         area of holes in fin [m^2]
+    h_fin : float, 
+        Hight of Al fins [m]
     n_channel : int, optional
         Number of chennels in detector 
     tload : float, optional
@@ -178,14 +177,14 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0, per_A
               operating_point=operating_point, alpha=alpha, beta=beta, n=n, 
               Qp=Qp, t_mc=t_mc)
     
-    qet = QET(l_fin=l_fin0, h_fin=h_fin0, TES=tes, ahole=ahole, ePQP=ePQP,
+    qet = QET(l_fin=l_fin0, h_fin=h_fin, TES=tes, ahole=ahole, ePQP=ePQP,
               eff_absb=eff_absb, wempty=wempty, wempty_tes=wempty_tes, 
               type_qp_eff=type_qp_eff)
     
     det = Detector(absorber=absorb, QET=qet, passive=1, 
                    n_channel=n_channel, freqs=freqs)
     
-    x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, h_fin0, n_fin0])
+    x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0])
     
     res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False), bounds=bounds )
     det1 = _loss_func(res['x'], absorb, tes, qet, det, None, True)
