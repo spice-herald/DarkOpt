@@ -66,7 +66,7 @@ def plot_ltes_vs_lfin(l_tes, l_fin, det, val='energy', figsize=(6.75, 4.455)):
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
             tes1 = TES(length=l_tes[ii], width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
-                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
                      alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
@@ -112,7 +112,7 @@ def plot_ltes_vs_lfin(l_tes, l_fin, det, val='energy', figsize=(6.75, 4.455)):
     ax.set_xlabel("Al Fin Length [μm]")
     ax.set_ylabel('TES Length [μm]')
     
-    return fig, ax
+    return fig, ax, res
     
 
 def plot_ltes_vs_hfin(l_tes, h_fin, det, val='energy', figsize=(6.75, 4.455)):
@@ -156,7 +156,7 @@ def plot_ltes_vs_hfin(l_tes, h_fin, det, val='energy', figsize=(6.75, 4.455)):
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
             tes1 = TES(length=l_tes[ii], width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
-                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
                      alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
@@ -245,7 +245,7 @@ def plot_ltes_vs_loverlap(l_tes, l_overlap, det, val='energy', figsize=(6.75, 4.
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
             tes1 = TES(length=l_tes[ii], width=tes.w, l_overlap=l_overlap[jj], n_fin=tes.n_fin, sigma=tes.sigma,
-                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
                      alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
@@ -336,7 +336,7 @@ def plot_loverlap_vs_lfin(l_overlap, l_fin, det, val='energy', figsize=(6.75, 4.
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
             tes1 = TES(length=tes.l, width=tes.w, l_overlap=l_overlap[ii], n_fin=tes.n_fin, sigma=tes.sigma,
-                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
                      alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
@@ -427,7 +427,7 @@ def plot_hfin_vs_lfin(h_fin, l_fin, det, val='energy', figsize=(6.75, 4.455)):
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
             tes1 = TES(length=tes.l, width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
-                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
                      alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
@@ -519,7 +519,7 @@ def plot_loverlap_vs_hfin(l_overlap, h_fin, det, val='energy', figsize=(6.75, 4.
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
             tes1 = TES(length=tes.l, width=tes.w, l_overlap=l_overlap[ii], n_fin=tes.n_fin, sigma=tes.sigma,
-                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
                      alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
@@ -615,7 +615,7 @@ def plot_ltes_vs_tc(l_tes, tc, det, val='energy', figsize=(6.75, 4.455)):
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
             tes1 = TES(length=l_tes[ii], width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
-                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=material, operating_point=tes.fOp,
                      alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
@@ -710,7 +710,7 @@ def plot_lfin_vs_tc(l_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
             tes1 = TES(length=tes.l, width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
-                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=material, operating_point=tes.fOp,
                      alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
@@ -805,7 +805,7 @@ def plot_hfin_vs_tc(h_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
             tes1 = TES(length=tes.l, width=tes.w, l_overlap=tes.l_overlap, n_fin=tes.n_fin, sigma=tes.sigma,
-                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=material, operating_point=tes.fOp,
                      alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
@@ -901,7 +901,7 @@ def plot_loverlap_vs_tc(l_overlap, tc, det, val='energy', figsize=(6.75, 4.455))
                             height=absorber._h, width=absorber._width,
                             w_safety=absorber._w_safety)
             tes1 = TES(length=tes.l, width=tes.w, l_overlap=l_overlap[ii], n_fin=tes.n_fin, sigma=tes.sigma,
-                     rn=tes.n, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
+                     rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=material, operating_point=tes.fOp,
                      alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
