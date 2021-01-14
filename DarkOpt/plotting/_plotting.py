@@ -84,7 +84,7 @@ def plot_ltes_vs_lfin(l_tes, l_fin, det, val='energy', figsize=(6.75, 4.455)):
             elif val == 'tau_ph':
                 res[ii,jj] = det1._t_pabsb
             elif val == 'al':
-                det1._fSA_qpabsorb
+                res[ii,jj] = det1._fSA_qpabsorb
             else:
                 raise ValueError('Specify what to plot with the val argument')
                 
@@ -103,7 +103,7 @@ def plot_ltes_vs_lfin(l_tes, l_fin, det, val='energy', figsize=(6.75, 4.455)):
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
     elif val == 'al':
         plt.pcolor(l_fin*1e6, l_tes*1e6, res*100, cmap='plasma')
-        plt.colorbar(label=r'$Al Surface Coverage\, [%]$')
+        plt.colorbar(label='Al Surface Coverage [%]')
         
     plt.plot(l_f_opt*1e6, l_opt*1e6, linestyle=' ', marker='+', color='k',
             zorder=10000, ms='8')
@@ -174,7 +174,7 @@ def plot_ltes_vs_hfin(l_tes, h_fin, det, val='energy', figsize=(6.75, 4.455)):
             elif val == 'tau_ph':
                 res[ii,jj] = det1._t_pabsb
             elif val == 'al':
-                det1._fSA_qpabsorb
+                res[ii,jj] = det1._fSA_qpabsorb
             else:
                 raise ValueError('Specify what to plot with the val argument')
                 
@@ -193,7 +193,7 @@ def plot_ltes_vs_hfin(l_tes, h_fin, det, val='energy', figsize=(6.75, 4.455)):
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
     elif val == 'al':
         plt.pcolor(h_fin*1e6, l_tes*1e6, res*100, cmap='plasma')
-        plt.colorbar(label=r'$Al Surface Coverage\, [%]$')
+        plt.colorbar(label='Al Surface Coverage [%]')
         
     plt.plot(h_f_opt*1e9, l_opt*1e6, linestyle=' ', marker='+', color='k',
             zorder=10000, ms='8')
@@ -263,7 +263,7 @@ def plot_ltes_vs_loverlap(l_tes, l_overlap, det, val='energy', figsize=(6.75, 4.
             elif val == 'tau_ph':
                 res[ii,jj] = det1._t_pabsb
             elif val == 'al':
-                det1._fSA_qpabsorb
+                res[ii,jj] = det1._fSA_qpabsorb
             else:
                 raise ValueError('Specify what to plot with the val argument')
                 
@@ -282,7 +282,7 @@ def plot_ltes_vs_loverlap(l_tes, l_overlap, det, val='energy', figsize=(6.75, 4.
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
     elif val == 'al':
         plt.pcolor(l_overlap*1e6, l_tes*1e6, res*100, cmap='plasma')
-        plt.colorbar(label=r'$Al Surface Coverage\, [%]$')
+        plt.colorbar(label='Al Surface Coverage [%]')
 
         
     plt.plot(l_overlap_opt*1e6, l_opt*1e6, linestyle=' ', marker='+', color='k',
@@ -354,7 +354,7 @@ def plot_loverlap_vs_lfin(l_overlap, l_fin, det, val='energy', figsize=(6.75, 4.
             elif val == 'tau_ph':
                 res[ii,jj] = det1._t_pabsb
             elif val == 'al':
-                det1._fSA_qpabsorb
+                res[ii,jj] = det1._fSA_qpabsorb
             else:
                 raise ValueError('Specify what to plot with the val argument')
                 
@@ -373,7 +373,7 @@ def plot_loverlap_vs_lfin(l_overlap, l_fin, det, val='energy', figsize=(6.75, 4.
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
     elif val == 'al':
         plt.pcolor(l_fin*1e6, l_overlap*1e6, res*100, cmap='plasma')
-        plt.colorbar(label=r'$Al Surface Coverage\, [%]$')
+        plt.colorbar(label='Al Surface Coverage [%]')
 
         
     plt.plot(l_fin_opt*1e6, l_overlap_opt*1e6, linestyle=' ', marker='+', color='k',
@@ -445,7 +445,7 @@ def plot_hfin_vs_lfin(h_fin, l_fin, det, val='energy', figsize=(6.75, 4.455)):
             elif val == 'tau_ph':
                 res[ii,jj] = det1._t_pabsb
             elif val == 'al':
-                det1._fSA_qpabsorb
+                res[ii,jj] = det1._fSA_qpabsorb
             else:
                 raise ValueError('Specify what to plot with the val argument')
                 
@@ -464,7 +464,7 @@ def plot_hfin_vs_lfin(h_fin, l_fin, det, val='energy', figsize=(6.75, 4.455)):
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
     elif val == 'al':
         plt.pcolor(l_fin*1e6, h_fin*1e6, res*100, cmap='plasma')
-        plt.colorbar(label=r'$Al Surface Coverage\, [%]$')
+        plt.colorbar(label='Al Surface Coverage [%]')
 
         
     plt.plot(l_fin_opt*1e6, h_fin_opt*1e9, linestyle=' ', marker='+', color='k',
@@ -537,7 +537,7 @@ def plot_loverlap_vs_hfin(l_overlap, h_fin, det, val='energy', figsize=(6.75, 4.
             elif val == 'tau_ph':
                 res[ii,jj] = det1._t_pabsb
             elif val == 'al':
-                det1._fSA_qpabsorb
+                res[ii,jj] = det1._fSA_qpabsorb
             else:
                 raise ValueError('Specify what to plot with the val argument')
                 
@@ -556,7 +556,7 @@ def plot_loverlap_vs_hfin(l_overlap, h_fin, det, val='energy', figsize=(6.75, 4.
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
     elif val == 'al':
         plt.pcolor(h_fin*1e6, l_overlap*1e6, res*100, cmap='plasma')
-        plt.colorbar(label=r'$Al Surface Coverage\, [%]$')
+        plt.colorbar(label='Al Surface Coverage [%]')
 
         
     plt.plot(h_fin_opt*1e9, l_overlap_opt*1e6, linestyle=' ', marker='+', color='k',
@@ -633,7 +633,7 @@ def plot_ltes_vs_tc(l_tes, tc, det, val='energy', figsize=(6.75, 4.455)):
             elif val == 'tau_ph':
                 res[ii,jj] = det1._t_pabsb
             elif val == 'al':
-                det1._fSA_qpabsorb
+                res[ii,jj] = det1._fSA_qpabsorb
             else:
                 raise ValueError('Specify what to plot with the val argument')
                 
@@ -652,7 +652,7 @@ def plot_ltes_vs_tc(l_tes, tc, det, val='energy', figsize=(6.75, 4.455)):
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
     elif val == 'al':
         plt.pcolor(tc*1e3, l_tes*1e6, res*100, cmap='plasma')
-        plt.colorbar(label=r'$Al Surface Coverage\, [%]$')
+        plt.colorbar(label='Al Surface Coverage [%]')
         
     plt.plot(tc_opt*1e3, l_opt*1e6, linestyle=' ', marker='+', color='k',
             zorder=10000, ms='8')
@@ -728,7 +728,7 @@ def plot_lfin_vs_tc(l_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
             elif val == 'tau_ph':
                 res[ii,jj] = det1._t_pabsb
             elif val == 'al':
-                det1._fSA_qpabsorb
+                res[ii,jj] = det1._fSA_qpabsorb
             else:
                 raise ValueError('Specify what to plot with the val argument')
                 
@@ -747,7 +747,7 @@ def plot_lfin_vs_tc(l_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
     elif val == 'al':
         plt.pcolor(tc*1e3, l_fin*1e6, res*100, cmap='plasma')
-        plt.colorbar(label=r'$Al Surface Coverage\, [%]$')
+        plt.colorbar(label='Al Surface Coverage [%]')
         
     plt.plot(tc_opt*1e3, l_f_opt*1e6, linestyle=' ', marker='+', color='k',
             zorder=10000, ms='8')
@@ -823,7 +823,7 @@ def plot_hfin_vs_tc(h_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
             elif val == 'tau_ph':
                 res[ii,jj] = det1._t_pabsb
             elif val == 'al':
-                det1._fSA_qpabsorb
+                res[ii,jj] = det1._fSA_qpabsorb
             else:
                 raise ValueError('Specify what to plot with the val argument')
                 
@@ -842,7 +842,7 @@ def plot_hfin_vs_tc(h_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
     elif val == 'al':
         plt.pcolor(tc*1e3, h_fin*1e6, res*100, cmap='plasma')
-        plt.colorbar(label=r'$Al Surface Coverage\, [%]$')
+        plt.colorbar(label='Al Surface Coverage [%]')
         
     plt.plot(tc_opt*1e3, h_f_opt*1e9, linestyle=' ', marker='+', color='k',
             zorder=10000, ms='8')
@@ -919,7 +919,7 @@ def plot_loverlap_vs_tc(l_overlap, tc, det, val='energy', figsize=(6.75, 4.455))
             elif val == 'tau_ph':
                 res[ii,jj] = det1._t_pabsb
             elif val == 'al':
-                det1._fSA_qpabsorb
+                res[ii,jj] = det1._fSA_qpabsorb
             else:
                 raise ValueError('Specify what to plot with the val argument')
                 
@@ -938,7 +938,7 @@ def plot_loverlap_vs_tc(l_overlap, tc, det, val='energy', figsize=(6.75, 4.455))
         plt.colorbar(label=r'$\tau_{\mathrm{phonon}}\, [\mu\mathrm{s}]$')
     elif val == 'al':
         plt.pcolor(tc*1e3, l_overlap*1e6, res*100, cmap='plasma')
-        plt.colorbar(label=r'$Al Surface Coverage\, [%]$')
+        plt.colorbar(label='Al Surface Coverage [%]')
         
     plt.plot(tc_opt*1e3, l_overlap_opt*1e6, linestyle=' ', marker='+', color='k',
             zorder=10000, ms='8')
