@@ -43,6 +43,7 @@ class QET:
         l_tes = TES.l
         w_tes = TES.w
         l_overlap = TES.l_overlap
+        self.nhole_per_fin = nhole_per_fin
         self.eQPabsb = None #gets set by method
         self.ePQP = ePQP # efficiency of phonon in subrate breaking cooper pair
                           # in Al

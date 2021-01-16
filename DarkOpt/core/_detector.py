@@ -71,8 +71,8 @@ class Detector:
             leave set to 1
         """
         # Width of Main Bias Rails and QET Rails 
-        self._w_rail_main = w_rail_main
-        self._w_railQET = w_railQET
+        self.w_rail_main = w_rail_main
+        self.w_railQET = w_railQET
 
         #self._name = name
         self._absorber = absorber
@@ -102,7 +102,7 @@ class Detector:
         QET_block = y_qet * x_qet
         
         if QET_block*tes.nTES > self._absorber.get_pattern_SA(): 
-            print("----- ERROR: Invalid Design - QET cells don't fit.")
+            #print("----- ERROR: Invalid Design - QET cells don't fit.")
             self._cells_fit = False
         else: self._cells_fit = True
         
@@ -115,13 +115,13 @@ class Detector:
         if self._l_cell > y_qet:
             #print("---- Not Close Packed")
             # Design is not close packed. Get passive Al/QET
-            a_passiveQET = self._l_cell * self._w_rail_main + (self._l_cell - y_qet) * self._w_railQET
+            a_passiveQET = self._l_cell * self.w_rail_main + (self._l_cell - y_qet) * self.w_railQET
             self._close_packed = False
         else:
             #print("---- Close Packed")
             # Design is close packed. No vertical rail to QET
             x_cell = a_cell / y_qet
-            a_passiveQET = x_cell * self._w_rail_main
+            a_passiveQET = x_cell * self.w_rail_main
             self._close_packed = True
         
         tes_passive = a_passiveQET * n_channel * tes.nTES
@@ -143,16 +143,16 @@ class Detector:
         # 6. Alignment Marks
         # 7. bonding pads
         if absorber._shape == "cylinder": # Indicates PD2-like Rail Layout
-            outer_ring = 2 * np.pi * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main
+            outer_ring = 2 * np.pi * (self._absorber.get_R() - self._absorber.get_w_safety()) * self.w_rail_main
             inner_ring = outer_ring / (np.sqrt(2))
-            inner_vertical_rail = 3 * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main * (1 - np.sqrt(2)/2.0)
-            outer_vertical_rail = (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main * (1 + np.sqrt(2)/2.0)
+            inner_vertical_rail = 3 * (self._absorber.get_R() - self._absorber.get_w_safety()) * self.w_rail_main * (1 - np.sqrt(2)/2.0)
+            outer_vertical_rail = (self._absorber.get_R() - self._absorber.get_w_safety()) * self.w_rail_main * (1 + np.sqrt(2)/2.0)
 
             self._SA_passive = tes_passive + outer_ring + inner_ring + inner_vertical_rail \
                                 + outer_vertical_rail + total_alignment + self.bonding_pad_area
         if absorber._shape == "square": # New Square Rail Layout Design
             if passive == 1:
-                self._SA_passive = tes_passive + 2*(self._absorber._width - 2*self._absorber._w_safety)*self._w_rail_main \
+                self._SA_passive = tes_passive + 2*(self._absorber._width - 2*self._absorber._w_safety)*self.w_rail_main \
                                                 + 2*one_alignment_window + self.bonding_pad_area
             elif passive == 0:            
                 self._SA_passive = 0 # FOR THEORETICAL UNDERSTANDING, DELETE  

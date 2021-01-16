@@ -53,15 +53,16 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False):
 
 
 def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
-                    abs_type, abs_shape, abs_height, abs_width, w_safety,
-                     sigma, rp, L_tot,  ahole, tes_width=2.5e-6, h_fin=600e-9, n_channel=1,
-                    rsh=5e-3, tload=30e-3, w_overlap=None, w_fin_con=2.5e-6, tes_h=40e-9, 
-                      veff_WAloverlap=0.45, nhole_per_fin=3,
-                    veff_WFinCon=0.88, con_type='ellipse', material=TESMaterial(), 
-                    operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
-                    t_mc=10e-3, ePQP=0.52, eff_absb = 1.22e-4, wempty=6e-6, 
-                    wempty_tes=7.5e-6, type_qp_eff=0, freqs=None, 
-                     bounds = [[50e-6, 300e-6], 
+                      abs_type, abs_shape, abs_height, abs_width, w_safety, sigma, 
+                      rp, L_tot,  ahole, tes_width=2.5e-6, h_fin=600e-9, n_channel=1,
+                      rsh=5e-3, tload=30e-3, w_overlap=None, w_fin_con=2.5e-6, 
+                      tes_h=40e-9, veff_WAloverlap=0.45, nhole_per_fin=3,
+                      veff_WFinCon=0.88, con_type='ellipse', material=TESMaterial(), 
+                      operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
+                      t_mc=10e-3, ePQP=0.52, eff_absb = 1.22e-4, wempty_fin=6e-6, 
+                      wempty_tes=7.5e-6, type_qp_eff=0, freqs=None, w_rail_main=6e-6, 
+                      w_railQET=4e-6, bonding_pad_area=4.5e-8,
+                      bounds = [[50e-6, 300e-6], 
                                [5e-6, 50e-6],
                                [50e-6, 300e-6],  
                                [2, 8] ]):
@@ -208,9 +209,9 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
               eff_absb=eff_absb, nhole_per_fin=nhole_per_fin,  
               type_qp_eff=type_qp_eff)
     
-    det = Detector(absorber=absorb, QET=qet, w_railQET=w_railQET, 
-                   bonding_pad_area=bonding_pad_area, n_channel=n_channel, 
-                   freqs=freqs, passive=1)
+    det = Detector(absorber=absorb, QET=qet, w_rail_main=w_rail_main, 
+                   w_railQET=w_railQET, bonding_pad_area=bonding_pad_area, 
+                   n_channel=n_channel, freqs=freqs, passive=1)
     
     x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0])
     
