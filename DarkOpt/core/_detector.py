@@ -28,20 +28,28 @@ rcParams.update(nice_fonts)
 
 class Detector:
 
-    def __init__(self, absorber, QET, passive=1, n_channel=1, 
+    def __init__(self, absorber, QET, n_channel=1, passive=1,  
                 freqs=None):
         
         """
-        
-        :param fridge: Fridge in which detector is in
-        :param absorber: Absorbing part of detector
-        :param n_channel: Number of channels
-        :param NQET.TES: Number of TES on detector
-        :param lQET.TES: Length of TES
-        :param l_fin: Length of QET Fin
-        :param h_fin: Height of QET Fin
-        :param l_overlap: Length of Overlap of W and Al???
-
+        Parameters:
+        -----------
+        absorber : Absorber object
+            Absorber object that holds parameters about
+            target geometry and material
+        QET : QET object
+            QET object that hold all QET and TES 
+            related parameters
+        n_channel : int, optional
+            The number of channels in the detector
+        passive : int, optional
+            leftover parameter for testing purposes. 
+            leave set to 1
+        freqs : Array, None-type, optional
+            The array of frequencies to be used
+            for noise modeling and energy resolution
+            calculationg. If None, freqs will be set
+            to freqs=np.linspace(.1, 1e6, int(1e5))
         """
         # Width of Main Bias Rails and QET Rails 
         self._w_rail_main = 6e-6
