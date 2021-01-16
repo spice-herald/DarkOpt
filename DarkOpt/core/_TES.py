@@ -136,11 +136,7 @@ class TES:
             else:
                 self.A_overlap = np.pi*self.w_overlap/2*self.l_overlap*n_fin
                 self.vol_WAl_overlap = self.A_overlap*self.h
-            
-
-        #  Volume of the W only Fin connector
-        #self._vol_WFinCon =  2.5e-6 * (n_fin * 4e-6 * self._t + (2 * self._l + self._foverlap_width))
-        #self._vol_WFinCon = 2.5e-6 * n_fin * 4e-6 * self._t + 2.5e-6 * (2 * self._l * self._foverlap_width) * self._t
+           
         
         
         # re-estimate for new desing (PD4):
@@ -154,14 +150,14 @@ class TES:
         # This is the efficiency factor for the volume of the fin connector
         # contributing to Gep ... we're assuming that this is also the efficiency
         # factor for the volume contributing to heat capacity as well.
+        # This comes from 2017 UCB measurements of QP chips
         self.veff_WFinCon = veff_WFinCon #zeta_W_fin
 
         # Volume of the W/Al overlap portion of the fin connector
         # The W/Al portion is completely proximitized ... it should have a very low
         # effective volume
-        # TODO this value is uncertain! Needs to be properly measured.
-        # self._veff_WAloverlap = 0.35
-        self.veff_WAloverlap = veff_WAloverlap#zeta_WAl_fin # -- changed to .45 to match matlab - SZ 2019  
+        # This comes from 2017 UCB measurements of QP chips
+        self.veff_WAloverlap = veff_WAloverlap 
 
         self.volume = self.volume_TES + self.veff_WFinCon * self.vol_WFinCon + \
                        self.veff_WAloverlap * self.vol_WAl_overlap
