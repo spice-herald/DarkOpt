@@ -69,7 +69,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                       wempty_tes=7.5e-6, type_qp_eff=0, freqs=None, w_rail_main=6e-6, 
                       w_railQET=4e-6, bonding_pad_area=4.5e-8,
                       bounds = [[10e-6, 300e-6], 
-                               [1e-6, 50e-6],
+                               [5e-6, 50e-6],
                                [20e-6, 300e-6],  
                                [2, 8] ],
                       fixrn=True,
@@ -231,11 +231,12 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     
     if fixrn:
         x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0])
+        bnds = bounds
     else:
         x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0, rn])
-        bounds.append(rnbounds)
-    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, rtnDet=False, fixrn=fixrn), bounds=bounds )
-    det1 = _loss_func(res['x'], absorb, tes, qet, det, per_Al=None, rtnDet=True, fixrn=fixrn)
+        bnds = bounds.append(rnbounds)
+    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False, fixrn), bounds=bounds )
+    det1 = _loss_func(res['x'], absorb, tes, qet, det, None, True, fixrn)
         
     print(f"resolution: {det1.calc_res()*1e3:.1f} [meV]")
     print(f"TES Length = {res['x'][0]*1e6:.1f} [μm]")
