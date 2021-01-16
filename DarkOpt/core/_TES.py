@@ -129,7 +129,7 @@ class TES:
             if self.w_overlap is None:
                 # not really sure where this calculation is comming from...
                 con_major = (self.l/2) + l_overlap 
-                con_minor = l_overlap + sel.fwempty_tes 
+                con_minor = l_overlap + self.wempty_tes 
                 con_ellipse = np.pi*con_major*con_minor 
                 self.A_overlap = con_ellipse - 2*self.l*self.wempty_tes - self.wempty_fin*n_fin*l_overlap 
                 self.vol_WAl_overlap = self.A_overlap*self.h  
