@@ -10,20 +10,26 @@ from scipy.optimize import minimize
 #import matplotlib.colors as mcolors
 from matplotlib import cm  
 
-def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False):
+def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False, fixrn=True):
     """
     Helper function to define the loss function to 
     minimize to optimize the detector parameters
     """
     
-    l, l_overlap, l_fin, n_fin = params
-    n_fin = int(n_fin)
+    if fixrn:
+        l, l_overlap, l_fin, n_fin = params
+        n_fin = int(n_fin)
+        rn = tes.rn
+    else:
+        l, l_overlap, l_fin, n_fin, rn = params
+        n_fin = int(n_fin)
+
     abso1 = Absorber(name=absorber._name, shape=absorber._shape,
                     height=absorber._h, width=absorber._width,
                     w_safety=absorber._w_safety)
     
     tes1 = TES(length=l, width=tes.w, l_overlap=l_overlap, n_fin=n_fin, sigma=tes.sigma,
-               rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload, 
+               rn=rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload, 
                w_overlap=tes.w_overlap, w_fin_con=tes.w_fin_con, h=tes.h, 
                veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
@@ -62,10 +68,12 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                       t_mc=10e-3, ePQP=0.52, eff_absb = 1.22e-4, wempty_fin=6e-6, 
                       wempty_tes=7.5e-6, type_qp_eff=0, freqs=None, w_rail_main=6e-6, 
                       w_railQET=4e-6, bonding_pad_area=4.5e-8,
-                      bounds = [[50e-6, 300e-6], 
-                               [5e-6, 50e-6],
-                               [50e-6, 300e-6],  
-                               [2, 8] ]):
+                      bounds = [[10e-6, 300e-6], 
+                               [1e-6, 50e-6],
+                               [20e-6, 300e-6],  
+                               [2, 8] ],
+                      fixrn=True,
+                      rnbounds = [50e-3, 2]):
     """
     Function to minimize the energy resolution of a detector object. The following
     parameters are DOF: 
@@ -74,6 +82,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
             Al fin length
             Al fin height
             number of fins
+    Rn can be made a free parameter buy changing the variable fixrn=False
+    
     
     Parameters:
     -----------
@@ -160,7 +170,6 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
         Parasitic heating [J]
     t_mc : float, optional
         Temperature of the mixing chamber [K]
-    
     ePQP : float, optional
         Phonon to QP Conversion Effciency, 
         Kaplan downconversion limits this to 52%
@@ -191,6 +200,13 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
         The area of passive Al used for the total
         number of bonding pads needed. The default
         is set to the area of 2 150um by 150um pads. [m^2]
+    fixrn : Bool, optional
+        If True, Rn is not a free parameter, if False
+        then it is allowed to vary.
+    rnbounds : list, array, optional
+        Lower and upper bounds for Rn if it is an 
+        optimization param
+        
     """
     
     absorb = Absorber(name=abs_type, shape=abs_shape, 
@@ -213,11 +229,14 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                    w_railQET=w_railQET, bonding_pad_area=bonding_pad_area, 
                    n_channel=n_channel, freqs=freqs, passive=1)
     
-    x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0])
-    
-    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False), bounds=bounds )
-    det1 = _loss_func(res['x'], absorb, tes, qet, det, None, True)
-    
+    if fixrn:
+        x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0])
+    else:
+        x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0, rn])
+        bounds.append(rnbounds)
+    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, rtnDet=False, fixrn=fixrn), bounds=bounds )
+    det1 = _loss_func(res['x'], absorb, tes, qet, det, per_Al=None, rtnDet=True, fixrn=fixrn)
+        
     print(f"resolution: {det1.calc_res()*1e3:.1f} [meV]")
     print(f"TES Length = {res['x'][0]*1e6:.1f} [μm]")
     print(f"Overlap Legth = {res['x'][1]*1e6:.1f} [μm]")
@@ -227,6 +246,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     print(f'Total Al surface coverage = {det1._fSA_qpabsorb*100:.3f} [%]')
     print(f'Absolute phonon collection energy efficiency = {det1._eEabsb*100:.2f} [%]')
     print(f'Number of TESs = {det1.QET.TES.nTES}')
+    print(f'Rn = {det1.QET.TES.rn*1e3:.1f} [mOhms]')
     print(f'Close Packed: {det1._close_packed}')
     
     if det1.QET.TES.is_phase_sep:
