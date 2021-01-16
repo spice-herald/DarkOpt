@@ -52,15 +52,15 @@ class Detector:
             The number of channels in the detector
         w_rail_main : float, optional
             The width of the main bias rials. By
-            default this is set to 6e-6
+            default this is set to 6e-6 [m]
         w_railQET : float, optional
             The width of the secondary bias lines
             connecting the the QETs to the main rails.
-            by default it is set to 4e-6.
+            by default it is set to 4e-6. [m]
         bonding_pad_area : float, optional
             The area of passive Al used for the total
             number of bonding pads needed. The default
-            is set to the area of 2 150um by 150um pads.
+            is set to the area of 2 150um by 150um pads. [m^2]
         freqs : Array, None-type, optional
             The array of frequencies to be used
             for noise modeling and energy resolution

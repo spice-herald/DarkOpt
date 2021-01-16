@@ -21,16 +21,22 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False):
     abso1 = Absorber(name=absorber._name, shape=absorber._shape,
                     height=absorber._h, width=absorber._width,
                     w_safety=absorber._w_safety)
+    
     tes1 = TES(length=l, width=tes.w, l_overlap=l_overlap, n_fin=n_fin, sigma=tes.sigma,
-             rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
-             h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
-             con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
-             alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+               rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload, 
+               w_overlap=tes.w_overlap, w_fin_con=tes.w_fin_con, h=tes.h, 
+               veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
+               con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
+               alpha=tes.alpha, beta=tes.beta, wempty_fin=tes.wempty_fin, 
+               wempty_tes=tes.wempty_tes, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+    
     qet1 = QET(l_fin=l_fin, h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
-               eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
+               eff_absb=qet.eff_absb, nhole_per_fin=qet.nhole_per_fin, 
                type_qp_eff=qet.type_qp_eff)
-    det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
-                    freqs=det.freqs)
+    
+    det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
+                    w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
+                    freqs=det.freqs )
     if rtnDet:
         return det1
     else:
@@ -49,7 +55,8 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False):
 def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                     abs_type, abs_shape, abs_height, abs_width, w_safety,
                      sigma, rp, L_tot,  ahole, tes_width=2.5e-6, h_fin=600e-9, n_channel=1,
-                    rsh=5e-3, tload=30e-3, tes_h=40e-9, veff_WAloverlap=0.45, 
+                    rsh=5e-3, tload=30e-3, w_overlap=None, w_fin_con=2.5e-6, tes_h=40e-9, 
+                      veff_WAloverlap=0.45, nhole_per_fin=3,
                     veff_WFinCon=0.88, con_type='ellipse', material=TESMaterial(), 
                     operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
                     t_mc=10e-3, ePQP=0.52, eff_absb = 1.22e-4, wempty=6e-6, 
@@ -116,6 +123,12 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
         The effective noise temperature for the passive johnson 
         noise from the shunt resistor and parasitic resistance
         in [Ohms]
+    w_overlap : float, optional
+        Width of the W/Al overlap region (if None, a rough estimate is used
+        for area calulations) [m]
+    w_fin_con : float, optional
+        Width of the W only part of the fin connector. Defaults
+        to the standard width of the TES of 2.5e-6. [m]
     tes_h : float
         thickness of TES in [m]
     veff_WAloverlap : float, optional
@@ -131,6 +144,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     operating_point : float, optional
         The operational resistance [%Rn]
         (fractional percentage of normal resistance)
+    nhole_per_fin : int, optional,
+            Number of holes per Al fin
     alpha : float, optional
         The logarithmic temperature sensitivity.
         If None, it will be estimated.
@@ -150,10 +165,10 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
         Kaplan downconversion limits this to 52%
     eff_absb : float, optional
         W/Al transmition/trapping probability
-    wempty : float, optional
-        ?
+    wempty_fin : float, optional
+        ? width of empty slot in the fin? [m]
     wempty_tes : float, optional
-        ?
+        ? width of empty space between TES and Al [m]
     type_qp_eff : int, optional
         how the efficiency should be calculated.
         0 : 'modern' estimate of overlap radius (small)
@@ -164,6 +179,17 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
         to calculate the expected energy resolution
     bounds : nested list, optional
         The upper and lower bounds for the free parameters
+    w_rail_main : float, optional
+        The width of the main bias rials. By
+        default this is set to 6e-6 [m]
+    w_railQET : float, optional
+        The width of the secondary bias lines
+        connecting the the QETs to the main rails.
+        by default it is set to 4e-6. [m]
+    bonding_pad_area : float, optional
+        The area of passive Al used for the total
+        number of bonding pads needed. The default
+        is set to the area of 2 150um by 150um pads. [m^2]
     """
     
     absorb = Absorber(name=abs_type, shape=abs_shape, 
@@ -172,17 +198,19 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     
     tes = TES(length=tes_length0, width=tes_width, l_overlap=tes_l_overlap0, 
               n_fin=n_fin0, sigma=sigma, rn=rn, rp=rp, L_tot=L_tot, rsh=rsh, 
-              tload=tload, h=tes_h, veff_WAloverlap=veff_WAloverlap, 
+              tload=tload, w_overlap=w_overlap,w_fin_con=w_fin_con, wempty_fin=wempty_fin,
+              wempty_tes=wempty_tes, h=tes_h, veff_WAloverlap=veff_WAloverlap, 
               veff_WFinCon=veff_WFinCon, con_type=con_type, material=material, 
               operating_point=operating_point, alpha=alpha, beta=beta, n=n, 
               Qp=Qp, t_mc=t_mc)
     
     qet = QET(l_fin=l_fin0, h_fin=h_fin, TES=tes, ahole=ahole, ePQP=ePQP,
-              eff_absb=eff_absb, wempty=wempty, wempty_tes=wempty_tes, 
+              eff_absb=eff_absb, nhole_per_fin=nhole_per_fin,  
               type_qp_eff=type_qp_eff)
     
-    det = Detector(absorber=absorb, QET=qet, passive=1, 
-                   n_channel=n_channel, freqs=freqs)
+    det = Detector(absorber=absorb, QET=qet, w_railQET=w_railQET, 
+                   bonding_pad_area=bonding_pad_area, n_channel=n_channel, 
+                   freqs=freqs, passive=1)
     
     x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0])
     

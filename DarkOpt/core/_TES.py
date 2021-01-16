@@ -38,10 +38,10 @@ class TES:
             in [Ohms]
         w_overlap : float, optional
             Width of the W/Al overlap region (if None, a rough estimate is used
-            for area calulations)
+            for area calulations) [m]
         w_fin_con : float, optional
             Width of the W only part of the fin connector. Defaults
-            to the standard width of the TES of 2.5e-6.
+            to the standard width of the TES of 2.5e-6. [m]
         h : float
             thickness of TES in [m]
         veff_WAloverlap : float, optional
@@ -65,9 +65,9 @@ class TES:
             If not changed, the small beta (beta=0) 
             approximation will be used.
         wempty_fin : float, optional
-            ? width of empty slot in the fin?
+            ? width of empty slot in the fin? [m]
         wempty_tes : float, optional
-            ? width of empty space between TES and Al
+            ? width of empty space between TES and Al [m]
         n : int, optional
             Thermal powerlaw exponent
         Qp : float, optional
@@ -90,9 +90,10 @@ class TES:
         
        
         # The next two shouldn't change (to avoid shorts)
-        self.width_no_Al = 12e-6 # width around TES where no Al
-        self.Al_erase = 6e-6 # width between fins with no Al 
-        
+        self.width_no_Al = 12e-6 # width around TES where no Al # what is the difference between this and 
+                                                                # wempty_tes?
+        self.Al_erase = 6e-6 # width between fins with no Al # what is the difference between this and 
+                                                             # wempty_fin?
         self.wempty_fin = wempty_fin
         self.wempty_tes = wempty_tes
         
