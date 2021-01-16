@@ -8,9 +8,9 @@ class TES:
     Class to store TES properties. Calculated the TES and fin connector volumes.
     """
     def __init__(self, length, width, l_overlap, n_fin, sigma, rn, rsh, rp, L_tot, tload=30e-3,
-                 h=40e-9, veff_WAloverlap=0.45, veff_WFinCon=0.88, con_type='ellipse',
+                 w_overlap=None, w_fin_con=2.5e-6, h=40e-9, veff_WAloverlap=0.45, veff_WFinCon=0.88, con_type='ellipse',
                  material=TESMaterial(), operating_point=0.45, alpha=None, beta=0, 
-                 n=5, Qp=0, t_mc=10e-3):
+                 wempty_fin=6e-6, wempty_tes=7.5e-6, n=5, Qp=0, t_mc=10e-3):
         
         """
         length : float
@@ -36,6 +36,12 @@ class TES:
             The effective noise temperature for the passive johnson 
             noise from the shunt resistor and parasitic resistance
             in [Ohms]
+        w_overlap : float, optional
+            Width of the W/Al overlap region (if None, a rough estimate is used
+            for area calulations)
+        w_fin_con : float, optional
+            Width of the W only part of the fin connector. Defaults
+            to the standard width of the TES of 2.5e-6.
         h : float
             thickness of TES in [m]
         veff_WAloverlap : float, optional
@@ -58,6 +64,10 @@ class TES:
             The logarithmic current sensitivity.
             If not changed, the small beta (beta=0) 
             approximation will be used.
+        wempty_fin : float, optional
+            ? width of empty slot in the fin?
+        wempty_tes : float, optional
+            ? width of empty space between TES and Al
         n : int, optional
             Thermal powerlaw exponent
         Qp : float, optional
@@ -83,8 +93,13 @@ class TES:
         self.width_no_Al = 12e-6 # width around TES where no Al
         self.Al_erase = 6e-6 # width between fins with no Al 
         
-        self.foverlap_width = (2*length+2*self.width_no_Al+4*l_overlap-n_fin*self.Al_erase)/(2*length+2*self.width_no_Al+4*l_overlap)
+        self.wempty_fin = wempty_fin
+        self.wempty_tes = wempty_tes
+        
+        self.foverlap_width = (2*length+2*self.width_no_Al+4*l_overlap-n_fin*self.Al_erase)/(2*length+2*self.width_no_Al+4*l_overlap) # what is this used for???? 
         self.l_overlap = l_overlap # length of W/Al overlap 
+        self.w_overlap = w_overlap
+        self.w_fin_con = w_fin_con
         self.n_fin = n_fin # number of fins to form QET  
         self.resistivity = material._rho_electrical # electrical resistivity of TES 
         
@@ -111,13 +126,17 @@ class TES:
 
         # elliptical connector type for small TES designs (cm squares/cubes)
         elif con_type == 'ellipse':
-                wempty = 6e-6 
-                wempty_tes = 7.5e-6
+            if self.w_overlap is None:
+                # not really sure where this calculation is comming from...
                 con_major = (self.l/2) + l_overlap 
-                con_minor = l_overlap+ wempty_tes 
-                con_ellipse = 3.1415*con_major*con_minor 
-                self.A_overlap = con_ellipse - 2*self.l*wempty_tes - wempty*n_fin*l_overlap 
+                con_minor = l_overlap + sel.fwempty_tes 
+                con_ellipse = np.pi*con_major*con_minor 
+                self.A_overlap = con_ellipse - 2*self.l*self.wempty_tes - self.wempty_fin*n_fin*l_overlap 
                 self.vol_WAl_overlap = self.A_overlap*self.h  
+            else:
+                self.A_overlap = np.pi*self.w_overlap/2*self.l_overlap*n_fin
+                self.vol_WAl_overlap = self.A_overlap*self.h
+            
 
         #  Volume of the W only Fin connector
         #self._vol_WFinCon =  2.5e-6 * (n_fin * 4e-6 * self._t + (2 * self._l + self._foverlap_width))
@@ -125,8 +144,10 @@ class TES:
         
         
         # re-estimate for new desing (PD4):
-        self.vol_WFinCon = n_fin*(19.040e-12+ 2*0.605e-12)*self.h  #### where do these number come from?????
-
+        #self.vol_WFinCon = n_fin*(19.040e-12+ 2*0.605e-12)*self.h  #### where do these number come from?????
+        self.vol_WFinCon = self.w_fin_con * self.wempty_tes * (self.n_fin - 2) * self.h # area of W part of fin connector
+                                                                                        # -2 because end fins don't have same 
+                                                                                        # excess W
         # Volume of the W only portion of the fin connector
         # Since the temperature in the fin connector is lower than the temperature
         # in the TES, the effective volume is smaller than the true volume
