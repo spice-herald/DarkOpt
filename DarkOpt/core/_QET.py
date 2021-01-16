@@ -10,7 +10,7 @@ class QET:
     """
 
     def __init__(self, l_fin, h_fin, TES, ahole, ePQP=0.52, eff_absb = 1.22e-4,
-                 wempty=6e-6, wempty_tes=7.5e-6, type_qp_eff=0):
+                  nhole_per_fin=3, type_qp_eff=0):
         
         """
         l_fin : float, 
@@ -26,10 +26,8 @@ class QET:
             Kaplan downconversion limits this to 52%
         eff_absb : float, optional
             W/Al transmition/trapping probability
-        wempty : float, optional
-            ?
-        wempty_tes : float, optional
-            ?
+        nhole_per_fin : int, optional,
+            Number of holes per Al fin
         type_qp_eff : int, optional
             how the efficiency should be calculated.
             0 : 'modern' estimate of overlap radius (small)
@@ -43,28 +41,42 @@ class QET:
         self.TES = TES
         n_fin = TES.n_fin
         l_tes = TES.l
+        w_tes = TES.w
         l_overlap = TES.l_overlap
+        self.nhole_per_fin = nhole_per_fin
         self.eQPabsb = None #gets set by method
         self.ePQP = ePQP # efficiency of phonon in subrate breaking cooper pair
                           # in Al
         self.eff_absb = eff_absb
         # ---- QET Active Area ----
-        self.wempty = wempty
-        self.wempty_tes = wempty_tes
-        self.nhole = 3 * n_fin
+        self.nhole = nhole_per_fin * n_fin 
         self.ahole = ahole 
-        self.afin_empty = n_fin * l_fin * wempty + 2 * l_tes * wempty_tes + self.nhole * ahole 
-        #self._a_fin = np.pi * (self._l_fin ** 2) + 2 * self._l_fin * TES._l - self._afin_empty # SZ: bug?? 
+        
+        
+        ##################
+        # Area of Al fin is calculated by calulating the 
+        # area of the overal ellipse, then subracting the non
+        # active Al; ie the area of the holes, the channel 
+        # cutouts, and the area of the TES + empty space around
+        # the TES
+        
+        # self.afin_empty = n_fin * l_fin * wempty_fin + 2 * l_tes * wempty_tes + self.nhole * ahole #Summers calc, missing
+        # area of TES itself
+        
+        a_fin_chan = n_fin * l_fin * self.TES.wempty_fin # area of cutout channels seperating fins
+        a_tes_space = l_tes*(w_tes + 2*self.TES.wempty_tes) # area of tes + empty space on either side
+        aholes = self.nhole * ahole # area of all holes in Al fins
+        self.afin_empty = a_fin_chan + a_tes_space + aholes
         self.a_fin = np.pi*l_fin*(l_fin + (l_tes/2)) - self.afin_empty
         self.type_qp_eff = type_qp_eff
         
         
-        a_overlap = TES.A_overlap
         if type_qp_eff == 0: # Updated estimate with small ci, changing effective l_overlap
             if TES.con_type == 'modern':            
                 self.ci = n_fin*2*l_overlap
             elif TES.con_type == 'ellipse':
-                self.ci = 2*l_tes + (7.5e-6)*4 - n_fin*(6e-6)
+                #self.ci = 2*l_tes + (7.5e-6)*4 - n_fin*(6e-6)
+                self.ci = 2*l_tes + (self.TES.wempty_tes)*4 - n_fin*(self.TES.wempty_fin) # this is confusing? 
             self.set_qpabsb_eff() 
         if type_qp_eff == 1: # Updated estimate with same ci, changing effective l_overlap 
             self.ci = 2*l_tes

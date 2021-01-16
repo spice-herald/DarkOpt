@@ -4,7 +4,12 @@ from darkopt.materials._MaterialProperties import DetectorMaterial
 
 class Absorber:
 
-    def __init__(self, name, shape, height, width, w_safety):
+    def __init__(self, 
+                 name, 
+                 shape, 
+                 height, 
+                 width, 
+                 w_safety=3e-3):
         """
         Absorber Medium of Detector. Assumed in shape of cylinder. 
         
