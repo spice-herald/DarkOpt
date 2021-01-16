@@ -28,8 +28,16 @@ rcParams.update(nice_fonts)
 
 class Detector:
 
-    def __init__(self, absorber, QET, n_channel=1, passive=1,  
-                freqs=None):
+    def __init__(self, 
+                 absorber, 
+                 QET, 
+                 n_channel=1, 
+                 w_rail_main=6e-6, 
+                 w_railQET=4e-6, 
+                 bonding_pad_area=4.5e-8,
+                 freqs=None,
+                 passive=1,
+                ):
         
         """
         Parameters:
@@ -42,18 +50,29 @@ class Detector:
             related parameters
         n_channel : int, optional
             The number of channels in the detector
-        passive : int, optional
-            leftover parameter for testing purposes. 
-            leave set to 1
+        w_rail_main : float, optional
+            The width of the main bias rials. By
+            default this is set to 6e-6
+        w_railQET : float, optional
+            The width of the secondary bias lines
+            connecting the the QETs to the main rails.
+            by default it is set to 4e-6.
+        bonding_pad_area : float, optional
+            The area of passive Al used for the total
+            number of bonding pads needed. The default
+            is set to the area of 2 150um by 150um pads.
         freqs : Array, None-type, optional
             The array of frequencies to be used
             for noise modeling and energy resolution
             calculationg. If None, freqs will be set
             to freqs=np.linspace(.1, 1e6, int(1e5))
+        passive : int, optional
+            leftover parameter for testing purposes. 
+            leave set to 1
         """
         # Width of Main Bias Rails and QET Rails 
-        self._w_rail_main = 6e-6
-        self._w_railQET = 3e-6 
+        self._w_rail_main = w_rail_main
+        self._w_railQET = w_railQET
 
         #self._name = name
         self._absorber = absorber
@@ -61,26 +80,29 @@ class Detector:
         self._l_fin = QET.l_fin
         self._h_fin = QET.h_fin
         self._l_overlap = QET.TES.l_overlap
-        self._sigma_energy = 0
         self.QET = QET 
         tes = QET.TES
         if freqs is None:
             freqs = np.linspace(.1, 1e6, int(1e5))
         self.freqs = freqs
+        self.bonding_pad_area = bonding_pad_area
         self.eres = None
  
-
 
         # ------------- QET Fins ----------------------------------------------
         # Surface area covered by QET Fins 
         self._SA_active = n_channel * tes.nTES * QET.a_fin
 
         # Average area per cell, and corresponding length
-        a_cell = self._absorber.get_pattern_SA() / (n_channel * tes.nTES) # 1/2 channels on each side
+        a_cell = self._absorber.get_pattern_SA() / (n_channel * tes.nTES) # Assuming one sided detector
        
-        QET_block = (2*QET.l_fin + tes.l)*(2*QET.l_fin) 
+        # calculate length and width of QET
+        y_qet = 2 * QET.l_fin + tes.l # length QET 
+        x_qet = 2*QET.l_fin + 2*tes.wempty_tes+tes.w # width of QET
+        QET_block = y_qet * x_qet
+        
         if QET_block*tes.nTES > self._absorber.get_pattern_SA(): 
-            #print("----- ERROR: Invalid Design - QET cells don't fit.")
+            print("----- ERROR: Invalid Design - QET cells don't fit.")
             self._cells_fit = False
         else: self._cells_fit = True
         
@@ -88,28 +110,24 @@ class Detector:
         self._w_cell = np.sqrt(a_cell/2) # hypothetical optimum but only gives a couple percent decrease in passive Al
         self._h_cell = 2*self._w_cell
 
-        y_cell = 2 * QET.l_fin + tes.l # length QET 
         
-        if self._l_cell > y_cell:
+        
+        if self._l_cell > y_qet:
             #print("---- Not Close Packed")
             # Design is not close packed. Get passive Al/QET
-            a_passiveQET = self._l_cell * self._w_rail_main + (self._l_cell - y_cell) * self._w_railQET
+            a_passiveQET = self._l_cell * self._w_rail_main + (self._l_cell - y_qet) * self._w_railQET
             self._close_packed = False
         else:
             #print("---- Close Packed")
             # Design is close packed. No vertical rail to QET
-            x_cell = a_cell / y_cell
+            x_cell = a_cell / y_qet
             a_passiveQET = x_cell * self._w_rail_main
             self._close_packed = True
         
         tes_passive = a_passiveQET * n_channel * tes.nTES
         
         # Passive Al Rails for PD2 Like Layout
-        outer_ring = 2 * np.pi * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main
-        inner_ring = outer_ring / (np.sqrt(2))
-        inner_vertical_rail = 3 * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main * (1 - np.sqrt(2)/2.0)
-        outer_vertical_rail = (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main * (1 + np.sqrt(2)/2.0)
-
+        
         # Calc Alignment Mark Passive Area 
         one_alignment_window = 20772e-12 
         total_alignment = 5*one_alignment_window
@@ -123,11 +141,19 @@ class Detector:
         # 4. Inner Vertical Rail
         # 5. Outer Vertical Rail
         # 6. Alignment Marks
+        # 7. bonding pads
         if absorber._shape == "cylinder": # Indicates PD2-like Rail Layout
-            self._SA_passive = tes_passive + outer_ring + inner_ring + inner_vertical_rail + outer_vertical_rail + total_alignment
+            outer_ring = 2 * np.pi * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main
+            inner_ring = outer_ring / (np.sqrt(2))
+            inner_vertical_rail = 3 * (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main * (1 - np.sqrt(2)/2.0)
+            outer_vertical_rail = (self._absorber.get_R() - self._absorber.get_w_safety()) * self._w_rail_main * (1 + np.sqrt(2)/2.0)
+
+            self._SA_passive = tes_passive + outer_ring + inner_ring + inner_vertical_rail \
+                                + outer_vertical_rail + total_alignment + self.bonding_pad_area
         if absorber._shape == "square": # New Square Rail Layout Design
             if passive == 1:
-                self._SA_passive = tes_passive + 2*(self._absorber._width - 2*self._absorber._w_safety)*self._w_rail_main + 2*one_alignment_window
+                self._SA_passive = tes_passive + 2*(self._absorber._width - 2*self._absorber._w_safety)*self._w_rail_main \
+                                                + 2*one_alignment_window + self.bonding_pad_area
             elif passive == 0:            
                 self._SA_passive = 0 # FOR THEORETICAL UNDERSTANDING, DELETE  
         
@@ -432,10 +458,11 @@ def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
         Kaplan downconversion limits this to 52%
     eff_absb : float, optional
         W/Al transmition/trapping probability
-    wempty : float, optional
+    wempty_fin : float, optional
         ?
     wempty_tes : float, optional
         ?
+    w_overlap : float, optional
     type_qp_eff : int, optional
         how the efficiency should be calculated.
         0 : 'modern' estimate of overlap radius (small)
