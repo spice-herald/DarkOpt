@@ -48,12 +48,10 @@ class QET:
                           # in Al
         self.eff_absb = eff_absb
         # ---- QET Active Area ----
-
-        
         self.nhole = nhole_per_fin * n_fin 
         self.ahole = ahole 
-        # self.afin_empty = n_fin * l_fin * wempty_fin + 2 * l_tes * wempty_tes + self.nhole * ahole #Summers calc, missing
-        # area of TES itself
+        
+        
         ##################
         # Area of Al fin is calculated by calulating the 
         # area of the overal ellipse, then subracting the non
@@ -61,16 +59,17 @@ class QET:
         # cutouts, and the area of the TES + empty space around
         # the TES
         
+        # self.afin_empty = n_fin * l_fin * wempty_fin + 2 * l_tes * wempty_tes + self.nhole * ahole #Summers calc, missing
+        # area of TES itself
+        
         a_fin_chan = n_fin * l_fin * self.TES.wempty_fin # area of cutout channels seperating fins
         a_tes_space = l_tes*(w_tes + 2*self.TES.wempty_tes) # area of tes + empty space on either side
-        a_holes = self.nhole * ahole # area of all holes in Al fins
+        aholes = self.nhole * ahole # area of all holes in Al fins
         self.afin_empty = a_fin_chan + a_tes_space + aholes
-        #self._a_fin = np.pi * (self._l_fin ** 2) + 2 * self._l_fin * TES._l - self._afin_empty # SZ: bug?? 
         self.a_fin = np.pi*l_fin*(l_fin + (l_tes/2)) - self.afin_empty
         self.type_qp_eff = type_qp_eff
         
         
-        a_overlap = TES.A_overlap
         if type_qp_eff == 0: # Updated estimate with small ci, changing effective l_overlap
             if TES.con_type == 'modern':            
                 self.ci = n_fin*2*l_overlap
