@@ -85,7 +85,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     Rn can be made a free parameter buy changing the variable fixrn=False
     
     Note: if the overlap bounds are set too low, you will start to get unphysical
-    results. recommended that the lower bound be 5um. 
+    results. recommended that the lower bound be ~5um. 
     
     Parameters:
     -----------
