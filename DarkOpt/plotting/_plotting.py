@@ -69,10 +69,10 @@ def plot_ltes_vs_lfin(l_tes, l_fin, det, val='energy', figsize=(6.75, 4.455)):
                      rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
-                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc,
+                     wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=l_fin[jj], h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
-                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
-                       type_qp_eff=qet.type_qp_eff)
+                       eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
             det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
                             freqs=det.freqs)
             if val == 'energy':
@@ -112,7 +112,7 @@ def plot_ltes_vs_lfin(l_tes, l_fin, det, val='energy', figsize=(6.75, 4.455)):
     ax.set_xlabel("Al Fin Length [μm]")
     ax.set_ylabel('TES Length [μm]')
     
-    return fig, ax, res
+    return fig, ax
     
 
 def plot_ltes_vs_hfin(l_tes, h_fin, det, val='energy', figsize=(6.75, 4.455)):
@@ -159,10 +159,10 @@ def plot_ltes_vs_hfin(l_tes, h_fin, det, val='energy', figsize=(6.75, 4.455)):
                      rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
-                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc,
+                      wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=h_fin[jj], TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
-                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
-                       type_qp_eff=qet.type_qp_eff)
+                       eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
             det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
                             freqs=det.freqs)
             if val == 'energy':
@@ -248,10 +248,10 @@ def plot_ltes_vs_loverlap(l_tes, l_overlap, det, val='energy', figsize=(6.75, 4.
                      rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
-                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc,
+                      wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
-                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
-                       type_qp_eff=qet.type_qp_eff)
+                       eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
             det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
                             freqs=det.freqs)
             if val == 'energy':
@@ -339,10 +339,10 @@ def plot_loverlap_vs_lfin(l_overlap, l_fin, det, val='energy', figsize=(6.75, 4.
                      rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
-                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc,
+                      wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=l_fin[jj], h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
-                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
-                       type_qp_eff=qet.type_qp_eff)
+                       eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
             det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
                             freqs=det.freqs)
             if val == 'energy':
@@ -430,10 +430,10 @@ def plot_hfin_vs_lfin(h_fin, l_fin, det, val='energy', figsize=(6.75, 4.455)):
                      rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
-                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc,
+                      wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=l_fin[jj], h_fin=h_fin[ii], TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
-                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
-                       type_qp_eff=qet.type_qp_eff)
+                       eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
             det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
                             freqs=det.freqs)
             if val == 'energy':
@@ -522,10 +522,10 @@ def plot_loverlap_vs_hfin(l_overlap, h_fin, det, val='energy', figsize=(6.75, 4.
                      rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
-                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc,
+                      wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=h_fin[jj], TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
-                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
-                       type_qp_eff=qet.type_qp_eff)
+                       eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
             det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
                             freqs=det.freqs)
             if val == 'energy':
@@ -618,10 +618,10 @@ def plot_ltes_vs_tc(l_tes, tc, det, val='energy', figsize=(6.75, 4.455)):
                      rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=material, operating_point=tes.fOp,
-                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc,
+                      wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
-                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
-                       type_qp_eff=qet.type_qp_eff)
+                       eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
             det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
                             freqs=det.freqs)
             if val == 'energy':
@@ -713,10 +713,10 @@ def plot_lfin_vs_tc(l_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
                      rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=material, operating_point=tes.fOp,
-                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc,
+                      wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=l_fin[ii], h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
-                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
-                       type_qp_eff=qet.type_qp_eff)
+                       eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
             det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
                             freqs=det.freqs)
             if val == 'energy':
@@ -808,10 +808,10 @@ def plot_hfin_vs_tc(h_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
                      rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=material, operating_point=tes.fOp,
-                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc,
+                      wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=h_fin[ii], TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
-                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
-                       type_qp_eff=qet.type_qp_eff)
+                       eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
             det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
                             freqs=det.freqs)
             if val == 'energy':
@@ -904,10 +904,10 @@ def plot_loverlap_vs_tc(l_overlap, tc, det, val='energy', figsize=(6.75, 4.455))
                      rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload,
                      h=tes.h, veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                      con_type=tes.con_type, material=material, operating_point=tes.fOp,
-                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+                     alpha=tes.alpha, beta=tes.beta, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc,
+                      wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
-                       eff_absb=qet.eff_absb, wempty=qet.wempty, wempty_tes=qet.wempty_tes, 
-                       type_qp_eff=qet.type_qp_eff)
+                       eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
             det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
                             freqs=det.freqs)
             if val == 'energy':
