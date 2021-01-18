@@ -254,11 +254,11 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     print(f'Close Packed: {det1._close_packed}')
     
     if det1.QET.TES.is_phase_sep:
-        print('Design is phase seperated')
+        print('Design is phase separated')
     else:     
         phase_margin = (det1.QET.TES.max_phase_length - det1.QET.TES.l)/det1.QET.TES.l
-        print('---------------------------------')
-        print(f'Phase margin = {phase_margin*100:.1f} [%] (phase_sep_legth - tes_legnth)/tes_legnth)')
+        print(f'Phase margin = {phase_margin*100:.1f} [%] (phase_sep_length  - tes_length )/tes_length )')
+        print('---------------------------------\n\n')
     
     return det1, res['fun'], res['x']
     
