@@ -84,6 +84,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
             number of fins
     Rn can be made a free parameter buy changing the variable fixrn=False
     
+    Note: if the overlap bounds are set too low, you will start to get unphysical
+    results. recommended that the lower bound be ~5um. 
     
     Parameters:
     -----------
@@ -234,8 +236,9 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
         bnds = bounds
     else:
         x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0, rn])
-        bnds = bounds.append(rnbounds)
-    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False, fixrn), bounds=bounds )
+        bnds = bounds.copy()
+        bnds.append(rnbounds)
+    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False, fixrn), bounds=bnds )
     det1 = _loss_func(res['x'], absorb, tes, qet, det, None, True, fixrn)
         
     print(f"resolution: {det1.calc_res()*1e3:.1f} [meV]")
@@ -251,11 +254,11 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     print(f'Close Packed: {det1._close_packed}')
     
     if det1.QET.TES.is_phase_sep:
-        print('Design is phase seperated')
+        print('Design is phase separated')
     else:     
         phase_margin = (det1.QET.TES.max_phase_length - det1.QET.TES.l)/det1.QET.TES.l
-        print('---------------------------------')
-        print(f'Phase margin = {phase_margin*100:.1f} [%] (phase_sep_legth - tes_legnth)/tes_legnth)')
+        print(f'Phase margin = {phase_margin*100:.1f} [%] (phase_sep_length  - tes_length )/tes_length )')
+        print('---------------------------------\n\n')
     
     return det1, res['fun'], res['x']
     

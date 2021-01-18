@@ -39,9 +39,9 @@ class Absorber:
             self._SA_pattern = (self._width - 2*self._w_safety)**2
             self._SA = 2*self._SA_face + self._h*4*self._width  
         elif shape == "cube": 
-            self._volume = self._h**3
-            self._SA_face = self._h**2
-            self._SA_pattern = (self._h -2*self._w_safety)**2
+            self._volume = self._width **3
+            self._SA_face = self._width **2
+            self._SA_pattern = (self._width  -2*self._w_safety)**2
             self._SA = 6*self._SA_face
         else:
             print("Wrong Shape.")
