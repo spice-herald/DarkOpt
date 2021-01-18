@@ -236,8 +236,9 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
         bnds = bounds
     else:
         x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0, rn])
-        bnds = bounds.append(rnbounds)
-    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False, fixrn), bounds=bounds )
+        bnds = bounds.copy()
+        bnds.append(rnbounds)
+    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False, fixrn), bounds=bnds )
     det1 = _loss_func(res['x'], absorb, tes, qet, det, None, True, fixrn)
         
     print(f"resolution: {det1.calc_res()*1e3:.1f} [meV]")
