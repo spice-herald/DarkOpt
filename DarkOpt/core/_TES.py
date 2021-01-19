@@ -97,7 +97,6 @@ class TES:
         self.L = L_tot
         self.tload = tload
         self.l_c = l_c
-        self.w_c = w_c
         self.w_overlap_stem = w_overlap_stem
         self.l_overlap_pre_ellipse = l_overlap_pre_ellipse
         
