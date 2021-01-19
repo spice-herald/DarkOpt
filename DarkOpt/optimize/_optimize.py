@@ -19,7 +19,6 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False, fix_w
     if fix_w_overlap:
         l, l_overlap, l_fin, n_fin = params
         n_fin = int(n_fin)
-        rn = tes.rn
         w_overlap = tes.w_overlap
     else:
         l, l_overlap, l_fin, n_fin, w_overlap = params
@@ -30,7 +29,7 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False, fix_w
                     w_safety=absorber._w_safety)
     
     tes1 = TES(length=l, width=tes.w, l_overlap=l_overlap, n_fin=n_fin, sigma=tes.sigma,
-               rn=rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload, 
+               rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload, 
                w_overlap=w_overlap, w_fin_con=tes.w_fin_con, h=tes.h, 
                veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
@@ -257,7 +256,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     print(f"resolution: {det1.calc_res()*1e3:.1f} [meV]")
     print(f"TES Length = {res['x'][0]*1e6:.1f} [μm]")
     print(f"Overlap Legth = {res['x'][1]*1e6:.1f} [μm]")
-    print(f"Overlap Width = {det1.QET.TES.w_overlap*1e6:.1f} [μm]")
+    if det1.QET.TES.w_overlap is not None:
+        print(f"Overlap Width = {det1.QET.TES.w_overlap*1e6:.1f} [μm]")
     print(f"Fin Length = {res['x'][2]*1e6:.1f} [μm]")
     print(f"Fin Height = {det1.QET.h_fin*1e6:.1f} [μm]")
     print(f"N Fins = {int(res['x'][3])}")
