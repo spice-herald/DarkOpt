@@ -10,7 +10,8 @@ class TES:
     def __init__(self, length, width, l_overlap, n_fin, sigma, rn, rsh, rp, L_tot, tload=30e-3,
                  w_overlap=None, w_fin_con=2.5e-6, h=40e-9, veff_WAloverlap=0.45, veff_WFinCon=0.88, con_type='ellipse',
                  material=TESMaterial(), operating_point=0.3, alpha=None, beta=0, 
-                 wempty_fin=6e-6, wempty_tes=6e-6, n=5, Qp=0, t_mc=10e-3):
+                 wempty_fin=6e-6, wempty_tes=6e-6, n=5, Qp=0, t_mc=10e-3, l_c=5e-6, 
+                 w_overlap_stem=4e-6,  l_overlap_pre_ellipse=2e-6):
         
         """
         length : float
@@ -74,6 +75,14 @@ class TES:
             Parasitic heating [J]
         t_mc : float, optional
             Temperature of the mixing chamber [K]
+        l_c : float, optional
+            The length of the fin connector before it widens
+            to connect to the Al
+        w_overlap_stem : float, optional
+            The wider part of the conector at the Al [m]
+        l_overlap_pre_ellipse : float, optional
+            The length of the rectangular part of the overlap
+            region before the half ellipse [m]
         """
   
         self.h = h # thickness of the TES. limited by fabrication constraints + noise. same as matlab. 
@@ -87,6 +96,10 @@ class TES:
         self.rl = rsh + rp
         self.L = L_tot
         self.tload = tload
+        self.l_c = l_c
+        self.w_c = w_c
+        self.w_overlap_stem = w_overlap_stem
+        self.l_overlap_pre_ellipse = l_overlap_pre_ellipse
         
        
         # The next two shouldn't change (to avoid shorts)
@@ -135,14 +148,16 @@ class TES:
                 self.A_overlap = con_ellipse - 2*self.l*self.wempty_tes - self.wempty_fin*n_fin*l_overlap 
                 self.vol_WAl_overlap = self.A_overlap*self.h  
             else:
-                self.A_overlap = np.pi*self.w_overlap/2*self.l_overlap*n_fin
+                self.A_overlap = (np.pi*self.w_overlap/2*self.l_overlap +  \
+                                  self.l_overlap_pre_ellipse*self.w_overlap_stem)*n_fin
                 self.vol_WAl_overlap = self.A_overlap*self.h
            
         
         
         # re-estimate for new desing (PD4):
         #self.vol_WFinCon = n_fin*(19.040e-12+ 2*0.605e-12)*self.h  #### where do these number come from?????
-        self.vol_WFinCon = self.w_fin_con * self.wempty_tes * (self.n_fin - 2) * self.h # area of W part of fin connector
+        self.vol_WFinCon = (self.w_fin_con*self.l_c*(self.n_fin - 2) + \
+                            (self.wempty_tes-self.l_c)*w_overlap_stem)* self.h # area of W part of fin connector
                                                                                         # -2 because end fins don't have same 
                                                                                         # excess W
         # Volume of the W only portion of the fin connector
