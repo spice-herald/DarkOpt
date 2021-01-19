@@ -77,7 +77,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                                [20e-6, 300e-6],  
                                [2, 8] ],
                       fix_w_overlap=True,
-                      rnbounds = [50e-3, 2]):
+                      w_overlap_bounds = [4e-6, 50e-6]):
     """
     Function to minimize the energy resolution of a detector object. The following
     parameters are DOF: 
