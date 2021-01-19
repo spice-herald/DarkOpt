@@ -10,7 +10,7 @@ class TES:
     def __init__(self, length, width, l_overlap, n_fin, sigma, rn, rsh, rp, L_tot, tload=30e-3,
                  w_overlap=None, w_fin_con=2.5e-6, h=40e-9, veff_WAloverlap=0.45, veff_WFinCon=0.88, con_type='ellipse',
                  material=TESMaterial(), operating_point=0.3, alpha=None, beta=0, 
-                 wempty_fin=6e-6, wempty_tes=7.5e-6, n=5, Qp=0, t_mc=10e-3):
+                 wempty_fin=6e-6, wempty_tes=6e-6, n=5, Qp=0, t_mc=10e-3):
         
         """
         length : float
