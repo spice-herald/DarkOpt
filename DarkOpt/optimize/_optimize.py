@@ -10,18 +10,18 @@ from scipy.optimize import minimize
 #import matplotlib.colors as mcolors
 from matplotlib import cm  
 
-def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False, fixrn=True):
+def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False, fix_w_overlap=True):
     """
     Helper function to define the loss function to 
     minimize to optimize the detector parameters
     """
     
-    if fixrn:
+    if fix_w_overlap:
         l, l_overlap, l_fin, n_fin = params
         n_fin = int(n_fin)
-        rn = tes.rn
+        w_overlap = tes.w_overlap
     else:
-        l, l_overlap, l_fin, n_fin, rn = params
+        l, l_overlap, l_fin, n_fin, w_overlap = params
         n_fin = int(n_fin)
 
     abso1 = Absorber(name=absorber._name, shape=absorber._shape,
@@ -29,12 +29,14 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False, fixrn
                     w_safety=absorber._w_safety)
     
     tes1 = TES(length=l, width=tes.w, l_overlap=l_overlap, n_fin=n_fin, sigma=tes.sigma,
-               rn=rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload, 
-               w_overlap=tes.w_overlap, w_fin_con=tes.w_fin_con, h=tes.h, 
+               rn=tes.rn, rsh=tes.rsh, rp=tes.rp, L_tot=tes.L, tload=tes.tload, 
+               w_overlap=w_overlap, w_fin_con=tes.w_fin_con, h=tes.h, 
                veff_WAloverlap=tes.veff_WAloverlap, veff_WFinCon=tes.veff_WFinCon, 
                con_type=tes.con_type, material=tes.material, operating_point=tes.fOp,
                alpha=tes.alpha, beta=tes.beta, wempty_fin=tes.wempty_fin, 
-               wempty_tes=tes.wempty_tes, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc)
+               wempty_tes=tes.wempty_tes, n=tes.n, Qp=tes.Qp, t_mc=tes.t_mc,
+               w_overlap_stem=tes.w_overlap_stem,  l_c=tes.l_c, 
+               l_overlap_pre_ellipse=tes.l_overlap_pre_ellipse)
     
     qet1 = QET(l_fin=l_fin, h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                eff_absb=qet.eff_absb, nhole_per_fin=qet.nhole_per_fin, 
@@ -66,14 +68,15 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                       veff_WFinCon=0.88, con_type='ellipse', material=TESMaterial(), 
                       operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
                       t_mc=10e-3, ePQP=0.52, eff_absb = 1.22e-4, wempty_fin=6e-6, 
-                      wempty_tes=7.5e-6, type_qp_eff=0, freqs=None, w_rail_main=6e-6, 
-                      w_railQET=4e-6, bonding_pad_area=4.5e-8,
+                      wempty_tes=6e-6, type_qp_eff=0, freqs=None, w_rail_main=6e-6, 
+                      w_railQET=4e-6, bonding_pad_area=4.5e-8, l_c=5e-6, 
+                      w_overlap_stem=4e-6,  l_overlap_pre_ellipse=2e-6,
                       bounds = [[10e-6, 300e-6], 
                                [5e-6, 50e-6],
                                [20e-6, 300e-6],  
                                [2, 8] ],
-                      fixrn=True,
-                      rnbounds = [50e-3, 2]):
+                      fix_w_overlap=True,
+                      w_overlap_bounds = [4e-6, 50e-6]):
     """
     Function to minimize the energy resolution of a detector object. The following
     parameters are DOF: 
@@ -82,7 +85,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
             Al fin length
             Al fin height
             number of fins
-    Rn can be made a free parameter buy changing the variable fixrn=False
+    Rn can be made a free parameter buy changing the variable fix_w_overlap=False
     
     Note: if the overlap bounds are set too low, you will start to get unphysical
     results. recommended that the lower bound be ~5um. 
@@ -202,12 +205,20 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
         The area of passive Al used for the total
         number of bonding pads needed. The default
         is set to the area of 2 150um by 150um pads. [m^2]
-    fixrn : Bool, optional
-        If True, Rn is not a free parameter, if False
+    fix_w_overlap : Bool, optional
+        If True, w_overlap is not a free parameter, if False
         then it is allowed to vary.
-    rnbounds : list, array, optional
-        Lower and upper bounds for Rn if it is an 
+    w_overlap_bounds : list, array, optional
+        Lower and upper bounds for w_overlap if it is an 
         optimization param
+    l_c : float, optional
+        The length of the fin connector before it widens
+        to connect to the Al
+    w_overlap_stem : float, optional
+        The wider part of the conector at the Al [m]
+    l_overlap_pre_ellipse : float, optional
+        The length of the rectangular part of the overlap
+        region before the half ellipse [m]
         
     """
     
@@ -221,7 +232,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
               wempty_tes=wempty_tes, h=tes_h, veff_WAloverlap=veff_WAloverlap, 
               veff_WFinCon=veff_WFinCon, con_type=con_type, material=material, 
               operating_point=operating_point, alpha=alpha, beta=beta, n=n, 
-              Qp=Qp, t_mc=t_mc)
+              Qp=Qp, t_mc=t_mc, l_c=l_c, w_overlap_stem=w_overlap_stem,  
+              l_overlap_pre_ellipse=l_overlap_pre_ellipse)
     
     qet = QET(l_fin=l_fin0, h_fin=h_fin, TES=tes, ahole=ahole, ePQP=ePQP,
               eff_absb=eff_absb, nhole_per_fin=nhole_per_fin,  
@@ -231,19 +243,21 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                    w_railQET=w_railQET, bonding_pad_area=bonding_pad_area, 
                    n_channel=n_channel, freqs=freqs, passive=1)
     
-    if fixrn:
+    if fix_w_overlap:
         x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0])
         bnds = bounds
     else:
-        x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0, rn])
+        x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0, w_overlap])
         bnds = bounds.copy()
-        bnds.append(rnbounds)
-    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False, fixrn), bounds=bnds )
-    det1 = _loss_func(res['x'], absorb, tes, qet, det, None, True, fixrn)
+        bnds.append(w_overlap_bounds)
+    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False, fix_w_overlap), bounds=bnds )
+    det1 = _loss_func(res['x'], absorb, tes, qet, det, None, True, fix_w_overlap)
         
     print(f"resolution: {det1.calc_res()*1e3:.1f} [meV]")
     print(f"TES Length = {res['x'][0]*1e6:.1f} [μm]")
     print(f"Overlap Legth = {res['x'][1]*1e6:.1f} [μm]")
+    if det1.QET.TES.w_overlap is not None:
+        print(f"Overlap Width = {det1.QET.TES.w_overlap*1e6:.1f} [μm]")
     print(f"Fin Length = {res['x'][2]*1e6:.1f} [μm]")
     print(f"Fin Height = {det1.QET.h_fin*1e6:.1f} [μm]")
     print(f"N Fins = {int(res['x'][3])}")
