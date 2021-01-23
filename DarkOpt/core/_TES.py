@@ -147,7 +147,7 @@ class TES:
                 self.A_overlap = con_ellipse - 2*self.l*self.wempty_tes - self.wempty_fin*n_fin*l_overlap 
                 self.vol_WAl_overlap = self.A_overlap*self.h  
             else:
-                self.A_overlap = (np.pi*self.w_overlap/2*self.l_overlap +  \
+                self.A_overlap = ((np.pi*self.w_overlap/2*self.l_overlap)/2 +  \
                                   self.l_overlap_pre_ellipse*self.w_overlap_stem)*n_fin
                 self.vol_WAl_overlap = self.A_overlap*self.h
            
@@ -155,8 +155,9 @@ class TES:
         
         # re-estimate for new desing (PD4):
         #self.vol_WFinCon = n_fin*(19.040e-12+ 2*0.605e-12)*self.h  #### where do these number come from?????
-        self.vol_WFinCon = (self.w_fin_con*self.l_c*(self.n_fin - 2) + \
-                            (self.wempty_tes-self.l_c)*w_overlap_stem)* self.h # area of W part of fin connector
+        self.vol_WFinCon =  ((self.w_fin_con*self.l_c * (self.n_fin - 2) )+\
+                             (self.wempty_tes-self.l_c)*w_overlap_stem * \
+                             (self.n_fin - 2)) * self.h # area of W part of fin connector
                                                                                         # -2 because end fins don't have same 
                                                                                         # excess W
         # Volume of the W only portion of the fin connector

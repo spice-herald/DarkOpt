@@ -5,8 +5,9 @@ import scipy.constants as constants
 import qetpy as qp
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
-
 from matplotlib import cm  
+from matplotlib import patches
+
 
 nice_fonts = {
         # Use LaTeX to write all text
@@ -948,6 +949,10 @@ def plot_loverlap_vs_tc(l_overlap, tc, det, val='energy', figsize=(6.75, 4.455))
     ax.set_ylabel('W/Al Overlap [μm]')
     
     return fig, ax
+
+
+
+
 
 
     
