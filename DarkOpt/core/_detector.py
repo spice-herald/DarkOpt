@@ -377,6 +377,10 @@ class Detector:
             _plot_qet(self)
         else:
             print('Currently only supported for 4 fin designs')
+            
+    def calc_angles(self):
+        
+        return calc_angles(self)
 
 
 def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
