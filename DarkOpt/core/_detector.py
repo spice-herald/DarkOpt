@@ -379,8 +379,15 @@ class Detector:
             print('Currently only supported for 4 fin designs')
             
     def calc_angles(self):
-        
-        return calc_angles(self)
+        """
+        Calculated the angles of the line dividing the Al ellipse.
+        Currently only works with 4 fin desings
+        """
+        if self.QET.TES.n_fin == 4:
+            calc_angles(self)
+        else:
+            print('Currently only supported for 4 fin designs')
+       
 
 
 def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
