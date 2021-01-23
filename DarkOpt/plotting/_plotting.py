@@ -1,12 +1,14 @@
 from darkopt.core import TES, QET, Absorber, Detector
 from darkopt.materials._MaterialProperties import TESMaterial, DetectorMaterial, QETMaterial
+from darkopt.utils._utils import _line, arc_patch, calc_angles
 import numpy as np
 import scipy.constants as constants
 import qetpy as qp
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
-
 from matplotlib import cm  
+from matplotlib import patches
+
 
 nice_fonts = {
         # Use LaTeX to write all text
@@ -946,6 +948,125 @@ def plot_loverlap_vs_tc(l_overlap, tc, det, val='energy', figsize=(6.75, 4.455))
             zorder=10000, ms='8')
     ax.set_xlabel(r"$T_c$ [mK]")
     ax.set_ylabel('W/Al Overlap [μm]')
+    
+    return fig, ax
+
+
+
+def plot_qet(det, figsize=(6.75, 4.455)):
+    """
+    Function to plot the QET based on the optimum params. 
+    This is only a visual aid and not exact
+    
+    Parameters:
+    -----------
+    det : detector object
+    
+    figsize : tuple, optional
+        Size of figure to be drawn
+        
+    Returns:
+    --------
+    fig, ax : matplotlib Figure and Axes object
+    """
+    
+    fig, ax = plt.subplots(figsize=figsize)
+
+    qet = det.QET
+    tes = det.QET.TES
+    
+    b = qet.l_fin + tes.l/2
+    a = qet.l_fin + tes.wempty_tes + tes.w/2
+
+    # Al ellipse
+    e1 = patches.Ellipse((0, 0), a*2, b*2,
+                         angle=0, linewidth=2, fill=True, color='xkcd:blue',
+                         zorder=2) 
+    # remove white space
+    e2 = patches.Rectangle((-(tes.w+tes.wempty_tes*2)/2,-tes.l/2),
+                           tes.w+tes.wempty_tes*2, 
+                           tes.l,
+                           color='xkcd:white', zorder=4)
+    # TES line
+    e3 = patches.Rectangle((-tes.w/2,-tes.l/2), tes.w, 
+                           tes.l,
+                           color='xkcd:purple', zorder=4)
+
+    # W fin connector
+    x_ = tes.l_c + tes.w/2
+    qet_con_L = patches.Rectangle((-x_,-tes.w_fin_con/2), tes.l_c, 
+                           tes.w_fin_con,
+                           color='xkcd:purple', zorder=4)
+
+    # Wider part of W fin connector
+    x_ = tes.l_c + tes.w/2 + tes.l_overlap_pre_ellipse + tes.wempty_tes - tes.l_c  
+    y_ = tes.w_overlap_stem/2
+    l_ = tes.l_overlap_pre_ellipse + tes.wempty_tes - tes.l_c
+    qet_con_L_ = patches.Rectangle((-x_,-y_),  l_  , 
+                           tes.w_overlap_stem,
+                           color='xkcd:purple', zorder=4)
+    # W/Al overlap half ellipse
+    arc_L = arc_patch((-x_,0), tes.l_overlap, tes.w_overlap, 90, 270, zorder=4)
+
+    # W fin connector
+    qet_con_R = patches.Rectangle((tes.w/2,-tes.w_fin_con/2), tes.l_c, 
+                           tes.w_fin_con,
+                           color='xkcd:purple', zorder=4)
+    # Wider part of W fin connector
+    x_ = tes.w/2+ tes.l_c  
+    y_ = tes.w_overlap_stem/2
+    l_ = tes.l_overlap_pre_ellipse + tes.wempty_tes - tes.l_c
+    qet_con_R_ = patches.Rectangle((x_, -y_), l_, 
+                           tes.w_overlap_stem,
+                           color='xkcd:purple', zorder=4)
+    # W/Al overlap half ellipse
+    arc_R = arc_patch((x_+l_,0), -tes.l_overlap, tes.w_overlap, 90, 270, zorder=4)
+
+
+    # W fin connector
+    x_ = tes.w_overlap_stem/2
+    y_ = tes.l/2
+    w_ = tes.l_overlap_pre_ellipse + tes.wempty_tes - tes.l_c
+    qet_con_T_ = patches.Rectangle((-x_, y_), tes.w_overlap_stem, 
+                           tes.l_overlap_pre_ellipse,
+                           color='xkcd:purple', zorder=4)
+    # W/Al overlap half ellipse
+    arc_T = arc_patch((0,y_+tes.l_overlap_pre_ellipse), tes.w_overlap, tes.l_overlap, 0, 180, zorder=4)
+    
+    # W fin connector
+    x_ = tes.w_overlap_stem/2
+    y_ = tes.l/2 + tes.l_overlap_pre_ellipse
+    w_ = tes.l_overlap_pre_ellipse + tes.wempty_tes - tes.l_c
+    qet_con_B_ = patches.Rectangle((-x_, -y_), tes.w_overlap_stem, 
+                           tes.l_overlap_pre_ellipse,
+                           color='xkcd:purple', zorder=4)
+    # W/Al overlap half ellipse
+    arc_B = arc_patch((0,-y_), tes.w_overlap, -tes.l_overlap, 0, 180, zorder=4)
+
+    
+    
+    ax.add_patch(e1)
+    ax.add_patch(e2)
+    ax.add_patch(e3)
+    ax.add_patch(qet_con_L)
+    ax.add_patch(qet_con_L_)
+    ax.add_patch(arc_L)
+    ax.add_patch(qet_con_R)
+    ax.add_patch(qet_con_R_)
+    ax.add_patch(arc_R)
+
+    ax.add_patch(qet_con_T_)
+    ax.add_patch(arc_T)
+
+    ax.add_patch(qet_con_B_)
+    ax.add_patch(arc_B)
+
+    plt.plot(x, line(angle1, x), color='w', linewidth=4)
+    plt.plot(-x, line(360-angle1, x), color='w', linewidth=4)
+    ax.tick_params(which="both", direction="in", right=True, top=True, zorder=300)
+    ax.set_title('Sample QET')
+
+    ax.axis('equal')
     
     return fig, ax
 
