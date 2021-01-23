@@ -384,7 +384,7 @@ class Detector:
         Currently only works with 4 fin desings
         """
         if self.QET.TES.n_fin == 4:
-            calc_angles(self)
+            return calc_angles(self)
         else:
             print('Currently only supported for 4 fin designs')
        
