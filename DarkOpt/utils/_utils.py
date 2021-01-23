@@ -1,4 +1,4 @@
-from darkopt.core import Detector
+#from darkopt.core import Detector
 import matplotlib.patches as mpatches
 import numpy as np
 
