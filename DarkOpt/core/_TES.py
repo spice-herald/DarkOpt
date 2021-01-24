@@ -8,7 +8,7 @@ class TES:
     Class to store TES properties. Calculated the TES and fin connector volumes.
     """
     def __init__(self, length, width, l_overlap, n_fin, sigma, rn, rsh, rp, L_tot, tload=30e-3,
-                 w_overlap=None, w_fin_con=2.5e-6, h=40e-9, veff_WAloverlap=0.45, veff_WFinCon=0.88, con_type='ellipse',
+                 w_overlap='circle', w_fin_con=2.5e-6, h=40e-9, veff_WAloverlap=0.45, veff_WFinCon=0.88, con_type='ellipse',
                  material=TESMaterial(), operating_point=0.3, alpha=None, beta=0, 
                  wempty_fin=6e-6, wempty_tes=6e-6, n=5, Qp=0, t_mc=10e-3, l_c=5e-6, 
                  w_overlap_stem=4e-6,  l_overlap_pre_ellipse=2e-6):
@@ -37,9 +37,10 @@ class TES:
             The effective noise temperature for the passive johnson 
             noise from the shunt resistor and parasitic resistance
             in [Ohms]
-        w_overlap : float, optional
+        w_overlap : float, NoneType, string, optional
             Width of the W/Al overlap region (if None, a rough estimate is used
-            for area calulations) [m]
+            for area calulations) if 'circle', then w_overlap
+            is set to be 2*l_overlap to make a circle. [m]
         w_fin_con : float, optional
             Width of the W only part of the fin connector. Defaults
             to the standard width of the TES of 2.5e-6. [m]
@@ -111,6 +112,8 @@ class TES:
         
         self.foverlap_width = (2*length+2*self.width_no_Al+4*l_overlap-n_fin*self.Al_erase)/(2*length+2*self.width_no_Al+4*l_overlap) # what is this used for???? 
         self.l_overlap = l_overlap # length of W/Al overlap 
+        if w_overlap == 'circle':
+            w_overlap = 2*l_overlap
         self.w_overlap = w_overlap
         self.w_fin_con = w_fin_con
         self.n_fin = n_fin # number of fins to form QET  

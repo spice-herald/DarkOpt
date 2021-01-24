@@ -234,6 +234,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
               operating_point=operating_point, alpha=alpha, beta=beta, n=n, 
               Qp=Qp, t_mc=t_mc, l_c=l_c, w_overlap_stem=w_overlap_stem,  
               l_overlap_pre_ellipse=l_overlap_pre_ellipse)
+    tes.w_overlap = w_overlap #forces it to be 'circle' if this is chosen
     
     qet = QET(l_fin=l_fin0, h_fin=h_fin, TES=tes, ahole=ahole, ePQP=ePQP,
               eff_absb=eff_absb, nhole_per_fin=nhole_per_fin,  

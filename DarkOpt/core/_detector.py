@@ -367,14 +367,25 @@ class Detector:
         print("total_L =  %s" % self.QET.TES.L)
         print("------------------------------------------------\n")
         
-    def plot_qet(self):
+    def plot_qet(self, xlims=None, ylims=None, figsize=(6.75, 6.75)):
         """
         Plots visualization of QET design. Currently only
-        works for 4 fin design
+        works for 4 fin design.
+        
+        Note, in order to maintain an equal aspect ratio, 
+        the distance of the range of xlims and ylims must 
+        be the same.
+        
+        xlims : 2-tuple, optional
+            limits of plotting [um]
+        ylims : 2-tuple, optional
+            limits of plotting [um]
+        figsize : tuple, optional
+            Size of figure to be drawn
         """
         
         if self.QET.TES.n_fin == 4:
-            _plot_qet(self)
+            _plot_qet(self, xlims=xlims, ylims=ylims, figsize=figsize)
         else:
             print('Currently only supported for 4 fin designs')
             
@@ -520,15 +531,22 @@ def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
     
               
     
-def _plot_qet(det, figsize=(6.75, 4.455)):
+def _plot_qet(det, xlims=None, ylims=None, figsize=(6.75, 6.75)):
     """
     Function to plot the QET based on the optimum params. 
-    This is only a visual aid and not exact
+    This is only a visual aid and not exact. 
+    
+    Note, in order to maintain an equal aspect ratio, 
+    the distance of the range of xlims and ylims must 
+    be the same.
     
     Parameters:
     -----------
     det : detector object
-    
+    xlims : 2-tuple, optional
+        limits of plotting [m]
+    ylims : 2-tuple, optional
+        limits of plotting [m]
     figsize : tuple, optional
         Size of figure to be drawn
         
@@ -573,7 +591,9 @@ def _plot_qet(det, figsize=(6.75, 4.455)):
                            tes.w_overlap_stem,
                            color='xkcd:purple', zorder=4)
     # W/Al overlap half ellipse
-    arc_L = arc_patch((-x_,0), tes.l_overlap, tes.w_overlap, 90, 270, zorder=4)
+    arc_L = arc_patch((-x_,0), width=tes.l_overlap, 
+                      height=tes.w_overlap/2, theta1=90, 
+                      theta2=270, zorder=4)
 
     # W fin connector
     qet_con_R = patches.Rectangle((tes.w/2,-tes.w_fin_con/2), tes.l_c, 
@@ -587,7 +607,9 @@ def _plot_qet(det, figsize=(6.75, 4.455)):
                            tes.w_overlap_stem,
                            color='xkcd:purple', zorder=4)
     # W/Al overlap half ellipse
-    arc_R = arc_patch((x_+l_,0), -tes.l_overlap, tes.w_overlap, 90, 270, zorder=4)
+    arc_R = arc_patch((x_+l_,0), width=-tes.l_overlap, 
+                      height=tes.w_overlap/2, theta1=90, 
+                      theta2=270, zorder=4)
 
 
     # W fin connector
@@ -598,7 +620,9 @@ def _plot_qet(det, figsize=(6.75, 4.455)):
                            tes.l_overlap_pre_ellipse,
                            color='xkcd:purple', zorder=4)
     # W/Al overlap half ellipse
-    arc_T = arc_patch((0,y_+tes.l_overlap_pre_ellipse), tes.w_overlap, tes.l_overlap, 0, 180, zorder=4)
+    arc_T = arc_patch((0,y_+tes.l_overlap_pre_ellipse), width=tes.w_overlap/2, 
+                      height=tes.l_overlap, theta1=0, 
+                      theta2=180, zorder=4)
     
     # W fin connector
     x_ = tes.w_overlap_stem/2
@@ -608,7 +632,9 @@ def _plot_qet(det, figsize=(6.75, 4.455)):
                            tes.l_overlap_pre_ellipse,
                            color='xkcd:purple', zorder=4)
     # W/Al overlap half ellipse
-    arc_B = arc_patch((0,-y_), tes.w_overlap, -tes.l_overlap, 0, 180, zorder=4)
+    arc_B = arc_patch((0,-y_), width=tes.w_overlap/2,
+                      height=-tes.l_overlap, theta1=0, 
+                      theta2=180, zorder=4)
 
     
     
@@ -635,6 +661,13 @@ def _plot_qet(det, figsize=(6.75, 4.455)):
     ax.tick_params(which="both", direction="in", right=True, top=True, zorder=300)
     ax.set_title('Sample QET')
 
+   
+    
+    if xlims is not None:
+        ax.set_xlim(xlims)
+    if ylims is not None:
+        ax.set_ylim(ylims)
+        
     locs, labels = plt.xticks() 
  
     ax.set_xticklabels(np.round(locs*1e6, decimals=0));
@@ -643,7 +676,7 @@ def _plot_qet(det, figsize=(6.75, 4.455)):
 
     ax.set_yticklabels(np.round(locs*1e6, decimals=0));
 
-    ax.axis('equal')
+    ax.set_aspect('equal')
     
     ax.set_xlabel(r'$\mu$m')
     ax.set_ylabel(r'$\mu$m')
