@@ -531,7 +531,7 @@ def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
     
               
     
-def _plot_qet(det, xlims=None, ylims=None, figsize=(6.75, 4.455)):
+def _plot_qet(det, xlims=None, ylims=None, figsize=(6.75, 6.75)):
     """
     Function to plot the QET based on the optimum params. 
     This is only a visual aid and not exact. 
@@ -591,7 +591,9 @@ def _plot_qet(det, xlims=None, ylims=None, figsize=(6.75, 4.455)):
                            tes.w_overlap_stem,
                            color='xkcd:purple', zorder=4)
     # W/Al overlap half ellipse
-    arc_L = arc_patch((-x_,0), tes.l_overlap, tes.w_overlap, 90, 270, zorder=4)
+    arc_L = arc_patch((-x_,0), width=tes.l_overlap, 
+                      height=tes.w_overlap/2, theta1=90, 
+                      theta2=270, zorder=4)
 
     # W fin connector
     qet_con_R = patches.Rectangle((tes.w/2,-tes.w_fin_con/2), tes.l_c, 
@@ -605,7 +607,9 @@ def _plot_qet(det, xlims=None, ylims=None, figsize=(6.75, 4.455)):
                            tes.w_overlap_stem,
                            color='xkcd:purple', zorder=4)
     # W/Al overlap half ellipse
-    arc_R = arc_patch((x_+l_,0), -tes.l_overlap, tes.w_overlap, 90, 270, zorder=4)
+    arc_R = arc_patch((x_+l_,0), width=-tes.l_overlap, 
+                      height=tes.w_overlap/2, theta1=90, 
+                      theta2=270, zorder=4)
 
 
     # W fin connector
@@ -616,7 +620,9 @@ def _plot_qet(det, xlims=None, ylims=None, figsize=(6.75, 4.455)):
                            tes.l_overlap_pre_ellipse,
                            color='xkcd:purple', zorder=4)
     # W/Al overlap half ellipse
-    arc_T = arc_patch((0,y_+tes.l_overlap_pre_ellipse), tes.w_overlap, tes.l_overlap, 0, 180, zorder=4)
+    arc_T = arc_patch((0,y_+tes.l_overlap_pre_ellipse), width=tes.w_overlap/2, 
+                      height=tes.l_overlap, theta1=0, 
+                      theta2=180, zorder=4)
     
     # W fin connector
     x_ = tes.w_overlap_stem/2
@@ -626,7 +632,9 @@ def _plot_qet(det, xlims=None, ylims=None, figsize=(6.75, 4.455)):
                            tes.l_overlap_pre_ellipse,
                            color='xkcd:purple', zorder=4)
     # W/Al overlap half ellipse
-    arc_B = arc_patch((0,-y_), tes.w_overlap, -tes.l_overlap, 0, 180, zorder=4)
+    arc_B = arc_patch((0,-y_), width=tes.w_overlap/2,
+                      height=-tes.l_overlap, theta1=0, 
+                      theta2=180, zorder=4)
 
     
     
