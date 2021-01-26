@@ -23,11 +23,7 @@ This package requires python 3.6 or greater. A current version of Anaconda3 shou
 * 
 * 
 
-####	Current issues:
 
-- Total load resistances/temperatures in electronics 
-- Expoential overflow in simulated_noise line 131.
-- Correct placement of squares etc. in formulae in simulated noise? Index manipulations maybe wrong also?
 
 ####	Work needed:
  
