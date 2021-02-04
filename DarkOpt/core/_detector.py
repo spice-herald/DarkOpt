@@ -365,7 +365,7 @@ class Detector:
         print(f'fraction total Al cov =  {self._fSA_qpabsorb}')
         print("fSA_passive =  %s" % self.fSA_passive)
         print("Alignment_area =  %s" % self.total_alignment)
-        print("fSA_QPabsb =  %s" % self._fSA_qpabsorb)
+        #print("fSA_QPabsb =  %s" % self._fSA_qpabsorb)
         print("ePcollect =  %s" % self._ePcollect)
         print("tau_pabsb =  %s" % self._t_pabsb)
         print("w_pabsb =  %s" % (1/self._t_pabsb))
