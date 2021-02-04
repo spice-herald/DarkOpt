@@ -41,6 +41,7 @@ class Detector:
                  bonding_pad_area=4.5e-8,
                  freqs=None,
                  passive=1,
+                 equal_spaced=True,
                 ):
         
         """
@@ -73,6 +74,14 @@ class Detector:
         passive : int, optional
             leftover parameter for testing purposes. 
             leave set to 1
+        equal_spaced : bool, optional
+            If True, the QETs are spread out evenly 
+            accross the instrumented surface area
+            of the detector. If False, the QETs
+            are spread out equally in one dimension, 
+            but not in the other. (ie, the secondary
+            bias rails are not used so a sparse design
+            can still be close packed)
         """
         # Width of Main Bias Rails and QET Rails 
         self.w_rail_main = w_rail_main
@@ -91,6 +100,7 @@ class Detector:
         self.freqs = freqs
         self.bonding_pad_area = bonding_pad_area
         self.eres = None
+        self.equal_spaced = equal_spaced
  
 
         # ------------- QET Fins ----------------------------------------------
@@ -114,20 +124,21 @@ class Detector:
         self._w_cell = np.sqrt(a_cell/2) # hypothetical optimum but only gives a couple percent decrease in passive Al
         self._h_cell = 2*self._w_cell
 
-        
-        
-        if self._l_cell > y_qet:
-            #print("---- Not Close Packed")
-            # Design is not close packed. Get passive Al/QET
-            a_passiveQET = self._l_cell * self.w_rail_main + (self._l_cell - y_qet) * self.w_railQET
-            self._close_packed = False
+        if self.equal_spaced:
+            if self._l_cell > y_qet:
+                #print("---- Not Close Packed")
+                # Design is not close packed. Get passive Al/QET
+                a_passiveQET = self._l_cell * self.w_rail_main + (self._l_cell - y_qet) * self.w_railQET
+                self._close_packed = False
+            else:
+                #print("---- Close Packed")
+                # Design is close packed. No vertical rail to QET
+                x_cell = a_cell / y_qet
+                a_passiveQET = x_cell * self.w_rail_main
+                self._close_packed = True
         else:
-            #print("---- Close Packed")
-            # Design is close packed. No vertical rail to QET
-            x_cell = a_cell / y_qet
-            a_passiveQET = x_cell * self.w_rail_main
-            self._close_packed = True
-        
+            a_passiveQET = self._l_cell * self.w_rail_main
+
         tes_passive = a_passiveQET * n_channel * tes.nTES
         
         # Passive Al Rails for PD2 Like Layout
