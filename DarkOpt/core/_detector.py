@@ -376,6 +376,7 @@ class Detector:
         print("nKpb =  %s" % self._nkpb)
         print("NQET.TES =  %s" % self.QET.TES.nTES)
         print("total_L =  %s" % self.QET.TES.L)
+        print(f"equal spaced = {self.equal_spaced}")
         print("------------------------------------------------\n")
         
     def plot_qet(self, xlims=None, ylims=None, figsize=(6.75, 6.75)):
@@ -419,7 +420,7 @@ def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
                     zeta_W_fin=0.88, con_type='ellipse', material=TESMaterial(), 
                     operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
                     t_mc=10e-3, ePQP=0.52, eff_absb = 1.22e-4, wempty=6e-6, 
-                    wempty_tes=7.5e-6, type_qp_eff=0, freqs=None):
+                    wempty_tes=7.5e-6, type_qp_eff=0, freqs=None, equal_spaced=True):
     """
     Helper function to create Absorber, TES, QET, and Detector 
     objects. A detector object is returned
@@ -518,7 +519,14 @@ def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
     freqs : array-like
         frequencies used for plotting noise and 
         to calculate the expected energy resolution
-        
+    equal_spaced : bool, optional
+            If True, the QETs are spread out evenly 
+            accross the instrumented surface area
+            of the detector. If False, the QETs
+            are spread out equally in one dimension, 
+            but not in the other. (ie, the secondary
+            bias rails are not used so a sparse design
+            can still be close packed)  
     """
     
     absorb = Absorber(name=abs_type, shape=abs_shape, 
@@ -536,7 +544,7 @@ def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
               type_qp_eff=type_qp_eff)
     
     det = Detector(absorber=absorb, QET=qet, passive=1, 
-                   n_channel=n_channel, freqs=freqs)
+                   n_channel=n_channel, freqs=freqs, equal_spaced=equal_spaced)
     
     return det
     
