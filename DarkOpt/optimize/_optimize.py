@@ -276,7 +276,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     print(f'Absolute phonon collection energy efficiency = {det1._eEabsb*100:.2f} [%]')
     print(f'Number of TESs = {det1.QET.TES.nTES}')
     print(f'Rn = {det1.QET.TES.rn*1e3:.1f} [mOhms]')
-    if not det1.equal_spaced:
+    if det1.equal_spaced:
         print(f'Close Packed: {det1._close_packed}')
     else:
         print(f'QETs are NOT equally spaced on surface')
