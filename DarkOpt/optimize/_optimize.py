@@ -44,7 +44,7 @@ def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False, fix_w
     
     det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
                     w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
-                    freqs=det.freqs )
+                    freqs=det.freqs, equal_spaced=det.equal_spaced )
     if rtnDet:
         return det1
     else:
@@ -76,7 +76,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                                [20e-6, 300e-6],  
                                [2, 8] ],
                       fix_w_overlap=True,
-                      w_overlap_bounds = [4e-6, 50e-6]):
+                      w_overlap_bounds = [4e-6, 50e-6], 
+                      equal_spaced=True):
     """
     Function to minimize the energy resolution of a detector object. The following
     parameters are DOF: 
@@ -219,6 +220,14 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     l_overlap_pre_ellipse : float, optional
         The length of the rectangular part of the overlap
         region before the half ellipse [m]
+    equal_spaced : bool, optional
+            If True, the QETs are spread out evenly 
+            accross the instrumented surface area
+            of the detector. If False, the QETs
+            are spread out equally in one dimension, 
+            but not in the other. (ie, the secondary
+            bias rails are not used so a sparse design
+            can still be close packed) 
         
     """
     
@@ -242,7 +251,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     
     det = Detector(absorber=absorb, QET=qet, w_rail_main=w_rail_main, 
                    w_railQET=w_railQET, bonding_pad_area=bonding_pad_area, 
-                   n_channel=n_channel, freqs=freqs, passive=1)
+                   n_channel=n_channel, freqs=freqs, passive=1, 
+                   equal_spaced=equal_spaced)
     
     if fix_w_overlap:
         x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0])
@@ -266,7 +276,11 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
     print(f'Absolute phonon collection energy efficiency = {det1._eEabsb*100:.2f} [%]')
     print(f'Number of TESs = {det1.QET.TES.nTES}')
     print(f'Rn = {det1.QET.TES.rn*1e3:.1f} [mOhms]')
-    print(f'Close Packed: {det1._close_packed}')
+    if not det1.equal_spaced:
+        print(f'Close Packed: {det1._close_packed}')
+    else:
+        print(f'QETs are NOT equally spaced on surface')
+    
     
     if det1.QET.TES.is_phase_sep:
         print('Design is phase separated')
