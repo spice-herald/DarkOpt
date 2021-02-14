@@ -77,7 +77,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                                [2, 8] ],
                       fix_w_overlap=True,
                       w_overlap_bounds = [4e-6, 50e-6], 
-                      equal_spaced=True):
+                      equal_spaced=True, 
+                      verbose=True):
     """
     Function to minimize the energy resolution of a detector object. The following
     parameters are DOF: 
@@ -228,7 +229,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
             but not in the other. (ie, the secondary
             bias rails are not used so a sparse design
             can still be close packed) 
-        
+    verbose : bool, optional
+        If True, the optimum params are printed
     """
     
     absorb = Absorber(name=abs_type, shape=abs_shape, 
@@ -263,35 +265,36 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
         bnds.append(w_overlap_bounds)
     res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False, fix_w_overlap), bounds=bnds )
     det1 = _loss_func(res['x'], absorb, tes, qet, det, None, True, fix_w_overlap)
-        
-    print(f"resolution: {det1.calc_res()*1e3:.1f} [meV]")
-    print(f"TES Length = {res['x'][0]*1e6:.1f} [μm]")
-    print(f"Overlap Legth = {res['x'][1]*1e6:.1f} [μm]")
-    if det1.QET.TES.w_overlap is not None:
-        print(f"Overlap Width = {det1.QET.TES.w_overlap*1e6:.1f} [μm]")
-    print(f"Fin Length = {res['x'][2]*1e6:.1f} [μm]")
-    print(f"Fin Height = {det1.QET.h_fin*1e6:.1f} [μm]")
-    print(f"N Fins = {int(res['x'][3])}")
-    print(f'Total Al surface coverage = {det1._fSA_qpabsorb*100:.3f} [%]')
-    print(f'percent active Al = {det1.fSA_active*100:.3f} [%]')
-    print(f'percent passive Al = {det1.fSA_passive*100:.3f} [%]')
-    print(f'TES response time τ-  = {det1.QET.TES.taup_m*1e6:.2f} [μs]')
-    print(f'Phonon collection time constant = {det1._t_pabsb*1e6:.2f} [μs]')
-    print(f'Absolute phonon collection energy efficiency = {det1._eEabsb*100:.2f} [%]')
-    print(f'Number of TESs = {det1.QET.TES.nTES}')
-    print(f'Rn = {det1.QET.TES.rn*1e3:.1f} [mOhms]')
-    if det1.equal_spaced:
-        print(f'Close Packed: {det1._close_packed}')
-    else:
-        print(f'QETs are NOT equally spaced on surface')
     
-    
-    if det1.QET.TES.is_phase_sep:
-        print('Design is phase separated')
-    else:     
-        phase_margin = (det1.QET.TES.max_phase_length - det1.QET.TES.l)/det1.QET.TES.l
-        print(f'Phase margin = {phase_margin*100:.1f} [%] (phase_sep_length  - tes_length )/tes_length )')
-        print('---------------------------------\n\n')
+    if verbose:
+        print(f"resolution: {det1.calc_res()*1e3:.1f} [meV]")
+        print(f"TES Length = {res['x'][0]*1e6:.1f} [μm]")
+        print(f"Overlap Legth = {res['x'][1]*1e6:.1f} [μm]")
+        if det1.QET.TES.w_overlap is not None:
+            print(f"Overlap Width = {det1.QET.TES.w_overlap*1e6:.1f} [μm]")
+        print(f"Fin Length = {res['x'][2]*1e6:.1f} [μm]")
+        print(f"Fin Height = {det1.QET.h_fin*1e6:.1f} [μm]")
+        print(f"N Fins = {int(res['x'][3])}")
+        print(f'Total Al surface coverage = {det1._fSA_qpabsorb*100:.3f} [%]')
+        print(f'percent active Al = {det1.fSA_active*100:.3f} [%]')
+        print(f'percent passive Al = {det1.fSA_passive*100:.3f} [%]')
+        print(f'TES response time τ-  = {det1.QET.TES.taup_m*1e6:.2f} [μs]')
+        print(f'Phonon collection time constant = {det1._t_pabsb*1e6:.2f} [μs]')
+        print(f'Absolute phonon collection energy efficiency = {det1._eEabsb*100:.2f} [%]')
+        print(f'Number of TESs = {det1.QET.TES.nTES}')
+        print(f'Rn = {det1.QET.TES.rn*1e3:.1f} [mOhms]')
+        if det1.equal_spaced:
+            print(f'Close Packed: {det1._close_packed}')
+        else:
+            print(f'QETs are NOT equally spaced on surface')
+
+
+        if det1.QET.TES.is_phase_sep:
+            print('Design is phase separated')
+        else:     
+            phase_margin = (det1.QET.TES.max_phase_length - det1.QET.TES.l)/det1.QET.TES.l
+            print(f'Phase margin = {phase_margin*100:.1f} [%] (phase_sep_length  - tes_length )/tes_length )')
+            print('---------------------------------\n\n')
     
     return det1, res['fun'], res['x']
     
