@@ -41,6 +41,7 @@ class Detector:
                  bonding_pad_area=4.5e-8,
                  freqs=None,
                  passive=1,
+                 equal_spaced=True,
                 ):
         
         """
@@ -73,6 +74,14 @@ class Detector:
         passive : int, optional
             leftover parameter for testing purposes. 
             leave set to 1
+        equal_spaced : bool, optional
+            If True, the QETs are spread out evenly 
+            accross the instrumented surface area
+            of the detector. If False, the QETs
+            are spread out equally in one dimension, 
+            but not in the other. (ie, the secondary
+            bias rails are not used so a sparse design
+            can still be close packed)
         """
         # Width of Main Bias Rails and QET Rails 
         self.w_rail_main = w_rail_main
@@ -91,6 +100,7 @@ class Detector:
         self.freqs = freqs
         self.bonding_pad_area = bonding_pad_area
         self.eres = None
+        self.equal_spaced = equal_spaced
  
 
         # ------------- QET Fins ----------------------------------------------
@@ -114,20 +124,21 @@ class Detector:
         self._w_cell = np.sqrt(a_cell/2) # hypothetical optimum but only gives a couple percent decrease in passive Al
         self._h_cell = 2*self._w_cell
 
-        
-        
-        if self._l_cell > y_qet:
-            #print("---- Not Close Packed")
-            # Design is not close packed. Get passive Al/QET
-            a_passiveQET = self._l_cell * self.w_rail_main + (self._l_cell - y_qet) * self.w_railQET
-            self._close_packed = False
+        if self.equal_spaced:
+            if self._l_cell > y_qet:
+                #print("---- Not Close Packed")
+                # Design is not close packed. Get passive Al/QET
+                a_passiveQET = self._l_cell * self.w_rail_main + (self._l_cell - y_qet) * self.w_railQET
+                self._close_packed = False
+            else:
+                #print("---- Close Packed")
+                # Design is close packed. No vertical rail to QET
+                x_cell = a_cell / y_qet
+                a_passiveQET = x_qet*1.1* self.w_rail_main
+                self._close_packed = True
         else:
-            #print("---- Close Packed")
-            # Design is close packed. No vertical rail to QET
-            x_cell = a_cell / y_qet
-            a_passiveQET = x_cell * self.w_rail_main
-            self._close_packed = True
-        
+            a_passiveQET = self._l_cell * self.w_rail_main
+
         tes_passive = a_passiveQET * n_channel * tes.nTES
         
         # Passive Al Rails for PD2 Like Layout
@@ -354,7 +365,7 @@ class Detector:
         print(f'fraction total Al cov =  {self._fSA_qpabsorb}')
         print("fSA_passive =  %s" % self.fSA_passive)
         print("Alignment_area =  %s" % self.total_alignment)
-        print("fSA_QPabsb =  %s" % self._fSA_qpabsorb)
+        #print("fSA_QPabsb =  %s" % self._fSA_qpabsorb)
         print("ePcollect =  %s" % self._ePcollect)
         print("tau_pabsb =  %s" % self._t_pabsb)
         print("w_pabsb =  %s" % (1/self._t_pabsb))
@@ -365,6 +376,7 @@ class Detector:
         print("nKpb =  %s" % self._nkpb)
         print("NQET.TES =  %s" % self.QET.TES.nTES)
         print("total_L =  %s" % self.QET.TES.L)
+        print(f"equal spaced = {self.equal_spaced}")
         print("------------------------------------------------\n")
         
     def plot_qet(self, xlims=None, ylims=None, figsize=(6.75, 6.75)):
@@ -408,7 +420,7 @@ def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
                     zeta_W_fin=0.88, con_type='ellipse', material=TESMaterial(), 
                     operating_point=0.45, alpha=None, beta=0,  n=5, Qp=0, 
                     t_mc=10e-3, ePQP=0.52, eff_absb = 1.22e-4, wempty=6e-6, 
-                    wempty_tes=7.5e-6, type_qp_eff=0, freqs=None):
+                    wempty_tes=7.5e-6, type_qp_eff=0, freqs=None, equal_spaced=True):
     """
     Helper function to create Absorber, TES, QET, and Detector 
     objects. A detector object is returned
@@ -507,7 +519,14 @@ def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
     freqs : array-like
         frequencies used for plotting noise and 
         to calculate the expected energy resolution
-        
+    equal_spaced : bool, optional
+            If True, the QETs are spread out evenly 
+            accross the instrumented surface area
+            of the detector. If False, the QETs
+            are spread out equally in one dimension, 
+            but not in the other. (ie, the secondary
+            bias rails are not used so a sparse design
+            can still be close packed)  
     """
     
     absorb = Absorber(name=abs_type, shape=abs_shape, 
@@ -525,7 +544,7 @@ def create_detector(tes_length, tes_l_overlap, rn,  l_fin, h_fin, n_fin,
               type_qp_eff=type_qp_eff)
     
     det = Detector(absorber=absorb, QET=qet, passive=1, 
-                   n_channel=n_channel, freqs=freqs)
+                   n_channel=n_channel, freqs=freqs, equal_spaced=equal_spaced)
     
     return det
     
