@@ -10,19 +10,18 @@ from scipy.optimize import minimize
 #import matplotlib.colors as mcolors
 from matplotlib import cm  
 
-def _loss_func(params, absorber, tes, qet, det, per_Al=None, rtnDet=False, fix_w_overlap=True):
+def _loss_func(params, n_fin, absorber, tes, qet, det, per_Al=None, rtnDet=False, fix_w_overlap=True):
     """
     Helper function to define the loss function to 
     minimize to optimize the detector parameters
     """
     
     if fix_w_overlap:
-        l, l_overlap, l_fin, n_fin = params
-        n_fin = int(n_fin)
+        l, l_overlap, l_fin = params
         w_overlap = tes.w_overlap
     else:
-        l, l_overlap, l_fin, n_fin, w_overlap = params
-        n_fin = int(n_fin)
+        l, l_overlap, l_fin, w_overlap = params
+
 
     abso1 = Absorber(name=absorber._name, shape=absorber._shape,
                     height=absorber._h, width=absorber._width,
@@ -255,16 +254,16 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                    w_railQET=w_railQET, bonding_pad_area=bonding_pad_area, 
                    n_channel=n_channel, freqs=freqs, passive=1, 
                    equal_spaced=equal_spaced)
-    
+
     if fix_w_overlap:
-        x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0])
-        bnds = bounds
+        x0 = np.array([tes_length0, tes_l_overlap0, l_fin0])
+        bnds = bounds[:-1]
     else:
-        x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, n_fin0, w_overlap])
-        bnds = bounds.copy()
+        x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, w_overlap])
+        bnds = bounds[:-1].copy()
         bnds.append(w_overlap_bounds)
-    res = minimize(_loss_func, x0, args=(absorb, tes, qet, det, per_Al, False, fix_w_overlap), bounds=bnds )
-    det1 = _loss_func(res['x'], absorb, tes, qet, det, None, True, fix_w_overlap)
+    res = minimize(_loss_func, x0, args=(n_fin0, absorb, tes, qet, det, per_Al, False, fix_w_overlap), bounds=bnds )
+    det1 = _loss_func(res['x'],n_fin0, absorb, tes, qet, det, None, True, fix_w_overlap)
     
     if verbose:
         print(f"resolution: {det1.calc_res()*1e3:.1f} [meV]")

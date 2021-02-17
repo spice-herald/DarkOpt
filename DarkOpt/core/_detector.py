@@ -134,10 +134,10 @@ class Detector:
                 #print("---- Close Packed")
                 # Design is close packed. No vertical rail to QET
                 x_cell = a_cell / y_qet
-                a_passiveQET = x_qet*1.1* self.w_rail_main
+                a_passiveQET = x_cell* self.w_rail_main
                 self._close_packed = True
         else:
-            a_passiveQET = self._l_cell * self.w_rail_main
+            a_passiveQET = x_qet*1.1 * self.w_rail_main
 
         tes_passive = a_passiveQET * n_channel * tes.nTES
         
