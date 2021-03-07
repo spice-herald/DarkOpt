@@ -257,10 +257,10 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
 
     if fix_w_overlap:
         x0 = np.array([tes_length0, tes_l_overlap0, l_fin0])
-        bnds = bounds[:-1]
+        bnds = bounds
     else:
         x0 = np.array([tes_length0, tes_l_overlap0, l_fin0, w_overlap])
-        bnds = bounds[:-1].copy()
+        bnds = bounds.copy()
         bnds.append(w_overlap_bounds)
     res = minimize(_loss_func, x0, args=(n_fin0, absorb, tes, qet, det, per_Al, False, fix_w_overlap), bounds=bnds )
     det1 = _loss_func(res['x'],n_fin0, absorb, tes, qet, det, None, True, fix_w_overlap)
@@ -295,5 +295,5 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
             print(f'Phase margin = {phase_margin*100:.1f} [%] (phase_sep_length  - tes_length )/tes_length )')
             print('---------------------------------\n\n')
     
-    return det1, res['fun'], res['x']
+    return det1, res['fun'], res['x'], res
     
