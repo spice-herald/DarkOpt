@@ -74,8 +74,9 @@ def plot_ltes_vs_lfin(l_tes, l_fin, det, val='energy', figsize=(6.75, 4.455)):
                      wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=l_fin[jj], h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                        eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
-            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
-                            freqs=det.freqs)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
+                            w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
+                            freqs=det.freqs , equal_spaced=det.equal_spaced)
             if val == 'energy':
                 res[ii,jj] = det1.calc_res()
             elif val == 'eff':
@@ -164,8 +165,9 @@ def plot_ltes_vs_hfin(l_tes, h_fin, det, val='energy', figsize=(6.75, 4.455)):
                       wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=h_fin[jj], TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                        eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
-            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
-                            freqs=det.freqs)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
+                            w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
+                            freqs=det.freqs , equal_spaced=det.equal_spaced)
             if val == 'energy':
                 res[ii,jj] = det1.calc_res()
             elif val == 'eff':
@@ -253,8 +255,9 @@ def plot_ltes_vs_loverlap(l_tes, l_overlap, det, val='energy', figsize=(6.75, 4.
                       wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                        eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
-            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
-                            freqs=det.freqs)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
+                            w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
+                            freqs=det.freqs , equal_spaced=det.equal_spaced)
             if val == 'energy':
                 res[ii,jj] = det1.calc_res()
             elif val == 'eff':
@@ -344,8 +347,9 @@ def plot_loverlap_vs_lfin(l_overlap, l_fin, det, val='energy', figsize=(6.75, 4.
                       wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=l_fin[jj], h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                        eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
-            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
-                            freqs=det.freqs)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
+                            w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
+                            freqs=det.freqs , equal_spaced=det.equal_spaced)
             if val == 'energy':
                 res[ii,jj] = det1.calc_res()
             elif val == 'eff':
@@ -435,8 +439,9 @@ def plot_hfin_vs_lfin(h_fin, l_fin, det, val='energy', figsize=(6.75, 4.455)):
                       wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=l_fin[jj], h_fin=h_fin[ii], TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                        eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
-            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
-                            freqs=det.freqs)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
+                            w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
+                            freqs=det.freqs , equal_spaced=det.equal_spaced)
             if val == 'energy':
                 res[ii,jj] = det1.calc_res()
             elif val == 'eff':
@@ -527,8 +532,9 @@ def plot_loverlap_vs_hfin(l_overlap, h_fin, det, val='energy', figsize=(6.75, 4.
                       wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=h_fin[jj], TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                        eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
-            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
-                            freqs=det.freqs)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
+                            w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
+                            freqs=det.freqs , equal_spaced=det.equal_spaced)
             if val == 'energy':
                 res[ii,jj] = det1.calc_res()
             elif val == 'eff':
@@ -623,8 +629,9 @@ def plot_ltes_vs_tc(l_tes, tc, det, val='energy', figsize=(6.75, 4.455)):
                       wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                        eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
-            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
-                            freqs=det.freqs)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
+                            w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
+                            freqs=det.freqs , equal_spaced=det.equal_spaced)
             if val == 'energy':
                 res[ii,jj] = det1.calc_res()
             elif val == 'eff':
@@ -718,8 +725,9 @@ def plot_lfin_vs_tc(l_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
                       wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=l_fin[ii], h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                        eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
-            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
-                            freqs=det.freqs)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
+                            w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
+                            freqs=det.freqs , equal_spaced=det.equal_spaced)
             if val == 'energy':
                 res[ii,jj] = det1.calc_res()
             elif val == 'eff':
@@ -813,8 +821,9 @@ def plot_hfin_vs_tc(h_fin, tc, det, val='energy', figsize=(6.75, 4.455)):
                       wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=h_fin[ii], TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                        eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
-            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
-                            freqs=det.freqs)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
+                            w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
+                            freqs=det.freqs , equal_spaced=det.equal_spaced)
             if val == 'energy':
                 res[ii,jj] = det1.calc_res()
             elif val == 'eff':
@@ -909,8 +918,9 @@ def plot_loverlap_vs_tc(l_overlap, tc, det, val='energy', figsize=(6.75, 4.455))
                       wempty_fin=tes.wempty_fin, wempty_tes=tes.wempty_tes)
             qet1 = QET(l_fin=qet.l_fin, h_fin=qet.h_fin, TES=tes1, ahole=qet.ahole, ePQP=qet.ePQP,
                        eff_absb=qet.eff_absb, type_qp_eff=qet.type_qp_eff)
-            det1 = Detector(abso1, qet1, n_channel=det._n_channel, 
-                            freqs=det.freqs)
+            det1 = Detector(abso1, qet1, n_channel=det._n_channel, w_rail_main=det.w_rail_main, 
+                            w_railQET=det.w_railQET, bonding_pad_area=det.bonding_pad_area,
+                            freqs=det.freqs , equal_spaced=det.equal_spaced)
             if val == 'energy':
                 res[ii,jj] = det1.calc_res()
             elif val == 'eff':
