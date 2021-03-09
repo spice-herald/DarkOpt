@@ -168,7 +168,7 @@ class Detector:
         if ((absorber._shape == "square") | (absorber._shape == 'cube')): # New Square Rail Layout Design
             if passive == 1:
                 self._SA_passive = tes_passive + 2*(self._absorber._width - 2*self._absorber._w_safety)*self.w_rail_main \
-                                                + 2*one_alignment_window + self.bonding_pad_area
+                                                 + self.bonding_pad_area
             elif passive == 0:            
                 self._SA_passive = 0 # FOR THEORETICAL UNDERSTANDING, DELETE  
         
