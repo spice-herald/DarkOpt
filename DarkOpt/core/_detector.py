@@ -134,10 +134,10 @@ class Detector:
                 #print("---- Close Packed")
                 # Design is close packed. No vertical rail to QET
                 x_cell = a_cell / y_qet
-                a_passiveQET = x_qet*1.1* self.w_rail_main
+                a_passiveQET = x_cell* self.w_rail_main
                 self._close_packed = True
         else:
-            a_passiveQET = self._l_cell * self.w_rail_main
+            a_passiveQET = x_qet*1.1 * self.w_rail_main
 
         tes_passive = a_passiveQET * n_channel * tes.nTES
         
@@ -167,8 +167,9 @@ class Detector:
                                 + outer_vertical_rail + total_alignment + self.bonding_pad_area
         if ((absorber._shape == "square") | (absorber._shape == 'cube')): # New Square Rail Layout Design
             if passive == 1:
-                self._SA_passive = tes_passive + 2*(self._absorber._width - 2*self._absorber._w_safety)*self.w_rail_main \
-                                                + 2*one_alignment_window + self.bonding_pad_area
+#                 self._SA_passive = tes_passive + 2*(self._absorber._width - 2*self._absorber._w_safety)*self.w_rail_main \
+#                                                  + self.bonding_pad_area
+                self._SA_passive = tes_passive
             elif passive == 0:            
                 self._SA_passive = 0 # FOR THEORETICAL UNDERSTANDING, DELETE  
         
