@@ -252,7 +252,7 @@ class Detector:
     def calc_res(self):
         eres = qp.sim.energy_res_estimate(self.freqs, 
                                           self._t_pabsb, 
-                                          self.noise.s_ptot(),
+                                          self._n_channel*self.noise.s_ptot(),
                                           self._eEabsb)
         self.eres = eres
         return self.eres
