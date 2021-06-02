@@ -273,7 +273,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
             print(f"Overlap Width = {det1.QET.TES.w_overlap*1e6:.1f} [μm]")
         print(f"Fin Length = {res['x'][2]*1e6:.1f} [μm]")
         print(f"Fin Height = {det1.QET.h_fin*1e6:.1f} [μm]")
-        print(f"N Fins = {int(res['x'][3])}")
+        print(f"N Fins = {n_fin0}")
         print(f'Total Al surface coverage = {det1._fSA_qpabsorb*100:.3f} [%]')
         print(f'percent active Al = {det1.fSA_active*100:.3f} [%]')
         print(f'percent passive Al = {det1.fSA_passive*100:.3f} [%]')
