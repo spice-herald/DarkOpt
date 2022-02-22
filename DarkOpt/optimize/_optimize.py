@@ -77,7 +77,8 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
                       fix_w_overlap=True,
                       w_overlap_bounds = [4e-6, 50e-6], 
                       equal_spaced=True, 
-                      verbose=True):
+                      verbose=True,
+                      nTES=None):
     """
     Function to minimize the energy resolution of a detector object. The following
     parameters are DOF: 
@@ -243,7 +244,7 @@ def optimize_detector(tes_length0, tes_l_overlap0, l_fin0, n_fin0, per_Al, rn,
               veff_WFinCon=veff_WFinCon, con_type=con_type, material=material, 
               operating_point=operating_point, alpha=alpha, beta=beta, n=n, 
               Qp=Qp, t_mc=t_mc, l_c=l_c, w_overlap_stem=w_overlap_stem,  
-              l_overlap_pre_ellipse=l_overlap_pre_ellipse)
+              l_overlap_pre_ellipse=l_overlap_pre_ellipse, nTES=nTES)
     tes.w_overlap = w_overlap #forces it to be 'circle' if this is chosen
     
     qet = QET(l_fin=l_fin0, h_fin=h_fin, TES=tes, ahole=ahole, ePQP=ePQP,

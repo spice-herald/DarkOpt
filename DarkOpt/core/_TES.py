@@ -11,7 +11,7 @@ class TES:
                  w_overlap='circle', w_fin_con=2.5e-6, h=40e-9, veff_WAloverlap=0.45, veff_WFinCon=0.88, con_type='ellipse',
                  material=TESMaterial(), operating_point=0.3, alpha=None, beta=0, 
                  wempty_fin=6e-6, wempty_tes=6e-6, n=5, Qp=0, t_mc=10e-3, l_c=5e-6, 
-                 w_overlap_stem=4e-6,  l_overlap_pre_ellipse=2e-6):
+                 w_overlap_stem=4e-6,  l_overlap_pre_ellipse=2e-6, nTES=None):
         
         """
         length : float
@@ -89,9 +89,7 @@ class TES:
         self.h = h # thickness of the TES. limited by fabrication constraints + noise. same as matlab. 
         self.l = length # length of tes
         self.w = width # width of tes 
-        self.rn = rn
         self.fOp = operating_point # Operating Resistance/Normal Resistance ratio 
-        self.r0 = self.rn * self.fOp # operating resistance
         self.rsh = rsh
         self.rp = rp
         self.rl = rsh + rp
@@ -132,7 +130,15 @@ class TES:
         wTc_1090 = 1.4e-3 * self.tc / 68e-3  # [K], line 65-66 Tc_ResPt.m [Not Used in TES]
         self.wTc = material._wTc 
         self.material._gPep_v
-
+        
+        self.res1tes = self.resistivity*self.l/(self.w*self.h)
+        if nTES is None:
+            # Have a desired output resistance and optimise length to fix n_TES
+            self.nTES = m.ceil(self.resistivity * self.l  / (self.w * self.h * self.rn))
+        else:
+            self.nTES = nTES
+            self.rn = self.resistivity * self.l  / (self.w * self.h * self.nTES)
+        self.r0 = self.rn * self.fOp # operating resistance
         
         # need new estimate for "modern" fin connectors...
         # instead of l_overlap want r of fin... l_overlap = radius of circle
@@ -183,9 +189,7 @@ class TES:
         
         self.zeta = self.volume_TES/(self.volume + self.volume_TES)
         # Resistance of 1 TES 
-        self.res1tes = self.resistivity*self.l/(self.w*self.h)
-        # Have a desired output resistance and optimise length to fix n_TES.
-        self.nTES = m.ceil(self.resistivity * self.l  / (self.w * self.h * self.rn))
+        
         self.tot_volume = self.volume * self.nTES
         self.K = self.tot_volume * sigma
         
