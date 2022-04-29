@@ -42,7 +42,7 @@ setup(
     long_description_content_type='text/markdown',
     author="Caleb Fink", 
     author_email="cwfink@berkeley.edu", 
-    url="https://github.com/ucbpylegroup/DarkOpt", 
+    url="https://github.com/spice-herald/DarkOpt", 
     packages=find_packages(), 
     zip_safe=False,
     cmdclass={
