@@ -133,8 +133,12 @@ class TES:
         
         self.res1tes = self.resistivity*self.l/(self.w*self.h)
         if nTES is None:
-            # Have a desired output resistance and optimise length to fix n_TES
-            self.nTES = m.ceil(self.resistivity * self.l  / (self.w * self.h * self.rn))
+            if rn is not None:
+                self.rn = rn
+                # Have a desired output resistance and optimise length to fix n_TES
+                self.nTES = m.ceil(self.resistivity * self.l  / (self.w * self.h * self.rn))
+            else:
+                raise ValueError('must provide nTES or rn')
         else:
             self.nTES = nTES
             self.rn = self.resistivity * self.l  / (self.w * self.h * self.nTES)
